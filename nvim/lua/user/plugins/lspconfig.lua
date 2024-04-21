@@ -22,7 +22,10 @@ return {
       capabilities = capabilities,
       on_attach = function(client)
         client.resolved_capabilities.document_formatting = false
-    end,
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentFormattingRangeProvider = false
+
+      end,
       init_options = {
         plugins = {
           {
@@ -33,11 +36,42 @@ return {
         },
       },
       filetypes = {
-        "javascript",
-        "typescript",
-        "vue",
+        -- "javascript",
+        -- "typescript",
+        -- "vue",
+        "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "vue"
       },
     } )
+
+    -- HTML
+    local capabilities_html = vim.lsp.protocol.make_client_capabilities()
+    capabilities_html.textDocument.completion.completionItem.snippetSupport = true
+
+    require('lspconfig').html.setup({
+      capabilities = capabilities,
+    })
+
+    require('lspconfig').htmx.setup({
+      -- capabilities = capabilities,
+    })
+
+    -- Go Lang
+    require('lspconfig').gopls.setup({
+      capabilities = capabilities,
+      cmd = {"gopls"},
+      filetypes = { "go", "gomod", "gowork", "gotmpl" },
+      -- root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+      settings = {
+        gopls = {
+          completeUnimported = true,
+          usePlaceholders = true,
+          analyses = {
+            unusedparams = true,
+          },
+        },
+      },
+    })
+
     -- PHP
     require('lspconfig').intelephense.setup({
       commands = {
@@ -84,17 +118,56 @@ return {
       }
     })
 
+    local util = require 'lspconfig.util'
+    local function get_typescript_server_path(root_dir)
+
+      local global_ts = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
+      -- Alternative location if installed as root:
+      -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
+      local found_ts = ''
+      local function check_dir(path)
+        found_ts =  util.path.join(path, 'node_modules', 'typescript', 'lib')
+        if util.path.exists(found_ts) then
+          return path
+        end
+      end
+      if util.search_ancestors(root_dir, check_dir) then
+        return found_ts
+      else
+        return global_ts
+      end
+    end
     -- Vue, JavaScript, TypeScript
     require('lspconfig').volar.setup({
-      on_attach = function(client, bufnr)
+      on_attach = function(client)
         client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-
-        -- client.resolved_capabilities.document_formatting = false
-        -- if client.server_capabilities.inlayHintProvider then
-        --   vim.lsp.buf.inlay_hint(bufnr, true)
-        -- end
+        client.server_capabilities.documentFormattingRangeProvider = false
       end,
+     on_new_config = function(new_config, new_root_dir)
+        new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
+      end,
+      settings = {
+          css = {
+              lint = {
+                  unknownAtRules = "ignore",
+              },
+          },
+
+          scss = {
+              lint = {
+                  unknownAtRules = "ignore",
+              },
+          },
+      },
+      -- on_attach = function(client, bufnr)
+      --   client.server_capabilities.documentFormattingProvider = false
+      --   client.server_capabilities.documentRangeFormattingProvider = false
+
+      --   -- client.resolved_capabilities.document_formatting = false
+      --   -- if client.server_capabilities.inlayHintProvider then
+      --   --   vim.lsp.buf.inlay_hint(bufnr, true)
+      --   -- end
+      -- end,
        -- init_options = {
        --  typescript = {
        --    tsdk = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
@@ -108,6 +181,9 @@ return {
 
     -- Tailwind CSS
     require('lspconfig').tailwindcss.setup({ capabilities = capabilities })
+
+    -- Astro
+    require('lspconfig').astro.setup({ capabilities = capabilities })
 
     -- JSON
     require('lspconfig').jsonls.setup({
@@ -160,18 +236,25 @@ return {
     local null_ls = require('null-ls')
     local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
     null_ls.setup({
+      debug = true,
       temp_dir = '/tmp',
       sources = {
+        -- null_ls.builtins.formatting.gofmt,
+        -- null_ls.builtins.formatting.goimports_revisor,
+        null_ls.builtins.formatting.gofumpt,
+        null_ls.builtins.formatting.goimports_reviser,
+        null_ls.builtins.formatting.golines,
+
         null_ls.builtins.diagnostics.eslint_d.with({
           condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js' })
+            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.cjs' })
           end,
         }),
         -- null_ls.builtins.diagnostics.phpstan, -- TODO: Only if config file
         null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
         null_ls.builtins.formatting.eslint_d.with({
           condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json' })
+            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.cjs' })
           end,
         }),
         null_ls.builtins.formatting.pint.with({
@@ -181,8 +264,9 @@ return {
         }),
 
         null_ls.builtins.formatting.prettier.with({
-                      disabled_filetypes = { "vue" },
-
+          prefer_local = "node_modules/.bin",
+          -- disabled_filetypes = { "vue" },
+          extra_filetypes = {'astro'},
           condition = function(utils)
             return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs' })
           end,
@@ -198,6 +282,8 @@ return {
       on_attach = function(client, bufnr)
         if client.supports_method("textDocument/formatting") then
           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+          vim.api.nvim_buf_set_option(bufnr, "formatexpr", "")
+
           vim.api.nvim_create_autocmd("BufWritePre", {
             group = augroup,
             buffer = bufnr,
