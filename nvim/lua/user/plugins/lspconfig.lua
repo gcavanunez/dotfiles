@@ -30,7 +30,8 @@ return {
         plugins = {
           {
             name = "@vue/typescript-plugin",
-            location = "/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/typescript-plugin",
+            -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
+            location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/typescript-plugin",
             languages = {"javascript", "typescript", "vue"},
           },
         },
@@ -121,7 +122,7 @@ return {
     local util = require 'lspconfig.util'
     local function get_typescript_server_path(root_dir)
 
-      local global_ts = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
+      local global_ts = '/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
       -- Alternative location if installed as root:
       -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
       local found_ts = ''
