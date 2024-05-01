@@ -2,6 +2,7 @@ return {
   'nvim-telescope/telescope.nvim',
   dependencies = {
     'nvim-lua/plenary.nvim',
+    'ThePrimeagen/harpoon',
     'nvim-tree/nvim-web-devicons',
     'nvim-telescope/telescope-live-grep-args.nvim',
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
@@ -74,5 +75,15 @@ return {
     })
 
     require('telescope').load_extension('fzf')
+    require('telescope').load_extension('harpoon')
+
+    local mark = require("harpoon.mark")
+    local ui = require("harpoon.ui")
+
+    vim.keymap.set("n", "<leader>a", mark.add_file)
+    vim.keymap.set("n", "<C-p>", ui.toggle_quick_menu)
+    vim.keymap.set("n","<leader><Tab>", function() ui.nav_next() end)
+    vim.keymap.set("n","<leader><S-Tab>", function() ui.nav_prev() end)
+    vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
   end,
 }
