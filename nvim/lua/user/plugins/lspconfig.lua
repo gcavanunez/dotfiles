@@ -32,7 +32,7 @@ return {
             name = "@vue/typescript-plugin",
             -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
             location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/typescript-plugin",
-            languages = {"javascript", "typescript", "vue"},
+            languages = {"vue"},
           },
         },
       },
@@ -140,26 +140,26 @@ return {
     end
     -- Vue, JavaScript, TypeScript
     require('lspconfig').volar.setup({
-      on_attach = function(client)
+      on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentFormattingRangeProvider = false
       end,
-     on_new_config = function(new_config, new_root_dir)
-        new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
-      end,
-      settings = {
-          css = {
-              lint = {
-                  unknownAtRules = "ignore",
-              },
-          },
+     -- on_new_config = function(new_config, new_root_dir)
+     --    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
+     --  end,
+      -- settings = {
+      --     css = {
+      --         lint = {
+      --             unknownAtRules = "ignore",
+      --         },
+      --     },
 
-          scss = {
-              lint = {
-                  unknownAtRules = "ignore",
-              },
-          },
-      },
+      --     scss = {
+      --         lint = {
+      --             unknownAtRules = "ignore",
+      --         },
+      --     },
+      -- },
       -- on_attach = function(client, bufnr)
       --   client.server_capabilities.documentFormattingProvider = false
       --   client.server_capabilities.documentRangeFormattingProvider = false

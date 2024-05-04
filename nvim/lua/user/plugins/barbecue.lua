@@ -8,4 +8,10 @@ return {
   opts = {
     theme = 'tokyonight',
   },
+  config = function()
+    -- local breadcrumbs = function(client, bufnr)
+    --   if client.name == "volar" then
+    --       return
+    --   end
+  end
 }

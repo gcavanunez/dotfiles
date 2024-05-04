@@ -129,6 +129,9 @@ require("lazy").setup({
 
   -- Highlight occurrences of the word under the cursor.
   { import = 'user.plugins.illuminate' },
+
+  -- Nicer Code folding.
+  { import = 'user.plugins.ufo' },
 }, {
   checker = {
     enabled = true,
