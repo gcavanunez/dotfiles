@@ -13,3 +13,6 @@ ln -s $DOTFILES/alacritty $HOME/.config/alacritty
 # Kitty
 rm -rf $HOME/.config/kitty
 ln -s $DOTFILES/kitty $HOME/.config/kitty
+
+# Tmux
+ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
