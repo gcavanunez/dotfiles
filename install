@@ -2,8 +2,14 @@
 
 DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
+# nvim
 rm -rf $HOME/.config/nvim
 ln -s $DOTFILES/nvim $HOME/.config/nvim
 
+# Alacritty
 rm -rf $HOME/.config/alacritty
 ln -s $DOTFILES/alacritty $HOME/.config/alacritty
+
+# Kitty
+rm -rf $HOME/.config/kitty
+ln -s $DOTFILES/kitty $HOME/.config/kitty
