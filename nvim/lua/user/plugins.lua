@@ -18,6 +18,7 @@ require("lazy").setup({
   { import = 'user.plugins.poimandres' },
   { import = 'user.plugins.nord' },
   { import = 'user.plugins.vesper' },
+  { import = 'user.plugins.mellow' },
 
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
@@ -141,6 +142,10 @@ require("lazy").setup({
     notify = false,
   },
   install = {
+    -- colorscheme = { "mellow", "habamax" },
     colorscheme = { "tokyonight", "habamax" },
   },
 })
+
+vim.cmd('colorscheme tokyonight')
+
