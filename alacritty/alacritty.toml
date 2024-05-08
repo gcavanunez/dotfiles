@@ -1,8 +1,8 @@
-# import = ["~/.config/alacritty/themes/nord.toml"]
+import = ["~/.config/alacritty/themes/nord.toml"]
 # import = ["~/.config/alacritty/themes/cappuchin-mocha.toml"]
 # import = ["~/.config/alacritty/themes/tokyo-night.toml"]
 # import = ["~/.config/alacritty/themes/mellow.toml"]
-import = ["~/.config/alacritty/themes/tokyo.toml"]
+# import = ["~/.config/alacritty/themes/tokyo.toml"]
 
 
 
@@ -16,7 +16,7 @@ size = 16
 # size = 12.0
 
 [font.offset]
-# y=2
+# y=32
 
 [font.bold]
 # family = "BlexMono Nerd Font Mono"

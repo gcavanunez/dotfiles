@@ -18,6 +18,11 @@ return {
     require('mason-lspconfig').setup({ automatic_installation = true })
 
     local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+    local mason_registry = require("mason-registry")
+    local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
+    -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
+
     require('lspconfig').tsserver.setup( {
       capabilities = capabilities,
       on_attach = function(client)
@@ -31,7 +36,9 @@ return {
           {
             name = "@vue/typescript-plugin",
             -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
-            location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/typescript-plugin",
+            -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
+            location = vue_language_server_path,
+
             languages = {"vue"},
           },
         },
@@ -120,30 +127,35 @@ return {
     })
 
     local util = require 'lspconfig.util'
-    local function get_typescript_server_path(root_dir)
-
-      local global_ts = '/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
-      -- Alternative location if installed as root:
-      -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
-      local found_ts = ''
-      local function check_dir(path)
-        found_ts =  util.path.join(path, 'node_modules', 'typescript', 'lib')
-        if util.path.exists(found_ts) then
-          return path
-        end
-      end
-      if util.search_ancestors(root_dir, check_dir) then
-        return found_ts
-      else
-        return global_ts
-      end
-    end
+    -- local function get_typescript_server_path(root_dir)
+    --   local global_ts = '/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
+    --   -- Alternative location if installed as root:
+    --   -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
+    --   local found_ts = ''
+    --   local function check_dir(path)
+    --     found_ts =  util.path.join(path, 'node_modules', 'typescript', 'lib')
+    --     if util.path.exists(found_ts) then
+    --       return path
+    --     end
+    --   end
+    --   if util.search_ancestors(root_dir, check_dir) then
+    --     return found_ts
+    --   else
+    --     return global_ts
+    --   end
+    -- end
     -- Vue, JavaScript, TypeScript
     require('lspconfig').volar.setup({
-      on_attach = function(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentFormattingRangeProvider = false
-      end,
+      capabilities = capabilities,
+    })
+
+    -- require('lspconfig').volar.setup({
+    --   on_attach = function(client, bufnr)
+    --     client.server_capabilities.documentFormattingProvider = false
+    --     client.server_capabilities.documentFormattingRangeProvider = false
+    --   end,
+    --   capabilities = capabilities,
+    --   filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
      -- on_new_config = function(new_config, new_root_dir)
      --    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
      --  end,
@@ -174,11 +186,9 @@ return {
        --    tsdk = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
        --  }
       -- },
-      capabilities = capabilities,
       -- Enable "Take Over Mode" where volar will provide all JS/TS LSP services
       -- This drastically improves the responsiveness of diagnostic updates on change
-      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
-    })
+    -- })
 
     -- Tailwind CSS
     require('lspconfig').tailwindcss.setup({ capabilities = capabilities })

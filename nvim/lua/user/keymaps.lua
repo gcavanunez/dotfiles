@@ -8,12 +8,16 @@ vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
 -- Close all open buffers.
 vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
 
+-- Close all open buffers.
+vim.keymap.set('n', '<leader>w', ':close<CR>')
+
 -- Allow gf to open non-existent files.
 vim.keymap.set('', 'gf', ':edit <cfile><CR>')
 
 -- Reselect visual selection after indenting.
 vim.keymap.set('v', '<', '<gv')
 vim.keymap.set('v', '>', '>gv')
+-- vim.keymap.set('v', 'p', '\\_dP')
 
 -- Maintain the cursor position when yanking a visual selection.
 -- http://ddrscott.github.io/blog/2016/yank-without-jank/
