@@ -5,10 +5,32 @@ vim.g.maplocalleader = ' '
 -- Quickly clear search highlighting.
 vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
 
+local change_font_script = [[
+  FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
+
+# Check if the resolved file exists
+  if [ ! -f "$FILE" ]; then
+      echo "Error: The file '$FILE' does not exist."
+      exit 1
+  fi
+
+# Check if the file contains 'size = 15'
+  if grep -q 'size = 16' "$FILE"; then
+      echo "Changing 'size = 16' to 'size = 22'"
+      gsed -i 's/size = 16/size = 22/g' "$FILE"
+# Check if the file contains 'size = 22'
+  elif grep -q 'size = 22' "$FILE"; then
+      echo "Changing 'size = 22' to 'size = 16'"
+      gsed -i 's/size = 22/size = 16/g' "$FILE"
+  else
+      echo "No changes made. The file does not contain 'size = 15' or 'size = 22'."
+  fi
+]]
 -- Quickly clear search highlighting.
 vim.keymap.set('n', '<leader>KK', function()
   -- vim.cmd('silent !~/change_font_size.sh')
-  vim.cmd('silent !zsh -ic "toggle_font"')
+  -- vim.cmd('silent !zsh -ic "toggle_font"')
+  vim.fn.system('bash -c ' .. vim.fn.shellescape(change_font_script))
 end, {desc = 'Change font size in Alacritty config'})
 
 -- Close all open buffers.

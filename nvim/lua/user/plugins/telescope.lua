@@ -68,6 +68,7 @@ return {
         },
         oldfiles = {
           prompt_title = 'History',
+          cwd_only = true,
         },
         lsp_references = {
           previewer = false,
@@ -78,11 +79,17 @@ return {
         lsp_document_symbols = {
           symbol_width = 55,
         },
+        git_status = {
+          previewer = true
+        }
       },
     })
 
     require('telescope').load_extension('fzf')
     require('telescope').load_extension('harpoon')
+
+    local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
+    vim.keymap.set("v", "<leader>H", live_grep_args_shortcuts.grep_visual_selection)
 
     local mark = require("harpoon.mark")
     local ui = require("harpoon.ui")
