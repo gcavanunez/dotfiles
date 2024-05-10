@@ -5,6 +5,12 @@ vim.g.maplocalleader = ' '
 -- Quickly clear search highlighting.
 vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
 
+-- Quickly clear search highlighting.
+vim.keymap.set('n', '<leader>KK', function()
+  -- vim.cmd('silent !~/change_font_size.sh')
+  vim.cmd('silent !zsh -ic "toggle_font"')
+end, {desc = 'Change font size in Alacritty config'})
+
 -- Close all open buffers.
 vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
 

@@ -26,6 +26,9 @@ require("lazy").setup({
   -- Add, change, and delete surrounding text.
   { 'tpope/vim-surround' },
 
+  -- https://github.com/mg979/vim-visual-multi
+  { 'mg979/vim-visual-multi' },
+
   -- Useful commands like :Rename and :SudoWrite.
   { 'tpope/vim-eunuch' },
 
