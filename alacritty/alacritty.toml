@@ -16,26 +16,30 @@ size = 16
 # size = 12.0
 
 [font.offset]
-# y=32
+# y=8
+# y=24
 
 [font.bold]
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
-family = "FiraCode Nerd Font Mono"
+# family = "FiraCode Nerd Font Mono"
+family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
-family = "FiraCode Nerd Font Mono"
+# family = "FiraCode Nerd Font Mono"
+family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Italic"
 
 [font.normal]
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
-family = "FiraCode Nerd Font Mono"
+# family = "FiraCode Nerd Font Mono"
+family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Regular"
 
@@ -44,11 +48,12 @@ history = 100000
 multiplier = 3
 
 [window]
+dynamic_padding = false
 decorations = "full"
 dynamic_title = false
 opacity = 1
 title = "👨‍💻"
 
 [window.padding]
-# x = 6
-# y = 6
+x = 0
+y = 0
