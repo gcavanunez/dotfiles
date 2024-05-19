@@ -57,7 +57,7 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
 -- Paste replace visual selection without copying it.
-vim.keymap.set('v', 'p', '"_dP')
+vim.keymap.set('v', '<leader>p', '"_dP')
 
 -- Easy insertion of a trailing ; or , from insert mode.
 vim.keymap.set('i', ';;', '<Esc>A;<Esc>')
@@ -76,7 +76,7 @@ vim.keymap.set('n', '<C-Down>', ':resize -2<CR>')
 vim.keymap.set('n', '<C-Left>', ':vertical resize -2<CR>')
 vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>')
 
-vim.keymap.set("n", "]g", vim.diagnostic.goto_next)
+vim.keymap.set('n', ']g', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<leader>S', ':noa w<CR>')
 
 -- vim.keymap.set("n", "[g", vim.diagnostic.goto_prev)
