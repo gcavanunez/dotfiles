@@ -20,26 +20,35 @@ size = 16
 # y=24
 
 [font.bold]
+family = "JetBrainsMono Nerd Font"
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
 # family = "FiraCode Nerd Font Mono"
-family = "MonaspiceKr Nerd Font"
+# family = "MonaspiceNe Nerd Font"
+# family = "MonaspiceAr Nerd Font"
+# family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
+family = "JetBrainsMono Nerd Font"
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
 # family = "FiraCode Nerd Font Mono"
-family = "MonaspiceKr Nerd Font"
+# family = "MonaspiceNe Nerd Font"
+# family = "MonaspiceAr Nerd Font"
+# family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Italic"
 
 [font.normal]
+family = "JetBrainsMono Nerd Font"
 # family = "BlexMono Nerd Font Mono"
 # family = "GeistMono Nerd Font"
 # family = "FiraCode Nerd Font Mono"
-family = "MonaspiceKr Nerd Font"
+# family = "MonaspiceNe Nerd Font"
+# family = "MonaspiceAr Nerd Font"
+# family = "MonaspiceKr Nerd Font"
 # family = "Hack Nerd Font Mono"
 style = "Regular"
 
