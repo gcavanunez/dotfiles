@@ -1,20 +1,19 @@
-# import = ["~/.config/alacritty/themes/nord.toml"]
-import = ["~/.config/alacritty/themes/nvim-tokyo-moon.toml"]
+import = ["~/.config/alacritty/themes/nord.toml"]
+# import = ["~/.config/alacritty/themes/nvim-tokyo-moon.toml"]
 # import = ["~/.config/alacritty/themes/cappuchin-mocha.toml"]
 # import = ["~/.config/alacritty/themes/tokyo-night-storm.toml"]
 # import = ["~/.config/alacritty/themes/tokyo-night.toml"]
 # import = ["~/.config/alacritty/themes/mellow.toml"]
 # import = ["~/.config/alacritty/themes/tokyo.toml"]
 
-
-
-# [env]
-# TERM = "xterm-256color"
+[env]
+TERM = "xterm-256color"
 
 [font]
 # size = 14.0
 # size = 18.0
 size = 16
+# size = 14
 # size = 12.0
 
 [font.offset]

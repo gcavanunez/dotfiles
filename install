@@ -16,3 +16,8 @@ ln -s $DOTFILES/kitty $HOME/.config/kitty
 
 # Tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+
+# https://gist.github.com/dhh/159b129f511f76db3ae8adb463f70d05
+# zellij
+rm -rf $HOME/.config/zellij
+ln -sf $DOTFILES/zellij $HOME/.config/zellij
