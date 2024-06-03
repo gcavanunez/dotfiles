@@ -63,7 +63,7 @@ return {
       -- capabilities = capabilities,
     })
 
-    -- Go Lang
+    -- GoLang
     require('lspconfig').gopls.setup({
       capabilities = capabilities,
       cmd = {"gopls"},
@@ -78,6 +78,11 @@ return {
           },
         },
       },
+    })
+
+    -- Elixir
+    require('lspconfig').lexical.setup({
+      -- capabilities = capabilities,
     })
 
     -- PHP

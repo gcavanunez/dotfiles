@@ -9,6 +9,7 @@ return {
     options = {
       indicator = {
         icon = ' ',
+        style = 'underline'
       },
       show_close_icon = false,
       tab_size = 0,
