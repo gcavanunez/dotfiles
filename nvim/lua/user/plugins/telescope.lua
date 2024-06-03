@@ -19,6 +19,29 @@ return {
   config = function ()
     local actions = require('telescope.actions')
 
+    local previewers = require('telescope.previewers')
+
+    local delta = previewers.new_termopen_previewer {
+      get_command = function(entry)
+        -- this is for status
+        -- You can get the AM things in entry.status. So we are displaying file if entry.status == '??' or 'A '
+        -- just do an if and return a different command
+        if entry.status == '??' or 'A ' then
+          return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value}
+        end
+
+        -- note we can't use pipes
+        -- this command is for git_commits and git_bcommits
+        return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value .. '^!'}
+
+      end
+    }
+    -- local delta = previewers.new_termopen_previewer {
+    --   get_command = function(entry)
+    --     return { 'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value .. '^!', '--', entry.current_file }
+    --   end
+    -- }
+
     require('telescope').setup({
       defaults = {
         path_display = { truncate = 1 },
@@ -37,6 +60,10 @@ return {
             ['<S-Down>'] = actions.cycle_history_next,
             ['<S-Up>'] = actions.cycle_history_prev,
           },
+        },
+        set_env = {
+          LESS = '',
+          DELTA_PAGER = 'less',
         },
         file_ignore_patterns = { '.git/' },
       },
@@ -61,10 +88,10 @@ return {
           hidden = true,
         },
         buffers = {
-          previewer = false,
-          layout_config = {
-            width = 80,
-          },
+          previewer = true,
+          -- layout_config = {
+          --   width = 80,
+          -- },
         },
         oldfiles = {
           prompt_title = 'History',
@@ -80,9 +107,14 @@ return {
           symbol_width = 55,
         },
         git_status = {
-          previewer = true
+          previewer = delta
         }
       },
+      -- builtin = {
+      --   git_status = {
+      --     previewer = delta
+      --   },
+      -- }
     })
 
     require('telescope').load_extension('fzf')
@@ -99,5 +131,7 @@ return {
     vim.keymap.set("n","<leader><Tab>", function() ui.nav_next() end)
     vim.keymap.set("n","<leader><S-Tab>", function() ui.nav_prev() end)
     vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
+
+
   end,
 }
