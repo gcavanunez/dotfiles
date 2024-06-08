@@ -11,6 +11,7 @@ return {
         icon = ' ',
         style = 'underline'
       },
+      -- always_show_bufferline = false,
       show_close_icon = false,
       tab_size = 0,
       max_name_length = 25,

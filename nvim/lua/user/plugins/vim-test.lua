@@ -8,9 +8,11 @@ return {
     { '<Leader>tv', ':TestVisit<CR>' },
   },
   dependencies = { 'voldikss/vim-floaterm' },
-  -- config = function()
-  --   vim.cmd([[let test#strategy = 'neovim_sticky']])
-  -- end,
+  config = function()
+    vim.cmd([[let test#strategy = 'neovim']])
+    -- vim.cmd([[let test#neovim#term_position = 'vert']])
+    vim.cmd([[let g:test#php#phpunit#executable = "./vendor/bin/phpunit"]])
+  end,
   -- config = function()
   --   vim.cmd([[
   --     " let test#php#phpunit#options = '--colors=always'

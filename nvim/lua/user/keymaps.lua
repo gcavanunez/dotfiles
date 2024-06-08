@@ -57,12 +57,18 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
 -- Paste replace visual selection without copying it.
-vim.keymap.set('v', '<leader>p', '"_dP')
+-- vim.keymap.set('v', 'p', '"_dP', { noremap = true })
+-- primeagen
+-- vim.keymap.set("x", "<leader>p", [["_dP]])
+-- this is way better
+vim.keymap.set({ "n", "x" }, "<leader>p", [["0p]], { desc = "paste from yank register" })
 
 -- Easy insertion of a trailing ; or , from insert mode.
 vim.keymap.set('i', ';;', '<Esc>A;<Esc>')
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('i', ',,', '<Esc>A,<Esc>')
+
+
 
 -- Open the current file in the default program (on Mac this should just be just `open`).
 vim.keymap.set('n', '<leader>x', ':!xdg-open %<cr><cr>')
@@ -91,3 +97,15 @@ vim.keymap.set('n', '<A-j>', ':move .+1<CR>==')
 vim.keymap.set('n', '<A-k>', ':move .-2<CR>==')
 vim.keymap.set('v', '<A-j>', ":move '>+1<CR>gv=gv")
 vim.keymap.set('v', '<A-k>', ":move '<-2<CR>gv=gv")
+
+-- https://www.lazyvim.org/configuration/tips
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+
+-- Move down and center.
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { noremap = true })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { noremap = true })
+
+vim.api.nvim_set_keymap('n', '<leader>kr', ':%s//', { noremap = true, silent = false })

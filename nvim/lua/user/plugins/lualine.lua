@@ -7,16 +7,17 @@ return {
   },
   opts = {
     options = {
-      section_separators = '',
-      component_separators = '',
+      -- section_separators = '',
+      -- component_separators = '',
       globalstatus = true,
-      theme = {
-        normal = {
-          a = 'StatusLine',
-          b = 'StatusLine',
-          c = 'StatusLine',
-        },
-      },
+      theme = "auto"
+      -- theme = {
+      --   normal = {
+      --     a = 'StatusLine',
+      --     b = 'StatusLine',
+      --     c = 'StatusLine',
+      --   },
+      -- },
     },
     sections = {
       lualine_a = {
@@ -34,7 +35,19 @@ return {
         { 'diagnostics', sources = { 'nvim_diagnostic' } },
       },
       lualine_c = {
-        'filename'
+        { 'filename', path = 1 },
+        -- require("lualine_require").root_dir(),
+        -- {
+        --   "diagnostics",
+        --   symbols = {
+        --     -- error = require("lazy.config").icons..diagnostics.Error,
+        --     -- warn = require("lazy.config").icons.diagnostics.Warn,
+        --     -- info = require("lazy.config").icons.diagnostics.Info,
+        --     -- hint = iconsrequire("lazy.config").icons.diagnostics.Hint,
+        --   },
+        -- },
+        -- { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
+        -- { vim.lualine.pretty_path() },
       },
       lualine_x = {
         {
@@ -56,5 +69,6 @@ return {
         'progress',
       },
     },
+    extensions = { "neo-tree", "lazy" },
   },
 }

@@ -63,7 +63,7 @@ require("lazy").setup({
   { 'windwp/nvim-autopairs', config = true },
 
   -- Add smooth scrolling to avoid jarring jumps
-  { 'karb94/neoscroll.nvim', config = true },
+  -- { 'karb94/neoscroll.nvim', config = true },
 
   -- All closing buffers without closing the split window.
   { import = 'user.plugins.bufdelete' },
@@ -103,6 +103,11 @@ require("lazy").setup({
 
   -- Improved syntax highlighting
   { import = 'user.plugins.treesitter' },
+
+  -- Debugging
+  -- {
+  --   "mfussenegger/nvim-dap",
+  -- }
 
   -- Language Server Protocol.
   { import = 'user.plugins.lspconfig' },

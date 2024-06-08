@@ -130,7 +130,7 @@ return {
     vim.keymap.set("n", "<C-p>", ui.toggle_quick_menu)
     vim.keymap.set("n","<leader><Tab>", function() ui.nav_next() end)
     vim.keymap.set("n","<leader><S-Tab>", function() ui.nav_prev() end)
-    vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
+    -- vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
 
 
   end,
