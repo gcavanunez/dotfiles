@@ -1,6 +1,6 @@
-import = ["~/.config/alacritty/themes/nord.toml"]
+# import = ["~/.config/alacritty/themes/nord.toml"]
 # import = ["~/.config/alacritty/themes/nvim-tokyo-moon.toml"]
-# import = ["~/.config/alacritty/themes/cappuchin-mocha.toml"]
+import = ["~/.config/alacritty/themes/cappuchin-mocha.toml"]
 # import = ["~/.config/alacritty/themes/tokyo-night-storm.toml"]
 # import = ["~/.config/alacritty/themes/tokyo-night.toml"]
 # import = ["~/.config/alacritty/themes/mellow.toml"]

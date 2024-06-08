@@ -107,7 +107,11 @@ return {
           symbol_width = 55,
         },
         git_status = {
-          previewer = delta
+          previewer = delta,
+          layout_config = {
+            -- vertical = { width = 0.5 }
+            width = 140,
+          },
         }
       },
       -- builtin = {
