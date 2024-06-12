@@ -104,6 +104,7 @@ require("lazy").setup({
   -- Improved syntax highlighting
   { import = 'user.plugins.treesitter' },
 
+
   -- Debugging
   -- {
   --   "mfussenegger/nvim-dap",
@@ -138,6 +139,12 @@ require("lazy").setup({
 
   -- Highlight occurrences of the word under the cursor.
   { import = 'user.plugins.illuminate' },
+
+  -- trouble
+  { import = 'user.plugins.trouble' },
+
+  -- trouble
+  { import = 'user.plugins.text-case' },
 
   -- Nicer Code folding.
   { import = 'user.plugins.ufo' },
