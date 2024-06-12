@@ -86,6 +86,8 @@ vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>')
 vim.keymap.set('n', ']g', function()
   vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
 end, { desc = "Go to next diagnostic warning" })
+vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
 
 vim.keymap.set('n', '<leader>S', ':noa w<CR>')
 
