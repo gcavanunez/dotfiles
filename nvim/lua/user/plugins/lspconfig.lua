@@ -25,12 +25,12 @@ return {
 
     require('lspconfig').tsserver.setup( {
       capabilities = capabilities,
-      on_attach = function(client)
-        client.resolved_capabilities.document_formatting = false
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentFormattingRangeProvider = false
+      -- on_attach = function(client)
+      --   client.resolved_capabilities.document_formatting = false
+      --   client.server_capabilities.documentFormattingProvider = false
+      --   client.server_capabilities.documentFormattingRangeProvider = false
 
-      end,
+      -- end,
       init_options = {
         plugins = {
           {
