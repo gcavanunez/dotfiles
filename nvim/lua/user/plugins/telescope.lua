@@ -13,7 +13,8 @@ return {
     { '<leader>b', function() require('telescope.builtin').buffers() end },
     { '<leader>g', function() require('telescope').extensions.live_grep_args.live_grep_args() end },
     { '<leader>h', function() require('telescope.builtin').oldfiles() end },
-    { '<leader>s', function() require('telescope.builtin').lsp_document_symbols() end },
+    { '<leader>ss', function() require('telescope.builtin').lsp_document_symbols() end },
+    { '<leader>sS', function() require('telescope.builtin').lsp_dynamic_workspace_symbols() end },
     { '<leader>G', function() require('telescope.builtin').git_status() end },
   },
   config = function ()

@@ -146,6 +146,9 @@ require("lazy").setup({
   -- trouble
   { import = 'user.plugins.text-case' },
 
+  -- undotree
+  { import = 'user.plugins.undotree' },
+
   -- Nicer Code folding.
   { import = 'user.plugins.ufo' },
 }, {
