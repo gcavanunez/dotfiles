@@ -25,12 +25,12 @@ return {
 
     require('lspconfig').tsserver.setup( {
       capabilities = capabilities,
-      -- on_attach = function(client)
-      --   client.resolved_capabilities.document_formatting = false
-      --   client.server_capabilities.documentFormattingProvider = false
-      --   client.server_capabilities.documentFormattingRangeProvider = false
+      on_attach = function(client)
+        -- client.resolved_capabilities.document_formatting = false
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentFormattingRangeProvider = false
 
-      -- end,
+      end,
       init_options = {
         plugins = {
           {
@@ -257,18 +257,19 @@ return {
       sources = {
         -- null_ls.builtins.formatting.gofmt,
         -- null_ls.builtins.formatting.goimports_revisor,
+
         null_ls.builtins.formatting.gofumpt,
-        null_ls.builtins.formatting.goimports_reviser,
+        -- null_ls.builtins.formatting.goimports_reviser,
         null_ls.builtins.formatting.golines,
 
-        null_ls.builtins.diagnostics.eslint_d.with({
+        null_ls.builtins.diagnostics.eslint.with({
           condition = function(utils)
             return utils.root_has_file({ '.eslintrc.js', '.eslintrc.cjs' })
           end,
         }),
         -- null_ls.builtins.diagnostics.phpstan, -- TODO: Only if config file
         null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
-        null_ls.builtins.formatting.eslint_d.with({
+        null_ls.builtins.formatting.eslint.with({
           condition = function(utils)
             return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.cjs' })
           end,

@@ -87,6 +87,7 @@ return {
       pickers = {
         find_files = {
           hidden = true,
+          previewer = false,
         },
         buffers = {
           previewer = true,
