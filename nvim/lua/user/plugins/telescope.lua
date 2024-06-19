@@ -3,6 +3,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'ThePrimeagen/harpoon',
+    'ahmedkhalf/project.nvim',
     'nvim-tree/nvim-web-devicons',
     'nvim-telescope/telescope-live-grep-args.nvim',
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
@@ -143,5 +144,7 @@ return {
     -- vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
 
 
+    require('telescope').load_extension('projects')
+    require("project_nvim").setup()
   end,
 }

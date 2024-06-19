@@ -31,7 +31,7 @@ vim.keymap.set('n', '<leader>KK', function()
   -- vim.cmd('silent !~/change_font_size.sh')
   -- vim.cmd('silent !zsh -ic "toggle_font"')
   vim.fn.system('bash -c ' .. vim.fn.shellescape(change_font_script))
-end, {desc = 'Change font size in Alacritty config'})
+end, {desc = 'Change font size in Alacritty config', noremap = true, silent = false})
 
 -- Close all open buffers.
 vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
