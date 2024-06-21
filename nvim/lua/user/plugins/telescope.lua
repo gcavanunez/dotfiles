@@ -23,21 +23,21 @@ return {
 
     local previewers = require('telescope.previewers')
 
-    local delta = previewers.new_termopen_previewer {
-      get_command = function(entry)
-        -- this is for status
-        -- You can get the AM things in entry.status. So we are displaying file if entry.status == '??' or 'A '
-        -- just do an if and return a different command
-        if entry.status == '??' or 'A ' then
-          return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value}
-        end
+    -- local delta = previewers.new_termopen_previewer {
+    --   get_command = function(entry)
+    --     -- this is for status
+    --     -- You can get the AM things in entry.status. So we are displaying file if entry.status == '??' or 'A '
+    --     -- just do an if and return a different command
+    --     if entry.status == '??' or 'A ' then
+    --       return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value}
+    --     end
 
-        -- note we can't use pipes
-        -- this command is for git_commits and git_bcommits
-        return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value .. '^!'}
+    --     -- note we can't use pipes
+    --     -- this command is for git_commits and git_bcommits
+    --     return {'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value .. '^!'}
 
-      end
-    }
+    --   end
+    -- }
     -- local delta = previewers.new_termopen_previewer {
     --   get_command = function(entry)
     --     return { 'git', '-c', 'core.pager=delta', '-c', 'delta.side-by-side=false', 'diff', entry.value .. '^!', '--', entry.current_file }
@@ -89,6 +89,9 @@ return {
         find_files = {
           hidden = true,
           previewer = false,
+          layout_config = {
+            width = 120,
+          },
         },
         buffers = {
           previewer = true,
@@ -110,7 +113,7 @@ return {
           symbol_width = 55,
         },
         git_status = {
-          previewer = delta,
+          -- previewer = delta,
           layout_config = {
             -- vertical = { width = 0.5 }
             width = 140,
