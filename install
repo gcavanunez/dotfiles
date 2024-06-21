@@ -21,3 +21,6 @@ ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 # zellij
 rm -rf $HOME/.config/zellij
 ln -sf $DOTFILES/zellij $HOME/.config/zellij
+
+# Starship
+ln -sf $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
