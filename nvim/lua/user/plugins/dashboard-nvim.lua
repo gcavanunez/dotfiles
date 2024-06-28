@@ -36,5 +36,29 @@ return {
     vim.api.nvim_set_hl(0, 'DashboardIcon', { fg = '#bd93f9' })
     vim.api.nvim_set_hl(0, 'DashboardKey', { fg = '#6272a4' })
     vim.api.nvim_set_hl(0, 'DashboardFooter', { fg = '#6272a4' })
+
+    -- https://github.com/nvimdev/dashboard-nvim/issues/372#issuecomment-1975279729
+    vim.defer_fn(
+      function ()
+        vim.api.nvim_create_autocmd(
+          'BufDelete',
+          {
+            group    = vim.api.nvim_create_augroup('open-dashboard-after-last-buffer-close', { clear = true }),
+            callback = function (event)
+              for buf = 1, vim.fn.bufnr('$') do
+                if buf ~= event.buf and vim.fn.buflisted(buf) == 1 then
+                  if vim.api.nvim_buf_get_name(buf) ~= '' and vim.bo[buf].filetype ~= 'dashboard' then
+                    return
+                  end
+                end
+              end
+
+              vim.cmd('Dashboard')
+            end,
+          }
+        )
+      end,
+      0
+    )
   end,
 }

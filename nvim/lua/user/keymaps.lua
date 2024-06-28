@@ -14,17 +14,17 @@ local change_font_script = [[
       exit 1
   fi
 
-# Check if the file contains 'size = 15'
-  if grep -q 'size = 16' "$FILE"; then
-      echo "Changing 'size = 16' to 'size = 22'"
-      gsed -i 's/size = 16/size = 22/g' "$FILE"
-# Check if the file contains 'size = 22'
-  elif grep -q 'size = 22' "$FILE"; then
-      echo "Changing 'size = 22' to 'size = 16'"
-      gsed -i 's/size = 22/size = 16/g' "$FILE"
-  else
-      echo "No changes made. The file does not contain 'size = 15' or 'size = 22'."
-  fi
+    # Check if the file contains 'size = 16'
+    if grep -q 'size = 16' "$FILE"; then
+        echo "Changing 'size = 16' to 'size = 22'"
+        sed -i '' 's/size = 16/size = 22/g' "$FILE"
+    # Check if the file contains 'size = 22'
+    elif grep -q 'size = 22' "$FILE"; then
+        echo "Changing 'size = 22' to 'size = 16'"
+        sed -i '' 's/size = 22/size = 16/g' "$FILE"
+    else
+        echo "No changes made. The file does not contain 'size = 16' or 'size = 22'."
+    fi
 ]]
 -- Quickly clear search highlighting.
 vim.keymap.set('n', '<leader>KK', function()

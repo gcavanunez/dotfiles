@@ -90,14 +90,11 @@ return {
           hidden = true,
           previewer = false,
           layout_config = {
-            width = 120,
+            width = 80,
           },
         },
         buffers = {
           previewer = true,
-          -- layout_config = {
-          --   width = 80,
-          -- },
         },
         oldfiles = {
           prompt_title = 'History',
