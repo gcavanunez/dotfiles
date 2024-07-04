@@ -5,8 +5,8 @@ return {
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'b0o/schemastore.nvim',
-    { 'jose-elias-alvarez/null-ls.nvim', dependencies = 'nvim-lua/plenary.nvim' },
-    'jayp0521/mason-null-ls.nvim',
+    -- { 'jose-elias-alvarez/null-ls.nvim', dependencies = 'nvim-lua/plenary.nvim' },
+    -- 'jayp0521/mason-null-ls.nvim',
   },
   config = function()
     -- Setup Mason to automatically install LSP servers
@@ -249,70 +249,70 @@ return {
     })
 
     -- null-ls
-    local null_ls = require('null-ls')
-    local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-    null_ls.setup({
-      debug = true,
-      temp_dir = '/tmp',
-      sources = {
-        -- null_ls.builtins.formatting.gofmt,
-        -- null_ls.builtins.formatting.goimports_revisor,
+    --local null_ls = require('null-ls')
+    --local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+    --null_ls.setup({
+    --  debug = true,
+    --  temp_dir = '/tmp',
+    --  sources = {
+    --    -- null_ls.builtins.formatting.gofmt,
+    --    -- null_ls.builtins.formatting.goimports_revisor,
 
-        null_ls.builtins.formatting.gofumpt,
-        -- null_ls.builtins.formatting.goimports_reviser,
-        null_ls.builtins.formatting.golines,
+    --    null_ls.builtins.formatting.gofumpt,
+    --    -- null_ls.builtins.formatting.goimports_reviser,
+    --    null_ls.builtins.formatting.golines,
 
-        null_ls.builtins.diagnostics.eslint.with({
-          condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.cjs' })
-          end,
-        }),
-        -- null_ls.builtins.diagnostics.phpstan, -- TODO: Only if config file
-        null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
-        null_ls.builtins.formatting.eslint.with({
-          condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.cjs' })
-          end,
-        }),
-        null_ls.builtins.formatting.pint.with({
-          condition = function(utils)
-            return utils.root_has_file({ 'vendor/bin/pint' })
-          end,
-        }),
+    --    null_ls.builtins.diagnostics.eslint.with({
+    --      condition = function(utils)
+    --        return utils.root_has_file({ '.eslintrc.js', '.eslintrc.cjs' })
+    --      end,
+    --    }),
+    --    -- null_ls.builtins.diagnostics.phpstan, -- TODO: Only if config file
+    --    null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
+    --    null_ls.builtins.formatting.eslint.with({
+    --      condition = function(utils)
+    --        return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.cjs' })
+    --      end,
+    --    }),
+    --    null_ls.builtins.formatting.pint.with({
+    --      condition = function(utils)
+    --        return utils.root_has_file({ 'vendor/bin/pint' })
+    --      end,
+    --    }),
 
-        null_ls.builtins.formatting.prettier.with({
-          prefer_local = "node_modules/.bin",
-          -- disabled_filetypes = { "vue" },
-          extra_filetypes = {'astro'},
-          condition = function(utils)
-            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs' })
-          end,
-        }),
-        null_ls.builtins.formatting.rustfmt
-        -- null_ls.builtins.formatting.rustfmt.with({
-          --
-          --     return utils.is_executable("rustfmt")
-          -- end,
-        -- })
+    --    null_ls.builtins.formatting.prettier.with({
+    --      prefer_local = "node_modules/.bin",
+    --      -- disabled_filetypes = { "vue" },
+    --      extra_filetypes = {'astro'},
+    --      condition = function(utils)
+    --        return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs' })
+    --      end,
+    --    }),
+    --    null_ls.builtins.formatting.rustfmt
+    --    -- null_ls.builtins.formatting.rustfmt.with({
+    --      --
+    --      --     return utils.is_executable("rustfmt")
+    --      -- end,
+    --    -- })
 
-      },
-      on_attach = function(client, bufnr)
-        if client.supports_method("textDocument/formatting") then
-          vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-          vim.api.nvim_buf_set_option(bufnr, "formatexpr", "")
+    --  },
+    --  on_attach = function(client, bufnr)
+    --    if client.supports_method("textDocument/formatting") then
+    --      vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+    --      vim.api.nvim_buf_set_option(bufnr, "formatexpr", "")
 
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = augroup,
-            buffer = bufnr,
-            callback = function()
-              vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
-            end,
-          })
-        end
-      end,
-    })
+    --      vim.api.nvim_create_autocmd("BufWritePre", {
+    --        group = augroup,
+    --        buffer = bufnr,
+    --        callback = function()
+    --          vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
+    --        end,
+    --      })
+    --    end
+    --  end,
+    --})
 
-    require('mason-null-ls').setup({ automatic_installation = true })
+    --require('mason-null-ls').setup({ automatic_installation = true })
 
     -- Keymaps
     vim.keymap.set('n', '<Leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>')

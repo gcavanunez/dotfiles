@@ -1,18 +1,18 @@
 -- Bootstrap Lazy
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable",
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable',
     lazypath,
   })
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
+require('lazy').setup({
   -- Color scheme
   { import = 'user.themes.tokyonight' },
   { import = 'user.themes.poimandres' },
@@ -20,7 +20,6 @@ require("lazy").setup({
   { import = 'user.themes.vesper' },
   { import = 'user.themes.mellow' },
   { import = 'user.themes.catppuccin' },
-
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
 
@@ -55,7 +54,7 @@ require("lazy").setup({
   { 'jessarcher/vim-heritage' },
 
   -- Text objects for HTML attributes.
-  { 'whatyouhide/vim-textobj-xmlattr', dependencies = 'kana/vim-textobj-user'  },
+  { 'whatyouhide/vim-textobj-xmlattr', dependencies = 'kana/vim-textobj-user' },
 
   -- Automatically set the working directory to the project root.
   { import = 'user.plugins.vim-rooter' },
@@ -105,7 +104,6 @@ require("lazy").setup({
   -- Improved syntax highlighting
   { import = 'user.plugins.treesitter' },
 
-
   -- Debugging
   -- {
   --   "mfussenegger/nvim-dap",
@@ -113,6 +111,9 @@ require("lazy").setup({
 
   -- Language Server Protocol.
   { import = 'user.plugins.lspconfig' },
+
+  -- Formating & diagnostics.
+  { import = 'user.plugins.none-ls' },
 
   -- Completion
   { import = 'user.plugins.cmp' },
@@ -162,9 +163,8 @@ require("lazy").setup({
   },
   install = {
     -- colorscheme = { "mellow", "habamax" },
-    colorscheme = { "tokyonight", "habamax" },
+    colorscheme = { 'tokyonight-storm', 'habamax' },
+    -- colorscheme = { 'poimandres', 'habamax' },
+    -- colorscheme = { 'nord', 'habamax' },
   },
 })
-
--- vim.cmd('colorscheme tokyonight')
-

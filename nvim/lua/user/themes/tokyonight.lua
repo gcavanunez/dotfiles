@@ -3,7 +3,7 @@ return {
   lazy = false,
   priority = 1000,
   opts = { -- test
-    on_colors = function (colors)
+    on_colors = function(colors)
       local util = require('tokyonight.util')
       colors.gitSigns = {
         add = colors.teal,
@@ -13,7 +13,7 @@ return {
     end,
     on_highlights = function(hl, c)
       local util = require('tokyonight.util')
-      local prompt = "#2d3149"
+      local prompt = '#2d3149'
 
       hl.BufferlineInactive = {
         bg = c.bg_dark,
@@ -66,7 +66,6 @@ return {
         bg = util.darken(c.bg_dark, 0.75, '#000000'),
         fg = util.darken(c.bg_dark, 0.85, '#000000'),
       }
-
 
       hl.StatusLine = {
         bg = util.darken(c.bg_dark, 0.85, '#000000'),
@@ -154,7 +153,7 @@ return {
       }
       hl.NvimTreeOpenedFile = {
         fg = c.fg,
-        bold = true
+        bold = true,
       }
       hl.NvimTreeNormal = {
         bg = util.darken(c.bg_dark, 0.85, '#000000'),
@@ -168,9 +167,9 @@ return {
       }
     end,
   },
-  config = function (plugin, opts)
+  config = function(plugin, opts)
     require('tokyonight').setup(opts)
 
-    vim.cmd('colorscheme tokyonight')
+    vim.cmd('colorscheme tokyonight-storm')
   end,
 }

@@ -5,11 +5,11 @@ return {
     require('nvim-treesitter.install').update({ with_sync = true })
   end,
   dependencies = {
-    { 'nvim-treesitter/playground', cmd = "TSPlaygroundToggle" },
+    { 'nvim-treesitter/playground', cmd = 'TSPlaygroundToggle' },
     {
       'JoosepAlviste/nvim-ts-context-commentstring',
       opts = {
-        custom_calculation = function (node, language_tree)
+        custom_calculation = function(node, language_tree)
           if vim.bo.filetype == 'blade' and language_tree._lang ~= 'javascript' then
             return '{{-- %s --}}'
           end
@@ -63,7 +63,7 @@ return {
     },
     indent = {
       enable = true,
-      disable = { "yaml" }
+      disable = { 'yaml' },
     },
     -- context_commentstring = {
     --   enable = true,
@@ -84,17 +84,17 @@ return {
       },
     },
   },
-  config = function (_, opts)
+  config = function(_, opts)
     require('nvim-treesitter.configs').setup(opts)
 
-    local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+    local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
     parser_config.blade = {
       install_info = {
-        url = "https://github.com/EmranMR/tree-sitter-blade",
-        files = {"src/parser.c"},
-        branch = "main",
+        url = 'https://github.com/EmranMR/tree-sitter-blade',
+        files = { 'src/parser.c' },
+        branch = 'main',
       },
-      filetype = "blade"
+      filetype = 'blade',
     }
     vim.filetype.add({
       pattern = {
@@ -104,8 +104,8 @@ return {
 
     vim.filetype.add({
       extension = {
-        mdx = 'mdx'
-      }
+        mdx = 'mdx',
+      },
     })
 
     vim.treesitter.language.register('markdown', 'mdx')

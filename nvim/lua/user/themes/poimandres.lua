@@ -3,11 +3,12 @@ return {
   lazy = false,
   priority = 1000,
   config = function()
-    require('poimandres').setup {
+    require('poimandres').setup({
       -- leave this setup function empty for default config
       -- or refer to the configuration section
       -- for configuration options
-    }
+    })
+    -- vim.cmd('colorscheme poimandres')
   end,
 
   -- optionally set the colorscheme within lazy config
