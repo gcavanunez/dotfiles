@@ -19,27 +19,27 @@ return {
 
     local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-    local mason_registry = require("mason-registry")
-    local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
-    -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
+    local mason_registry = require('mason-registry')
 
-    require('lspconfig').tsserver.setup( {
+    -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
+    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+
+    require('lspconfig').tsserver.setup({
       capabilities = capabilities,
       on_attach = function(client)
         -- client.resolved_capabilities.document_formatting = false
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentFormattingRangeProvider = false
-
       end,
       init_options = {
         plugins = {
           {
-            name = "@vue/typescript-plugin",
+            name = '@vue/typescript-plugin',
             -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
             -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
             location = vue_language_server_path,
 
-            languages = {"vue"},
+            languages = { 'vue' },
           },
         },
       },
@@ -47,9 +47,15 @@ return {
         -- "javascript",
         -- "typescript",
         -- "vue",
-        "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "vue"
+        'javascript',
+        'javascriptreact',
+        'javascript.jsx',
+        'typescript',
+        'typescriptreact',
+        'typescript.tsx',
+        'vue',
       },
-    } )
+    })
 
     -- HTML
     local capabilities_html = vim.lsp.protocol.make_client_capabilities()
@@ -66,8 +72,8 @@ return {
     -- GoLang
     require('lspconfig').gopls.setup({
       capabilities = capabilities,
-      cmd = {"gopls"},
-      filetypes = { "go", "gomod", "gowork", "gotmpl" },
+      cmd = { 'gopls' },
+      filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
       -- root_dir = util.root_pattern("go.work", "go.mod", ".git"),
       settings = {
         gopls = {
@@ -101,7 +107,7 @@ return {
         --   vim.lsp.buf.inlay_hint(bufnr, true)
         -- end
       end,
-      capabilities = capabilities
+      capabilities = capabilities,
     })
 
     require('lspconfig').phpactor.setup({
@@ -123,15 +129,15 @@ return {
         client.server_capabilities.documentRangeFormattingProvider = false
       end,
       init_options = {
-        ["language_server_phpstan.enabled"] = false,
-        ["language_server_psalm.enabled"] = false,
+        ['language_server_phpstan.enabled'] = false,
+        ['language_server_psalm.enabled'] = false,
       },
       handlers = {
-        ['textDocument/publishDiagnostics'] = function() end
-      }
+        ['textDocument/publishDiagnostics'] = function() end,
+      },
     })
 
-    local util = require 'lspconfig.util'
+    local util = require('lspconfig.util')
     -- local function get_typescript_server_path(root_dir)
     --   local global_ts = '/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
     --   -- Alternative location if installed as root:
@@ -152,6 +158,11 @@ return {
     -- Vue, JavaScript, TypeScript
     require('lspconfig').volar.setup({
       capabilities = capabilities,
+      on_attach = function(client, bufnr)
+        -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
+      end,
     })
 
     -- require('lspconfig').volar.setup({
@@ -161,38 +172,38 @@ return {
     --   end,
     --   capabilities = capabilities,
     --   filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json' },
-     -- on_new_config = function(new_config, new_root_dir)
-     --    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
-     --  end,
-      -- settings = {
-      --     css = {
-      --         lint = {
-      --             unknownAtRules = "ignore",
-      --         },
-      --     },
+    -- on_new_config = function(new_config, new_root_dir)
+    --    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
+    --  end,
+    -- settings = {
+    --     css = {
+    --         lint = {
+    --             unknownAtRules = "ignore",
+    --         },
+    --     },
 
-      --     scss = {
-      --         lint = {
-      --             unknownAtRules = "ignore",
-      --         },
-      --     },
-      -- },
-      -- on_attach = function(client, bufnr)
-      --   client.server_capabilities.documentFormattingProvider = false
-      --   client.server_capabilities.documentRangeFormattingProvider = false
+    --     scss = {
+    --         lint = {
+    --             unknownAtRules = "ignore",
+    --         },
+    --     },
+    -- },
+    -- on_attach = function(client, bufnr)
+    --   client.server_capabilities.documentFormattingProvider = false
+    --   client.server_capabilities.documentRangeFormattingProvider = false
 
-      --   -- client.resolved_capabilities.document_formatting = false
-      --   -- if client.server_capabilities.inlayHintProvider then
-      --   --   vim.lsp.buf.inlay_hint(bufnr, true)
-      --   -- end
-      -- end,
-       -- init_options = {
-       --  typescript = {
-       --    tsdk = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
-       --  }
-      -- },
-      -- Enable "Take Over Mode" where volar will provide all JS/TS LSP services
-      -- This drastically improves the responsiveness of diagnostic updates on change
+    --   -- client.resolved_capabilities.document_formatting = false
+    --   -- if client.server_capabilities.inlayHintProvider then
+    --   --   vim.lsp.buf.inlay_hint(bufnr, true)
+    --   -- end
+    -- end,
+    -- init_options = {
+    --  typescript = {
+    --    tsdk = '/home/mango/.local/share/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
+    --  }
+    -- },
+    -- Enable "Take Over Mode" where volar will provide all JS/TS LSP services
+    -- This drastically improves the responsiveness of diagnostic updates on change
     -- })
 
     -- Tailwind CSS
@@ -224,10 +235,10 @@ return {
       settings = {
         ['rust-analyzer'] = {
           cargo = {
-            allFeatures = true
-          }
-        }
-      }
+            allFeatures = true,
+          },
+        },
+      },
       -- settings = {
       --   ['rust-analyzer'] = {
       --         cargo = {
@@ -250,7 +261,7 @@ return {
 
     -- null-ls
     --local null_ls = require('null-ls')
-    --local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+    --local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
     --null_ls.setup({
     --  debug = true,
     --  temp_dir = '/tmp',
@@ -281,27 +292,26 @@ return {
     --    }),
 
     --    null_ls.builtins.formatting.prettier.with({
-    --      prefer_local = "node_modules/.bin",
+    --      prefer_local = 'node_modules/.bin',
     --      -- disabled_filetypes = { "vue" },
-    --      extra_filetypes = {'astro'},
+    --      extra_filetypes = { 'astro' },
     --      condition = function(utils)
     --        return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs' })
     --      end,
     --    }),
-    --    null_ls.builtins.formatting.rustfmt
+    --    null_ls.builtins.formatting.rustfmt,
     --    -- null_ls.builtins.formatting.rustfmt.with({
-    --      --
-    --      --     return utils.is_executable("rustfmt")
-    --      -- end,
+    --    --
+    --    --     return utils.is_executable("rustfmt")
+    --    -- end,
     --    -- })
-
     --  },
     --  on_attach = function(client, bufnr)
-    --    if client.supports_method("textDocument/formatting") then
+    --    if client.supports_method('textDocument/formatting') then
     --      vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-    --      vim.api.nvim_buf_set_option(bufnr, "formatexpr", "")
+    --      vim.api.nvim_buf_set_option(bufnr, 'formatexpr', '')
 
-    --      vim.api.nvim_create_autocmd("BufWritePre", {
+    --      vim.api.nvim_create_autocmd('BufWritePre', {
     --        group = augroup,
     --        buffer = bufnr,
     --        callback = function()
@@ -327,14 +337,16 @@ return {
     vim.keymap.set('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 
     -- Commands
-    vim.api.nvim_create_user_command('Format', function() vim.lsp.buf.format({ timeout_ms = 5000 }) end, {})
+    vim.api.nvim_create_user_command('Format', function()
+      vim.lsp.buf.format({ timeout_ms = 5000 })
+    end, {})
 
     -- Diagnostic configuration
     vim.diagnostic.config({
       virtual_text = false,
       float = {
         source = true,
-      }
+      },
     })
 
     -- Sign configuration
