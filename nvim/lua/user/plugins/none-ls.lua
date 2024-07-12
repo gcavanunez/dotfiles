@@ -16,8 +16,12 @@ return {
 
         null_ls.builtins.formatting.stylua,
         null_ls.builtins.formatting.prettier,
-        null_ls.builtins.formatting.pint,
-
+        -- null_ls.builtins.formatting.pint,
+        null_ls.builtins.formatting.pint.with({
+          condition = function(utils)
+            return utils.root_has_file({ 'vendor/bin/pint' })
+          end,
+        }),
         require('none-ls.diagnostics.eslint'),
         -- require('none-ls.formatting.eslint'),
         -- require('none-ls.formatting.eslint'),
