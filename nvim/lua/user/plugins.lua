@@ -153,6 +153,9 @@ require('lazy').setup({
 
   -- Nicer Code folding.
   { import = 'user.plugins.ufo' },
+
+  -- Lazygit.
+  { import = 'user.plugins.lazygit' },
 }, {
   checker = {
     enabled = true,

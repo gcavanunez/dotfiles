@@ -12,16 +12,24 @@ return {
       temp_dir = '/tmp',
       sources = {
 
-        null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
+        null_ls.builtins.diagnostics.trail_space.with({
+          disabled_filetypes = { 'NvimTree' },
+          condition = function(utils)
+            return not utils.root_has_file({ 'vendor/bin/pint' }) == false
+          end,
+        }),
 
         null_ls.builtins.formatting.stylua,
         null_ls.builtins.formatting.prettier,
+
         -- null_ls.builtins.formatting.pint,
         null_ls.builtins.formatting.pint.with({
           condition = function(utils)
             return utils.root_has_file({ 'vendor/bin/pint' })
           end,
         }),
+        -- require('user.plugins.duster'),
+
         require('none-ls.diagnostics.eslint'),
         -- require('none-ls.formatting.eslint'),
         -- require('none-ls.formatting.eslint'),
