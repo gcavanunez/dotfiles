@@ -20,7 +20,29 @@ return {
         }),
 
         null_ls.builtins.formatting.stylua,
-        null_ls.builtins.formatting.prettier,
+        null_ls.builtins.formatting.prettier.with({
+          -- extra_filetypes = { 'blade.php' },
+          filetypes = {
+            'javascript',
+            'javascriptreact',
+            'typescript',
+            'typescriptreact',
+            'vue',
+            'css',
+            'scss',
+            'less',
+            'html',
+            'json',
+            'jsonc',
+            'yaml',
+            'markdown',
+            'markdown.mdx',
+            'graphql',
+            'handlebars',
+            'astro',
+            'blade',
+          },
+        }),
 
         -- null_ls.builtins.formatting.pint,
         null_ls.builtins.formatting.pint.with({

@@ -25,18 +25,17 @@ cursor_blink_interval 0
 # window_padding_width 10
 # hide_window_decorations yes
 # macos_hide_titlebar yes
-# wayland_titlebar_color background
+wayland_titlebar_color background
 remember_window_size yes
 initial_window_width 1680
 initial_window_height 1200
 enable_audio_bell no
 
 # BEGIN_KITTY_THEME
-# Catppuccin-Mocha
 include current-theme.conf
 # END_KITTY_THEME
 # tab_title_template 🍎
 # map ctrl+shift+n no_op
 # map shift+ctrl+n no_op
 kitty_mod ctrl+shift+alt
-# macos_option_as_alt no
+
