@@ -20,6 +20,7 @@ require('lazy').setup({
   { import = 'user.themes.vesper' },
   { import = 'user.themes.mellow' },
   { import = 'user.themes.catppuccin' },
+  -- { import = 'user.themes.noirbuddy' },
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
 

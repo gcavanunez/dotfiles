@@ -31,7 +31,7 @@ vim.keymap.set('n', '<leader>KK', function()
   -- vim.cmd('silent !~/change_font_size.sh')
   -- vim.cmd('silent !zsh -ic "toggle_font"')
   vim.fn.system('bash -c ' .. vim.fn.shellescape(change_font_script))
-end, {desc = 'Change font size in Alacritty config', noremap = true, silent = false})
+end, { desc = 'Change font size in Alacritty config', noremap = true, silent = false })
 
 -- Close all open buffers.
 vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
@@ -61,14 +61,12 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 -- primeagen
 -- vim.keymap.set("x", "<leader>p", [["_dP]])
 -- this is way better
-vim.keymap.set({ "n", "x" }, "<leader>p", [["0p]], { desc = "paste from yank register" })
+vim.keymap.set({ 'n', 'x' }, '<leader>p', [["0p]], { desc = 'paste from yank register' })
 
 -- Easy insertion of a trailing ; or , from insert mode.
 vim.keymap.set('i', ';;', '<Esc>A;<Esc>')
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('i', ',,', '<Esc>A,<Esc>')
-
-
 
 -- Open the current file in the default program (on Mac this should just be just `open`).
 vim.keymap.set('n', '<leader>x', ':!xdg-open %<cr><cr>')
@@ -85,9 +83,13 @@ vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>')
 -- vim.keymap.set('n', ']g', vim.diagnostic.goto_next)
 vim.keymap.set('n', ']g', function()
   vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = "Go to next diagnostic warning" })
-vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+end, { desc = 'Go to next diagnostic warning' })
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.goto_next()
+end, opts)
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.goto_prev()
+end, opts)
 
 vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
 
@@ -101,13 +103,13 @@ vim.keymap.set('v', '<A-j>', ":move '>+1<CR>gv=gv")
 vim.keymap.set('v', '<A-k>', ":move '<-2<CR>gv=gv")
 
 -- https://www.lazyvim.org/configuration/tips
-vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
-vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
-vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+vim.keymap.set('n', '<S-h>', '<cmd>bprevious<cr>', { desc = 'Prev Buffer' })
+vim.keymap.set('n', '<S-l>', '<cmd>bnext<cr>', { desc = 'Next Buffer' })
+vim.keymap.set('n', '[b', '<cmd>bprevious<cr>', { desc = 'Prev Buffer' })
+vim.keymap.set('n', ']b', '<cmd>bnext<cr>', { desc = 'Next Buffer' })
 
 -- Move down and center.
-vim.keymap.set("n", "<C-d>", "<C-d>zz", { noremap = true })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", { noremap = true })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { noremap = true })
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<leader>kr', ':%s//', { noremap = true, silent = false })
