@@ -157,6 +157,9 @@ require('lazy').setup({
 
   -- Lazygit.
   { import = 'user.plugins.lazygit' },
+
+  -- rendering md
+  { import = 'user.plugins.render-markdown' },
 }, {
   checker = {
     enabled = true,
