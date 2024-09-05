@@ -113,3 +113,46 @@ vim.keymap.set('n', '<C-d>', '<C-d>zz', { noremap = true })
 vim.keymap.set('n', '<C-u>', '<C-u>zz', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<leader>kr', ':%s//', { noremap = true, silent = false })
+
+local toggle_surrounding_quote_style = function()
+  local current_line = vim.fn.line('.')
+  local next_single_quote = vim.fn.searchpos("'", 'cn')
+  local next_double_quote = vim.fn.searchpos('"', 'cn')
+  local next_backtick = vim.fn.searchpos('`', 'cn')
+
+  if next_single_quote[1] ~= current_line then
+    next_single_quote = false
+  end
+  if next_double_quote[1] ~= current_line then
+    next_double_quote = false
+  end
+  if next_backtick[1] ~= current_line then
+    next_backtick = false
+  end
+
+  if next_single_quote == false and next_double_quote == false and next_backtick == false then
+    print('Could not find quotes or backticks on current line!')
+  else
+    -- Determine which quote type is the closest
+    local closest = nil
+    if next_single_quote then
+      closest = next_single_quote
+    end
+    if next_double_quote and (not closest or next_double_quote[2] < closest[2]) then
+      closest = next_double_quote
+    end
+    if next_backtick and (not closest or next_backtick[2] < closest[2]) then
+      closest = next_backtick
+    end
+
+    if closest == next_single_quote then
+      vim.cmd.normal([[macs'"a]])
+    elseif closest == next_double_quote then
+      vim.cmd.normal([[macs"`a]])
+    elseif closest == next_backtick then
+      vim.cmd.normal([[macs`'a]])
+    end
+  end
+end
+
+vim.keymap.set('n', "<Leader>'", toggle_surrounding_quote_style)
