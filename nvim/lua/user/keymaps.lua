@@ -34,7 +34,7 @@ vim.keymap.set('n', '<leader>KK', function()
 end, { desc = 'Change font size in Alacritty config', noremap = true, silent = false })
 
 -- Close all open buffers.
-vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
+-- vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
 
 -- Close all open buffers.
 vim.keymap.set('n', '<leader>w', ':close<CR>')
