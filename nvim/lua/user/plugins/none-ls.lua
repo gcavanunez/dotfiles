@@ -52,7 +52,11 @@ return {
         }),
         -- require('user.plugins.duster'),
 
-        require('none-ls.diagnostics.eslint'),
+        require('none-ls.diagnostics.eslint').with({
+          condition = function(utils)
+            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml' })
+          end,
+        }),
         -- require('none-ls.formatting.eslint'),
         -- require('none-ls.formatting.eslint'),
       },

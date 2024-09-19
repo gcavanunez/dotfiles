@@ -24,7 +24,7 @@ return {
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
     local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
-    require('lspconfig').tsserver.setup({
+    require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
       on_attach = function(client)
         -- client.resolved_capabilities.document_formatting = false
