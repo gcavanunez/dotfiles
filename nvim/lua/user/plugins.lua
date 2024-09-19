@@ -24,6 +24,8 @@ require('lazy').setup({
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
 
+  -- { import = 'user.plugins.noice' },
+
   -- Add, change, and delete surrounding text.
   { 'tpope/vim-surround' },
 
