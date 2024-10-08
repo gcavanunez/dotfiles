@@ -24,7 +24,7 @@ require('lazy').setup({
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
 
-  -- { import = 'user.plugins.noice' },
+  { import = 'user.plugins.noice' },
 
   -- Add, change, and delete surrounding text.
   { 'tpope/vim-surround' },
@@ -114,6 +114,12 @@ require('lazy').setup({
 
   -- Language Server Protocol.
   { import = 'user.plugins.lspconfig' },
+
+  -- Blade lsp
+  { import = 'user.plugins.blade-nav' },
+
+  -- Avante lsp
+  { import = 'user.plugins.avante' },
 
   -- Formating & diagnostics.
   { import = 'user.plugins.none-ls' },

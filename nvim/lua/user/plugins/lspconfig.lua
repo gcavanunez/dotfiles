@@ -322,17 +322,54 @@ return {
     --  end,
     --})
 
+    -- Define an autocmd group for the blade workaround
+    local augroup = vim.api.nvim_create_augroup('lsp_blade_workaround', { clear = true })
+
+    -- Autocommand to temporarily change 'blade' filetype to 'php' when opening for LSP server activation
+    vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+      group = augroup,
+      pattern = '*.blade.php',
+      callback = function()
+        vim.bo.filetype = 'php'
+      end,
+    })
+
+    -- Additional autocommand to switch back to 'blade' after LSP has attached
+    vim.api.nvim_create_autocmd('LspAttach', {
+      pattern = '*.blade.php',
+      callback = function(args)
+        vim.schedule(function()
+          -- Check if the attached client is 'intelephense'
+          for _, client in ipairs(vim.lsp.get_active_clients()) do
+            if client.name == 'intelephense' and client.attached_buffers[args.buf] then
+              vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
+              -- update treesitter parser to blade
+              vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
+              break
+            end
+          end
+        end)
+      end,
+    })
+
+    -- make $ part of the keyword for php.
+    vim.api.nvim_exec(
+      [[
+autocmd FileType php set iskeyword+=$
+]],
+      false
+    )
     --require('mason-null-ls').setup({ automatic_installation = true })
 
     -- Keymaps
     vim.keymap.set('n', '<Leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>')
     vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
     vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>')
-    vim.keymap.set('n', 'gd', ':Telescope lsp_definitions<CR>')
+    vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<CR>')
     vim.keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-    vim.keymap.set('n', 'gi', ':Telescope lsp_implementations<CR>')
-    vim.keymap.set('n', 'gr', ':Telescope lsp_references<CR>')
-    vim.keymap.set('n', '<Leader>lr', ':LspRestart<CR>', { silent = true })
+    vim.keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>')
+    vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>')
+    vim.keymap.set('n', '<Leader>lr', '<cmd>LspRestart<CR>', { silent = true })
     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
     vim.keymap.set('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 

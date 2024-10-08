@@ -1,17 +1,18 @@
 return {
   'vim-test/vim-test',
   keys = {
-    { '<Leader>tn', ':TestNearest<CR>' },
-    { '<Leader>tf', ':TestFile<CR>' },
-    { '<Leader>ts', ':TestSuite<CR>' },
-    { '<Leader>tl', ':TestLast<CR>' },
-    { '<Leader>tv', ':TestVisit<CR>' },
+    { '<Leader>tn', '<cmd>TestNearest<CR>' },
+    { '<Leader>tf', '<cmd>TestFile<CR>' },
+    { '<Leader>ts', '<cmd>TestSuite<CR>' },
+    { '<Leader>tl', '<cmd>TestLast<CR>' },
+    { '<Leader>tv', '<cmd>TestVisit<CR>' },
   },
   dependencies = { 'voldikss/vim-floaterm' },
   config = function()
     vim.cmd([[let test#strategy = 'neovim']])
     vim.cmd([[let test#neovim#term_position = 'vert']])
     vim.cmd([[let g:test#php#phpunit#executable = "./vendor/bin/phpunit"]])
+    vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/pest"]])
   end,
   -- config = function()
   --   vim.cmd([[

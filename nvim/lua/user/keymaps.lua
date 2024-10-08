@@ -3,7 +3,8 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Quickly clear search highlighting.
-vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
+-- vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
+vim.keymap.set('n', '<leader>k', '<cmd>nohlsearch<CR>')
 
 local change_font_script = [[
   FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
@@ -37,7 +38,7 @@ end, { desc = 'Change font size in Alacritty config', noremap = true, silent = f
 -- vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
 
 -- Close all open buffers.
-vim.keymap.set('n', '<leader>w', ':close<CR>')
+vim.keymap.set('n', '<leader>w', '<cmd>close<CR>')
 
 -- Allow gf to open non-existent files.
 vim.keymap.set('', 'gf', ':edit <cfile><CR>')
@@ -91,7 +92,8 @@ vim.keymap.set('n', ']d', function()
   vim.diagnostic.goto_prev()
 end, opts)
 
-vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
+-- vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
+vim.keymap.set('n', '<leader><c-s>', '<cmd>noautocmd write<CR>')
 
 -- vim.keymap.set("n", "[g", vim.diagnostic.goto_prev)
 -- Move text up and down
@@ -154,5 +156,8 @@ local toggle_surrounding_quote_style = function()
     end
   end
 end
-
+vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { noremap = true })
+vim.keymap.set('t', 'jk', [[<C-\><C-n>]], { noremap = true })
 vim.keymap.set('n', "<Leader>'", toggle_surrounding_quote_style)
+
+vim.keymap.set('n', '<leader>kd', '<cmd>NoiceDismiss<CR>', { desc = 'Dismiss Noice' })

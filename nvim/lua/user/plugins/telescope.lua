@@ -9,20 +9,77 @@ return {
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   },
   keys = {
-    { '<leader>f', function() require('telescope.builtin').find_files() end },
-    { '<leader>F', function() require('telescope.builtin').find_files({ no_ignore = true, prompt_title = 'All Files' }) end },
-    { '<leader>b', function() require('telescope.builtin').buffers() end },
-    { '<leader>g', function() require('telescope').extensions.live_grep_args.live_grep_args() end },
-    { '<leader>h', function() require('telescope.builtin').oldfiles() end },
-    { '<leader>ss', function() require('telescope.builtin').lsp_document_symbols() end },
-    { '<leader>sS', function() require('telescope.builtin').lsp_dynamic_workspace_symbols() end },
-    { '<leader>G', function() require('telescope.builtin').git_status() end },
+    {
+      '<leader>f',
+      function()
+        require('telescope.builtin').find_files()
+      end,
+    },
+    {
+      '<leader>F',
+      function()
+        require('telescope.builtin').find_files({ no_ignore = true, prompt_title = 'All Files' })
+      end,
+    },
+    {
+      '<leader>b',
+      function()
+        require('telescope.builtin').buffers()
+      end,
+    },
+    {
+      '<leader>g',
+      function()
+        require('telescope').extensions.live_grep_args.live_grep_args()
+      end,
+    },
+    {
+      '<leader>h',
+      function()
+        require('telescope.builtin').oldfiles()
+      end,
+    },
+    {
+      '<leader>ss',
+      function()
+        require('telescope.builtin').lsp_document_symbols()
+      end,
+    },
+    {
+      '<leader>sS',
+      function()
+        require('telescope.builtin').lsp_dynamic_workspace_symbols()
+      end,
+    },
+    {
+      '<leader>G',
+      function()
+        require('telescope.builtin').git_status()
+      end,
+    },
   },
-  config = function ()
+  config = function()
     local actions = require('telescope.actions')
 
     local previewers = require('telescope.previewers')
 
+    local focus_preview = function(prompt_bufnr)
+      local action_state = require('telescope.actions.state')
+      local actions = require('telescope.actions')
+      local picker = action_state.get_current_picker(prompt_bufnr)
+      local prompt_win = picker.prompt_win
+      local previewer = picker.previewer
+      local winid = previewer.state.winid
+      local bufnr = previewer.state.bufnr
+      vim.keymap.set('n', '<Tab>', function()
+        vim.cmd(string.format('noautocmd lua vim.api.nvim_set_current_win(%s)', prompt_win))
+      end, { buffer = bufnr })
+      vim.keymap.set('n', 'q', function()
+        actions.close(prompt_bufnr)
+      end, { buffer = bufnr })
+      vim.cmd(string.format('noautocmd lua vim.api.nvim_set_current_win(%s)', winid))
+      -- api.nvim_set_current_win(winid)
+    end
     -- local delta = previewers.new_termopen_previewer {
     --   get_command = function(entry)
     --     -- this is for status
@@ -57,10 +114,16 @@ return {
         },
         sorting_strategy = 'ascending',
         mappings = {
+          n = {
+            ['<C-p>'] = require('telescope.actions.layout').toggle_preview,
+            ['<Tab>'] = focus_preview,
+          },
           i = {
+            ['<C-p>'] = require('telescope.actions.layout').toggle_preview,
             ['<esc>'] = actions.close,
             ['<S-Down>'] = actions.cycle_history_next,
             ['<S-Up>'] = actions.cycle_history_prev,
+            -- ['<S-Tab>'] = focus_preview,
           },
         },
         set_env = {
@@ -74,13 +137,13 @@ return {
           fuzzy = true,
           override_generic_sorter = true,
           override_file_sorter = true,
-          case_mode = "smart_case",
+          case_mode = 'smart_case',
         },
         live_grep_args = {
           mappings = {
             i = {
-              ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
-              ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt({ postfix = " --iglob " }),
+              ['<C-k>'] = require('telescope-live-grep-args.actions').quote_prompt(),
+              ['<C-i>'] = require('telescope-live-grep-args.actions').quote_prompt({ postfix = ' --iglob ' }),
             },
           },
         },
@@ -90,7 +153,7 @@ return {
           hidden = true,
           previewer = false,
           layout_config = {
-            width = 80,
+            width = 100,
           },
         },
         buffers = {
@@ -115,7 +178,7 @@ return {
             -- vertical = { width = 0.5 }
             width = 140,
           },
-        }
+        },
       },
       -- builtin = {
       --   git_status = {
@@ -127,24 +190,43 @@ return {
     require('telescope').load_extension('fzf')
     require('telescope').load_extension('harpoon')
 
-    local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
-    vim.keymap.set("v", "<leader>H", live_grep_args_shortcuts.grep_visual_selection)
+    local live_grep_args_shortcuts = require('telescope-live-grep-args.shortcuts')
+    vim.keymap.set('v', '<leader>H', live_grep_args_shortcuts.grep_visual_selection)
 
-    local mark = require("harpoon.mark")
-    local ui = require("harpoon.ui")
+    local mark = require('harpoon.mark')
+    local ui = require('harpoon.ui')
 
-    vim.keymap.set("n", "<leader>a", mark.add_file)
-    vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu, { noremap = true, silent = true })
-    vim.keymap.set("n", "<leader>1", function() ui.nav_file(1) end, { noremap = true, silent = true })
-    vim.keymap.set("n", "<leader>2", function() ui.nav_file(2) end, { noremap = true, silent = true })
-    vim.keymap.set("n", "<leader>3", function() ui.nav_file(3) end, { noremap = true, silent = true })
-    vim.keymap.set("n", "<leader>4", function() ui.nav_file(4) end, { noremap = true, silent = true })
-    vim.keymap.set("n","<leader><Tab>", function() ui.nav_next() end)
-    vim.keymap.set("n","<leader><S-Tab>", function() ui.nav_prev() end)
+    vim.keymap.set('n', '<leader>a', mark.add_file)
+    vim.keymap.set('n', '<C-e>', ui.toggle_quick_menu, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>1', function()
+      ui.nav_file(1)
+    end, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>2', function()
+      ui.nav_file(2)
+    end, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>3', function()
+      ui.nav_file(3)
+    end, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>4', function()
+      ui.nav_file(4)
+    end, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader><Tab>', function()
+      ui.nav_next()
+    end)
+    vim.keymap.set('n', '<leader><S-Tab>', function()
+      ui.nav_prev()
+    end)
+
     -- vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
-
-
+    -- vim.api.nvim_create_autocmd({ 'User' }, {
+    --   pattern = 'TelescopePreviewerLoaded',
+    --   callback = function(data)
+    --     local winid = data.data.winid
+    --     vim.wo[winid].number = true
+    --   end,
+    -- })
     require('telescope').load_extension('projects')
-    require("project_nvim").setup()
+    require('telescope').load_extension('noice')
+    require('project_nvim').setup()
   end,
 }
