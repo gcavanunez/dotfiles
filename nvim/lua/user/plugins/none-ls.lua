@@ -1,3 +1,29 @@
+local async_formatting = function(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+  vim.lsp.buf_request(bufnr, 'textDocument/formatting', vim.lsp.util.make_formatting_params({}), function(err, res, ctx)
+    if err then
+      local err_msg = type(err) == 'string' and err or err.message
+      -- you can modify the log message / level (or ignore it completely)
+      vim.notify('formatting: ' .. err_msg, vim.log.levels.WARN)
+      return
+    end
+
+    -- don't apply results if buffer is unloaded or has been modified
+    if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, 'modified') then
+      return
+    end
+
+    if res then
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
+      vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or 'utf-16')
+      vim.api.nvim_buf_call(bufnr, function()
+        vim.cmd('silent noautocmd update')
+      end)
+    end
+  end)
+end
+
 return {
   'nvimtools/none-ls.nvim',
   dependencies = {
@@ -50,7 +76,12 @@ return {
             return utils.root_has_file({ 'vendor/bin/pint' })
           end,
         }),
-        -- require('user.plugins.duster'),
+
+        require('user.plugins.duster').with({
+          condition = function(utils)
+            return utils.root_has_file({ 'vendor/bin/duster' })
+          end,
+        }),
 
         require('none-ls.diagnostics.eslint').with({
           condition = function(utils)
@@ -73,12 +104,67 @@ return {
               -- on later neovim version, you should use vim.lsp.buf.format({ async = false }) instead
               vim.lsp.buf.format({ async = false })
               -- vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
+              -- vim.lsp.buf.formatting_sync()
+              -- async_formatting(bufnr)
             end,
           })
+
+          -- vim.api.nvim_create_autocmd('BufWritePost', {
+          --   group = augroup,
+          --   pattern = '*',
+          --   callback = function()
+          --     -- Your command here
+          --     vim.cmd("")
+          --   end,
+          -- })
         end
       end,
     })
 
     vim.keymap.set('n', '<leader>gf', vim.lsp.buf.format, {})
+
+    -- local autocmd_group_duster = vim.api.nvim_create_augroup('CustomAutocommands', { clear = true })
+
+    -- vim.api.nvim_create_autocmd('BufWritePost', {
+    --   group = autocmd_group_duster,
+    --   pattern = '*.php', -- Trigger only for PHP files
+    --   callback = function()
+    --     local duster_path = vim.fn.getcwd() .. '/vendor/bin/duster'
+
+    --     -- return not utils.root_has_file({ 'vendor/bin/pint' }) == false
+    --     local file_path = vim.fn.expand('%:p')
+
+    --     -- Check if Duster exists in the project
+    --     if vim.fn.filereadable(duster_path) == 1 then
+    --       local cmd = string.format('%s fix %s', duster_path, file_path)
+
+    --       vim.fn.jobstart(cmd, {
+    --         cwd = vim.fn.getcwd(),
+    --         on_exit = function(_, exit_code)
+    --           if exit_code == 0 then
+    --             print('Duster fix completed successfully for ' .. file_path)
+    --             -- Reload the file
+    --             -- vim.cmd('edit!')
+    --             -- Save cursor position
+    --             -- local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+    --             -- Reload the file
+    --             vim.cmd('edit!')
+
+    --             -- -- Restore cursor position
+    --             -- vim.api.nvim_win_set_cursor(0, cursor_pos)
+
+    --             print('File reloaded, cursor position restored')
+
+    --           else
+    --             print('Duster fix encountered an error for ' .. file_path)
+    --           end
+    --         end,
+    --       })
+    --     else
+    --       print('Duster not found in this project. Skipping fix.')
+    --     end
+    --   end,
+    -- })
   end,
 }

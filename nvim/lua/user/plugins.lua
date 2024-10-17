@@ -15,6 +15,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- Color scheme
   { import = 'user.themes.tokyonight' },
+  { import = 'user.themes.solarized-osaka' },
   { import = 'user.themes.poimandres' },
   { import = 'user.themes.nord' },
   { import = 'user.themes.vesper' },
@@ -136,6 +137,9 @@ require('lazy').setup({
   -- Testing helper
   { import = 'user.plugins.vim-test' },
 
+  -- Window picker
+  -- { import = 'user.plugins.nvim-window-picker' },
+
   -- GitHub Copilot
   { import = 'user.plugins.copilot' },
 
@@ -179,6 +183,7 @@ require('lazy').setup({
   install = {
     -- colorscheme = { "mellow", "habamax" },
     colorscheme = { 'tokyonight-storm', 'habamax' },
+    -- colorscheme = { 'solarized-osaka', 'habamax' },
     -- colorscheme = { 'poimandres', 'habamax' },
     -- colorscheme = { 'nord', 'habamax' },
   },
