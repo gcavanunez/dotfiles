@@ -65,9 +65,9 @@ return {
       capabilities = capabilities,
     })
 
-    require('lspconfig').htmx.setup({
-      -- capabilities = capabilities,
-    })
+    -- require('lspconfig').htmx.setup({
+    --   -- capabilities = capabilities,
+    -- })
 
     -- GoLang
     require('lspconfig').gopls.setup({
@@ -93,6 +93,10 @@ return {
 
     -- PHP
     require('lspconfig').intelephense.setup({
+      init_options = {
+        globalStoragePath = os.getenv('HOME') .. '/.local/share/intelephense',
+        storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
+      },
       commands = {
         IntelephenseIndex = {
           function()
@@ -103,6 +107,7 @@ return {
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
+
         -- if client.server_capabilities.inlayHintProvider then
         --   vim.lsp.buf.inlay_hint(bufnr, true)
         -- end

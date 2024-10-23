@@ -73,7 +73,7 @@ return {
         -- null_ls.builtins.formatting.pint,
         null_ls.builtins.formatting.pint.with({
           condition = function(utils)
-            return utils.root_has_file({ 'vendor/bin/pint' })
+            return utils.root_has_file({ 'vendor/bin/pint' }) and utils.root_has_file({ 'vendor/bin/duster' }) == false
           end,
         }),
 
