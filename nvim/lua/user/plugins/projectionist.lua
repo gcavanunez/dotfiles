@@ -15,9 +15,14 @@ return {
             'tests/Feature/{}Test.php',
           },
         },
+
         ['tests/Feature/*Test.php'] = {
           type = 'test',
           alternate = 'app/{}.php',
+        },
+        ['tests/Feature/Controllers/*Test.php'] = {
+          type = 'test',
+          alternate = 'app/Http/Controllers/{}.php',
         },
         ['tests/Unit/*Test.php'] = {
           type = 'test',
@@ -28,6 +33,10 @@ return {
         },
         ['app/Http/Controllers/*.php'] = {
           type = 'controller',
+          alternate = {
+            'tests/Feature/Controllers/{}Test.php',
+            'tests/Feature/{}Test.php',
+          },
         },
         ['routes/*.php'] = {
           type = 'route',
