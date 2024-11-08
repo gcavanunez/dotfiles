@@ -108,14 +108,16 @@ require('lazy').setup({
   -- Improved syntax highlighting
   { import = 'user.plugins.treesitter' },
 
-  -- Debugging
-  -- {
-  --   "mfussenegger/nvim-dap",
-  -- }
-
   -- Language Server Protocol.
   { import = 'user.plugins.lspconfig' },
 
+  -- Debugging
+  {
+    import = 'user.plugins.dap',
+  },
+  {
+    import = 'user.plugins.dap-ui',
+  },
   -- Blade lsp
   { import = 'user.plugins.blade-nav' },
 

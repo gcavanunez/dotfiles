@@ -160,4 +160,6 @@ vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { noremap = true })
 vim.keymap.set('t', 'jk', [[<C-\><C-n>]], { noremap = true })
 vim.keymap.set('n', "<Leader>'", toggle_surrounding_quote_style)
 
+vim.keymap.set('n', '<leader>tb', '<cmd>DapToggleBreakpoint<CR>', { desc = 'Add breakpoint at line' })
+vim.keymap.set('n', '<leader>tr', '<cmd>DapContinue<CR>', { desc = 'Run or continue the debugger' })
 vim.keymap.set('n', '<leader>kd', '<cmd>NoiceDismiss<CR>', { desc = 'Dismiss Noice' })

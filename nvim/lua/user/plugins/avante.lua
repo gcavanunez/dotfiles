@@ -1,10 +1,11 @@
 return {
   'yetone/avante.nvim',
   event = 'VeryLazy',
-  provider = 'copilot',
   lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
+    -- provider = 'claude',
+    -- auto_suggestions_provider = 'copilot',
     -- add any opts here
   },
   -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`

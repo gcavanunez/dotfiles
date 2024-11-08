@@ -15,7 +15,13 @@ return {
         height = 0.8,
       },
     })
-    require('mason-lspconfig').setup({ automatic_installation = true })
+    require('mason-lspconfig').setup({
+      automatic_installation = true,
+      ensure_installed = {
+        'lua_ls',
+        -- 'js-debug-adapter',
+      },
+    })
 
     local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
@@ -66,7 +72,7 @@ return {
     })
 
     -- require('lspconfig').htmx.setup({
-    --   -- capabilities = capabilities,
+    --   capabilities = capabilities,
     -- })
 
     -- GoLang
@@ -88,7 +94,7 @@ return {
 
     -- Elixir
     require('lspconfig').lexical.setup({
-      -- capabilities = capabilities,
+      capabilities = capabilities,
     })
 
     -- PHP
