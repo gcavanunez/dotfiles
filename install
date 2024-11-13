@@ -26,5 +26,9 @@ ln -sf $DOTFILES/zellij $HOME/.config/zellij
 rm -rf $HOME/.config/wezterm
 ln -s $DOTFILES/wezterm $HOME/.config/wezterm
 
+# lazygit
+rm -rf $HOME/.config/lazygit
+ln -s $DOTFILES/lazygit $HOME/.config/lazygit
+
 # Starship
 ln -sf $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
