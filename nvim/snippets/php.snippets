@@ -28,3 +28,20 @@ snippet testa "test method (annotation)"
 	{
 		${0}
 	}
+
+snippet comp "computed property"
+	#[Computed]
+	public function ${1}()
+	{
+	    ${0}
+	}
+
+snippet url "livewire url property"
+	#[Url(${3})]
+	public ${1} = ${2};
+
+snippet mount "livewire mount method"
+	public function mount()
+	{
+		${0}
+	}

@@ -1,0 +1,29 @@
+snippet echo "Mustache braces"
+	{{ $0 }}
+
+snippet raw "Raw mustache braces"
+	{!! $0 !!}
+
+snippet dd "Raw dd()"
+	{!! dd($0) !!}
+
+snippet csrf "Add csrf"
+	@csrf
+
+snippet if "If statement"
+	@if (${1:CONDITION})
+		${2:// TODO}	
+	@else
+		${3:// TODO}	
+	@endif
+
+snippet for "loop list"
+	@foreach ($$1s as $${1:item})
+	@endforeach
+
+snippet forelse "Description"
+	@forelse ($$1s as $${1:ITEM})
+		<li>{{ $$1->name }}</li>
+	@empty
+		<p>No $1</p>
+	@endforelse

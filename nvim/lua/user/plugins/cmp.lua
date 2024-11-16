@@ -47,6 +47,9 @@ return {
       preselect = false,
       snippet = {
         expand = function(args)
+          -- https://github.com/dev4dev/blade-snippets
+          -- https://github.com/jesseleite/dotfiles/blob/master/nvim/lua/jl/luasnip/old_snippets/blade.snippets
+          -- https://github.com/sunzhongwei/vim-zhongwei-snippets/blob/master/UltiSnips/html_blade.snippets
           luasnip.lsp_expand(args.body)
         end,
       },
