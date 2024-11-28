@@ -78,9 +78,9 @@ return {
           '.git',
         },
       },
-      -- follow_current_file = {
-      --   enabled = true,
-      -- },
+      follow_current_file = {
+        enabled = true,
+      },
       group_empty_dirs = false,
     },
   },

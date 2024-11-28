@@ -44,8 +44,11 @@ local routes = {
 
   -- FIX LSP bugs?
   -- { filter = { event = 'msg_show', find = 'lsp_signature? handler RPC' }, skip = true },
-    -- stylua: ignore
-    { filter = { event = "msg_show", find = "^%s*at process.processTicksAndRejections" }, skip = true },
+  -- stylua: ignore
+  { filter = { event = "msg_show", find = "^%s*at process.processTicksAndRejections" }, skip = true },
+
+  -- skip test messages
+  { filter = { event = 'msg_show', find = '%test' }, skip = true },
 
   -- code actions
   { filter = { event = 'notify', find = 'No code actions available' }, skip = true },
@@ -85,11 +88,11 @@ return {
     --   },
     -- },
     presets = {
-      bottom_search = true, -- use a classic bottom cmdline for search
-      command_palette = true, -- position the cmdline and popupmenu together
+      bottom_search = true,         -- use a classic bottom cmdline for search
+      command_palette = true,       -- position the cmdline and popupmenu together
       long_message_to_split = true, -- long messages will be sent to a split
-      inc_rename = true, -- enables an input dialog for inc-rename.nvim
-      lsp_doc_border = true, -- add a border to hover docs and signature help
+      inc_rename = true,            -- enables an input dialog for inc-rename.nvim
+      lsp_doc_border = true,        -- add a border to hover docs and signature help
     },
   },
   dependencies = {

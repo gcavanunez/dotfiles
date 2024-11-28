@@ -9,6 +9,7 @@ return {
     -- 'hrsh7th/cmp-copilot',
     'L3MON4D3/LuaSnip',
     'saadparwaiz1/cmp_luasnip',
+    'rafamadriz/friendly-snippets',
     'onsails/lspkind-nvim',
   },
   config = function()
@@ -16,6 +17,7 @@ return {
     local luasnip = require('luasnip')
     local lspkind = require('lspkind')
 
+    require('luasnip/loaders/from_vscode').lazy_load()
     require('luasnip/loaders/from_snipmate').lazy_load()
 
     -- local has_words_before = function()
@@ -120,7 +122,7 @@ return {
         { name = 'nvim_lsp' },
         { name = 'nvim_lsp_signature_help' },
         { name = 'luasnip' },
-        -- { name = 'copilot' },
+        { name = 'copilot' },
         { name = 'buffer' },
         { name = 'path' },
       },

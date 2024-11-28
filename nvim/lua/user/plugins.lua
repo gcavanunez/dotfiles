@@ -31,13 +31,22 @@ require('lazy').setup({
   { 'tpope/vim-surround' },
 
   -- https://github.com/mg979/vim-visual-multi
-  { 'mg979/vim-visual-multi' },
+  {
+    'mg979/vim-visual-multi', -- See https://github.com/mg979/vim-visual-multi/issues/241
+    init = function()
+      vim.g.VM_default_mappings = 0
+      vim.g.VM_maps = {
+        ['Find Under'] = '',
+      }
+      vim.g.VM_add_cursor_at_pos_no_mappings = 1
+    end,
+  },
 
   -- Useful commands like :Rename and :SudoWrite.
   { 'tpope/vim-eunuch' },
 
   -- Pairs of handy bracket mappings, like [b and ]b.
-  { 'tpope/vim-unimpaired', event = 'VeryLazy' },
+  { 'tpope/vim-unimpaired',                  event = 'VeryLazy' },
 
   -- Indent autodetection with editorconfig support.
   { 'tpope/vim-sleuth' },
@@ -58,13 +67,13 @@ require('lazy').setup({
   { 'jessarcher/vim-heritage' },
 
   -- Text objects for HTML attributes.
-  { 'whatyouhide/vim-textobj-xmlattr', dependencies = 'kana/vim-textobj-user' },
+  { 'whatyouhide/vim-textobj-xmlattr',       dependencies = 'kana/vim-textobj-user' },
 
   -- Automatically set the working directory to the project root.
   { import = 'user.plugins.vim-rooter' },
 
   -- Automatically add closing brackets, quotes, etc.
-  { 'windwp/nvim-autopairs', config = true },
+  { 'windwp/nvim-autopairs',                 config = true },
 
   -- Add smooth scrolling to avoid jarring jumps
   -- { 'karb94/neoscroll.nvim', config = true },
@@ -100,7 +109,7 @@ require('lazy').setup({
   { import = 'user.plugins.gitsigns' },
 
   -- Git commands.
-  { 'tpope/vim-fugitive', dependencies = 'tpope/vim-rhubarb' },
+  { 'tpope/vim-fugitive',                    dependencies = 'tpope/vim-rhubarb' },
 
   --- Floating terminal.
   { import = 'user.plugins.floaterm' },
@@ -184,7 +193,8 @@ require('lazy').setup({
   },
   install = {
     -- colorscheme = { "mellow", "habamax" },
-    colorscheme = { 'tokyonight-storm', 'habamax' },
+    -- colorscheme = { 'tokyonight-storm', 'habamax' },
+    -- colorscheme = { 'catppuccin-mocha', 'habamax' },
     -- colorscheme = { 'solarized-osaka', 'habamax' },
     -- colorscheme = { 'poimandres', 'habamax' },
     -- colorscheme = { 'nord', 'habamax' },

@@ -1,5 +1,6 @@
 return {
   'craftzdog/solarized-osaka.nvim',
+  enabled = false,
   lazy = false,
   priority = 1000,
   opts = {
@@ -36,8 +37,8 @@ return {
   },
 
   config = function(plugin, opts)
-    -- require('solarized-osaka').setup(opts)
+    require('solarized-osaka').setup(opts)
 
-    -- vim.cmd('colorscheme solarized-osaka')
+    vim.cmd('colorscheme solarized-osaka')
   end,
 }

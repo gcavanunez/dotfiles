@@ -7,25 +7,41 @@ vim.g.maplocalleader = ' '
 vim.keymap.set('n', '<leader>k', '<cmd>nohlsearch<CR>')
 
 local change_font_script = [[
-  FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
+  # FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
+  FILE=$(readlink -f $HOME/dotfiles/wezterm/wezterm.lua)
 
-# Check if the resolved file exists
+  # Check if the resolved file exists
   if [ ! -f "$FILE" ]; then
       echo "Error: The file '$FILE' does not exist."
       exit 1
   fi
 
-    # Check if the file contains 'size = 16'
-    if grep -q 'size = 16' "$FILE"; then
-        echo "Changing 'size = 16' to 'size = 22'"
-        sed -i '' 's/size = 16/size = 22/g' "$FILE"
-    # Check if the file contains 'size = 22'
-    elif grep -q 'size = 22' "$FILE"; then
-        echo "Changing 'size = 22' to 'size = 16'"
-        sed -i '' 's/size = 22/size = 16/g' "$FILE"
-    else
-        echo "No changes made. The file does not contain 'size = 16' or 'size = 22'."
-    fi
+  # Check if the file contains 'size = 16'
+  # if grep -q 'size = 16' "$FILE"; then
+  #    echo "Changing 'size = 16' to 'size = 22'"
+  #    sed -i '' 's/size = 16/size = 22/g' "$FILE"
+  # Check if the file contains 'size = 22'
+  # elif grep -q 'size = 22' "$FILE"; then
+  #    echo "Changing 'size = 22' to 'size = 16'"
+  #    sed -i '' 's/size = 22/size = 16/g' "$FILE"
+  # else
+  #    echo "No changes made. The file does not contain 'size = 16' or 'size = 22'."
+  # fi
+
+  # Check if the file contains 'config.font_size = 16'
+  if grep -q 'config.font_size = 16' "$FILE"; then
+      echo "Changing 'config.font_size = 16' to 'config.font_size = 20'"
+      sed -i '' 's/config.font_size = 16/config.font_size = 20/g' "$FILE"
+  # Check if the file contains 'config.font_size = 22'
+  elif grep -q 'config.font_size = 20' "$FILE"; then
+      echo "Changing 'config.font_size = 20' to 'config.font_size = 12'"
+      sed -i '' 's/config.font_size = 20/config.font_size = 14/g' "$FILE"
+  elif grep -q 'config.font_size = 14' "$FILE"; then
+      echo "Changing 'config.font_size = 14' to 'config.font_size = 16'"
+      sed -i '' 's/config.font_size = 14/config.font_size = 16/g' "$FILE"
+  else
+      echo "No changes made. The file does not contain 'config.font_size = 16' or 'config.font_size = 22'."
+  fi
 ]]
 -- Quickly clear search highlighting.
 vim.keymap.set('n', '<leader>KK', function()
@@ -94,6 +110,7 @@ end, opts)
 
 -- vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
 vim.keymap.set('n', '<leader><c-s>', '<cmd>noautocmd write<CR>')
+vim.keymap.set('n', '<c-s>', '<cmd>write<CR>')
 
 -- vim.keymap.set("n", "[g", vim.diagnostic.goto_prev)
 -- Move text up and down
@@ -163,3 +180,17 @@ vim.keymap.set('n', "<Leader>'", toggle_surrounding_quote_style)
 vim.keymap.set('n', '<leader>tb', '<cmd>DapToggleBreakpoint<CR>', { desc = 'Add breakpoint at line' })
 vim.keymap.set('n', '<leader>tr', '<cmd>DapContinue<CR>', { desc = 'Run or continue the debugger' })
 vim.keymap.set('n', '<leader>kd', '<cmd>NoiceDismiss<CR>', { desc = 'Dismiss Noice' })
+-- https://github.com/alextricity25/nvim_weekly_plugin_configs/blob/main/lua/keymappings.lua
+local function visual_cursors_with_delay()
+  -- Execute the vm-visual-cursors command.
+  vim.cmd('silent! execute "normal! \\<Plug>(VM-Visual-Cursors)"')
+  -- Introduce delay via VimScript's 'sleep' (set to 500 milliseconds here).
+  vim.cmd('sleep 200m')
+  -- Press 'A' in normal mode after the delay.
+  vim.cmd('silent! execute "normal! A"')
+end
+vim.keymap.set('n', '<leader>ma', '<Plug>(VM-Select-All)<Tab>', { desc = 'Select All' })
+vim.keymap.set('n', '<leader>mr', '<Plug>(VM-Start-Regex-Search)', { desc = 'Start Regex Search' })
+vim.keymap.set('n', '<leader>mp', '<Plug>(VM-Add-Cursor-At-Pos)', { desc = 'Add Cursor At Pos' })
+vim.keymap.set('v', '<leader>mv', visual_cursors_with_delay, { desc = 'Visual Cursors' })
+vim.keymap.set('n', '<leader>mo', '<Plug>(VM-Toggle-Mappings)', { desc = 'Toggle Mapping' })

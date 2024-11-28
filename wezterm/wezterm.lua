@@ -29,5 +29,8 @@ config.window_padding = {
 -- }
 -- https://github.com/joshmedeski/dotfiles/blob/main/.config/wezterm/wezterm.lua
 config.color_scheme = "Catppuccin Mocha"
+config.keys = {
+	{ key = "n", mods = "SHIFT|CTRL", action = wezterm.action.DisableDefaultAssignment },
+}
 
 return config

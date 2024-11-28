@@ -28,7 +28,8 @@ return {
     local mason_registry = require('mason-registry')
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
+    '/node_modules/@vue/language-server'
 
     require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
@@ -63,12 +64,41 @@ return {
       },
     })
 
+    require('lspconfig').lua_ls.setup({
+      capabilities = capabilities,
+
+      settings = {
+        Lua = {
+          -- runtime = {
+          --   version = 'LuaJIT',
+          --   path = vim.split(package.path, ';'),
+          -- },
+          diagnostics = {
+            globals = { 'vim' },
+          },
+          workspace = {
+            library = {
+              [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+              -- [vim.fn.stdpath('config' .. '/lua')] = true,
+              -- [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+            },
+          },
+        },
+      },
+    })
+
     -- HTML
     local capabilities_html = vim.lsp.protocol.make_client_capabilities()
     capabilities_html.textDocument.completion.completionItem.snippetSupport = true
 
     require('lspconfig').html.setup({
       capabilities = capabilities,
+
+      on_attach = function(client)
+        -- client.resolved_capabilities.document_formatting = false
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentFormattingRangeProvider = false
+      end,
     })
 
     -- require('lspconfig').htmx.setup({
@@ -128,7 +158,7 @@ return {
         client.server_capabilities.hoverProvider = false
         client.server_capabilities.implementationProvider = false
         client.server_capabilities.referencesProvider = false
-        client.server_capabilities.renameProvider = false
+        -- client.server_capabilities.renameProvider = false
         client.server_capabilities.selectionRangeProvider = false
         client.server_capabilities.signatureHelpProvider = false
         client.server_capabilities.typeDefinitionProvider = false
@@ -139,6 +169,8 @@ return {
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
       end,
+      -- filetypes = { 'php', 'blade' },
+
       init_options = {
         ['language_server_phpstan.enabled'] = false,
         ['language_server_psalm.enabled'] = false,

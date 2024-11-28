@@ -9,10 +9,27 @@ return {
     {
       'JoosepAlviste/nvim-ts-context-commentstring',
       opts = {
+        -- custom_calculation = function(node, language_tree)
+        --   if vim.bo.filetype == 'blade' and language_tree._lang ~= 'javascript' then
+        --     return '{{-- %s --}}'
+        --   end
+        -- end,
         custom_calculation = function(node, language_tree)
-          if vim.bo.filetype == 'blade' and language_tree._lang ~= 'javascript' then
-            return '{{-- %s --}}'
+          -- print(language_tree:lang())
+          -- print(node:type())
+          -- print(vim.bo.filetype)
+          -- print(language_tree._lang)
+          -- print('----')
+          if vim.bo.filetype == 'blade' then
+            if language_tree._lang == 'html' then
+              return '{{-- %s --}}'
+            else
+              return '// %s'
+            end
           end
+          -- if vim.bo.filetype == 'blade' and language_tree._lang ~= 'javascript' and language_tree._lang ~= 'php' then
+          --   return '{{-- %s --}}'
+          -- end
         end,
       },
     },
@@ -81,6 +98,14 @@ return {
           ['ia'] = '@parameter.inner',
           ['aa'] = '@parameter.outer',
         },
+      },
+    },
+
+    incremental_selection = {
+      enable = true,
+      keymaps = {
+        node_incremental = 'v',
+        node_decremental = 'V',
       },
     },
   },
