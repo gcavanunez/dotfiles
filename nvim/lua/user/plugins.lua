@@ -25,7 +25,9 @@ require('lazy').setup({
   -- Commenting support.
   { import = 'user.plugins.vim-commentary' },
 
+  -- Notifications
   { import = 'user.plugins.noice' },
+  -- { import = 'user.plugins.snacks' },
 
   -- Add, change, and delete surrounding text.
   { 'tpope/vim-surround' },
@@ -44,7 +46,10 @@ require('lazy').setup({
 
   -- Useful commands like :Rename and :SudoWrite.
   { 'tpope/vim-eunuch' },
-
+  -- {
+  --   'sphamba/smear-cursor.nvim',
+  --   opts = {},
+  -- },
   -- Pairs of handy bracket mappings, like [b and ]b.
   { 'tpope/vim-unimpaired',                  event = 'VeryLazy' },
 

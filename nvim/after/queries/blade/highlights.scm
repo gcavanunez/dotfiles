@@ -26,3 +26,18 @@
 (directive_start) @tag
 (directive_end) @tag
 ((comment) @comment @spell (#set! priority 101))
+
+; (directive) @tag
+; (directive_start) @tag
+; (directive_end) @tag
+; (comment) @comment
+
+; (directive) @tag
+; (directive_start) @tag
+; (directive_end) @tag
+; ((comment) @comment @spell (#set! priority 101))
+; ((parameter) @include (#set! "priority" 110))
+; ((php_only) @include (#set! "priority" 110))
+; ((bracket_start) @function (#set! "priority" 120))
+; ((bracket_end) @function (#set! "priority" 120))
+; (keyword) @function

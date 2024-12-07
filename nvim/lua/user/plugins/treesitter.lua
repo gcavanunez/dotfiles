@@ -73,6 +73,8 @@ return {
       'vue',
       'xml',
       'yaml',
+      'eex',
+      'elixir',
     },
     auto_install = true,
     highlight = {

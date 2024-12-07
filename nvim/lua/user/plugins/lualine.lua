@@ -10,7 +10,7 @@ return {
       section_separators = '',
       component_separators = '',
       globalstatus = true,
-      theme = "auto"
+      theme = 'auto',
       -- theme = {
       --   normal = {
       --     a = 'StatusLine',
@@ -29,7 +29,7 @@ return {
           'diff',
           symbols = { added = ' ', modified = ' ', removed = ' ' },
         },
-        function ()
+        function()
           return '󰅭 ' .. vim.pesc(tostring(#vim.tbl_keys(vim.lsp.buf_get_clients())) or '')
         end,
         { 'diagnostics', sources = { 'nvim_diagnostic' } },
@@ -51,9 +51,9 @@ return {
       },
       lualine_x = {
         {
-          require("lazy.status").updates,
-          cond = require("lazy.status").has_updates,
-          color = { fg = "#ff9e64" },
+          require('lazy.status').updates,
+          cond = require('lazy.status').has_updates,
+          color = { fg = '#ff9e64' },
         },
       },
       lualine_y = {
@@ -69,6 +69,6 @@ return {
         'progress',
       },
     },
-    extensions = { "neo-tree", "lazy" },
+    extensions = { 'neo-tree', 'lazy' },
   },
 }

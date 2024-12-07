@@ -6,49 +6,107 @@ vim.g.maplocalleader = ' '
 -- vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
 vim.keymap.set('n', '<leader>k', '<cmd>nohlsearch<CR>')
 
-local change_font_script = [[
-  # FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
-  FILE=$(readlink -f $HOME/dotfiles/wezterm/wezterm.lua)
+-- local change_font_script = [[
+--   # FILE=$(readlink -f $HOME/.config/alacritty/alacritty.toml)
+--   FILE=$(readlink -f $HOME/dotfiles/wezterm/wezterm.lua)
 
-  # Check if the resolved file exists
-  if [ ! -f "$FILE" ]; then
-      echo "Error: The file '$FILE' does not exist."
-      exit 1
-  fi
+--   # Check if the resolved file exists
+--   if [ ! -f "$FILE" ]; then
+--       echo "Error: The file '$FILE' does not exist."
+--       exit 1
+--   fi
 
-  # Check if the file contains 'size = 16'
-  # if grep -q 'size = 16' "$FILE"; then
-  #    echo "Changing 'size = 16' to 'size = 22'"
-  #    sed -i '' 's/size = 16/size = 22/g' "$FILE"
-  # Check if the file contains 'size = 22'
-  # elif grep -q 'size = 22' "$FILE"; then
-  #    echo "Changing 'size = 22' to 'size = 16'"
-  #    sed -i '' 's/size = 22/size = 16/g' "$FILE"
-  # else
-  #    echo "No changes made. The file does not contain 'size = 16' or 'size = 22'."
-  # fi
+--   # Check if the file contains 'size = 16'
+--   # if grep -q 'size = 16' "$FILE"; then
+--   #    echo "Changing 'size = 16' to 'size = 22'"
+--   #    sed -i '' 's/size = 16/size = 22/g' "$FILE"
+--   # Check if the file contains 'size = 22'
+--   # elif grep -q 'size = 22' "$FILE"; then
+--   #    echo "Changing 'size = 22' to 'size = 16'"
+--   #    sed -i '' 's/size = 22/size = 16/g' "$FILE"
+--   # else
+--   #    echo "No changes made. The file does not contain 'size = 16' or 'size = 22'."
+--   # fi
 
-  # Check if the file contains 'config.font_size = 16'
-  if grep -q 'config.font_size = 16' "$FILE"; then
-      echo "Changing 'config.font_size = 16' to 'config.font_size = 20'"
-      sed -i '' 's/config.font_size = 16/config.font_size = 20/g' "$FILE"
-  # Check if the file contains 'config.font_size = 22'
-  elif grep -q 'config.font_size = 20' "$FILE"; then
-      echo "Changing 'config.font_size = 20' to 'config.font_size = 12'"
-      sed -i '' 's/config.font_size = 20/config.font_size = 14/g' "$FILE"
-  elif grep -q 'config.font_size = 14' "$FILE"; then
-      echo "Changing 'config.font_size = 14' to 'config.font_size = 16'"
-      sed -i '' 's/config.font_size = 14/config.font_size = 16/g' "$FILE"
-  else
-      echo "No changes made. The file does not contain 'config.font_size = 16' or 'config.font_size = 22'."
-  fi
-]]
+--   # Check if the file contains 'config.font_size = 16'
+--   if grep -q 'config.font_size = 16' "$FILE"; then
+--       echo "Changing 'config.font_size = 16' to 'config.font_size = 20'"
+--       sed -i '' 's/config.font_size = 16/config.font_size = 20/g' "$FILE"
+--   # Check if the file contains 'config.font_size = 22'
+--   elif grep -q 'config.font_size = 20' "$FILE"; then
+--       echo "Changing 'config.font_size = 20' to 'config.font_size = 12'"
+--       sed -i '' 's/config.font_size = 20/config.font_size = 14/g' "$FILE"
+--   elif grep -q 'config.font_size = 14' "$FILE"; then
+--       echo "Changing 'config.font_size = 14' to 'config.font_size = 16'"
+--       sed -i '' 's/config.font_size = 14/config.font_size = 16/g' "$FILE"
+--   else
+--       echo "No changes made. The file does not contain 'config.font_size = 16' or 'config.font_size = 22'."
+--   fi
+-- ]]
 -- Quickly clear search highlighting.
-vim.keymap.set('n', '<leader>KK', function()
-  -- vim.cmd('silent !~/change_font_size.sh')
-  -- vim.cmd('silent !zsh -ic "toggle_font"')
-  vim.fn.system('bash -c ' .. vim.fn.shellescape(change_font_script))
-end, { desc = 'Change font size in Alacritty config', noremap = true, silent = false })
+-- vim.keymap.set('n', '<leader>KK', function()
+--   -- vim.cmd('silent !~/change_font_size.sh')
+--   -- vim.cmd('silent !zsh -ic "toggle_font"')
+--   vim.fn.system('bash -c ' .. vim.fn.shellescape(change_font_script))
+-- end, { desc = 'Change font size in Alacritty config', noremap = true, silent = false })
+
+local function change_wezterm_font_size()
+  local file_path = vim.fn.expand('~/dotfiles/wezterm/wezterm.lua')
+
+  -- Check if file exists
+  if vim.fn.filereadable(file_path) == 0 then
+    vim.notify("Error: The file '" .. file_path .. "' does not exist.", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Read file content
+  local content = vim.fn.readfile(file_path)
+  local content_str = table.concat(content, '\n')
+
+  -- Define the font size transitions
+  local size_changes = {
+    [16] = 20,
+    [20] = 14,
+    [14] = 16,
+  }
+
+  -- Find current font size with more permissive pattern
+  local current_size = string.match(content_str, 'config%.font_size%s*=%s*(%d+)')
+
+  -- Debug output
+  if not current_size then
+    vim.notify('No font size found in config', vim.log.levels.WARN)
+    -- Print a portion of the content for debugging
+    local preview = string.sub(content_str, 1, 500)
+    vim.notify('File content preview: ' .. preview, vim.log.levels.DEBUG)
+    return
+  end
+
+  current_size = tonumber(current_size)
+  -- vim.notify('Found font size: ' .. tostring(current_size))
+
+  if current_size and size_changes[current_size] then
+    local new_size = size_changes[current_size]
+    local new_content = string.gsub(content_str, 'config%.font_size%s*=%s*' .. current_size,
+      'config.font_size = ' .. new_size)
+
+    -- Write changes back to file
+    local file = io.open(file_path, 'w')
+    if file then
+      file:write(new_content)
+      file:close()
+      vim.notify(string.format('Changed font size from %d to %d', current_size, new_size))
+    else
+      vim.notify('Failed to write to file', vim.log.levels.ERROR)
+    end
+  else
+    vim.notify('No valid font size found for transition', vim.log.levels.WARN)
+  end
+end
+
+-- Font size toggle keybinding
+vim.keymap.set('n', '<leader>KK', change_wezterm_font_size,
+  { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
 
 -- Close all open buffers.
 -- vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')

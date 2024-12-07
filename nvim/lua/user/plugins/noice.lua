@@ -114,4 +114,8 @@ return {
     --   desc = '󰎟 Redirect Cmdline',
     -- },
   },
+  messages = {
+
+    enabled = false, -- enables the Noice messages UI
+  },
 }
