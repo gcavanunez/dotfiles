@@ -1,7 +1,7 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
-config.font_size = 20
+config.font_size = 16
 -- config.line_height = 1.1
 
 config.enable_tab_bar = false
@@ -10,7 +10,7 @@ config.font = wezterm.font_with_fallback({
 	"JetBrainsMono Nerd Font",
 	-- "GeistMono Nerd Font",
 	-- "MonaspiceKr Nerd Font",
-	{ family = "Symbols Nerd Font Mono" },
+	{ family = "MonaspiceKr Nerd Font" },
 })
 config.window_decorations = "RESIZE"
 config.window_padding = {

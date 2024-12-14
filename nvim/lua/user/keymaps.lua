@@ -65,9 +65,10 @@ local function change_wezterm_font_size()
 
   -- Define the font size transitions
   local size_changes = {
-    [16] = 20,
-    [20] = 14,
     [14] = 16,
+    [16] = 18,
+    [18] = 20,
+    [20] = 14,
   }
 
   -- Find current font size with more permissive pattern
@@ -161,10 +162,10 @@ vim.keymap.set('n', ']g', function()
 end, { desc = 'Go to next diagnostic warning' })
 vim.keymap.set('n', '[d', function()
   vim.diagnostic.goto_next()
-end, opts)
+end)
 vim.keymap.set('n', ']d', function()
   vim.diagnostic.goto_prev()
-end, opts)
+end)
 
 -- vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
 vim.keymap.set('n', '<leader><c-s>', '<cmd>noautocmd write<CR>')

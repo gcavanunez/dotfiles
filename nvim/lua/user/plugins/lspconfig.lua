@@ -423,7 +423,7 @@ autocmd FileType php set iskeyword+=$
     vim.keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
     vim.keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>')
     vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>')
-    vim.keymap.set('n', '<Leader>lr', '<cmd>LspRestart<CR>', { silent = true })
+    vim.keymap.set('n', '<Leader>lr', '<cmd>LspRestart<CR>')
     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
     vim.keymap.set('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 

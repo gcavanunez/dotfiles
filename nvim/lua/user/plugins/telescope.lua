@@ -31,7 +31,7 @@ return {
       end,
     },
     {
-      '<leader>g',
+      '<leader>gg',
       function()
         require('telescope').extensions.live_grep_args.live_grep_args()
       end,
@@ -55,7 +55,7 @@ return {
       end,
     },
     {
-      '<leader>G',
+      '<leader>GG',
       function()
         require('telescope.builtin').git_status()
       end,

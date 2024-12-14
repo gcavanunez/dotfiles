@@ -4,6 +4,7 @@ return {
   lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
+    hints = { enabled = false },
     -- provider = 'claude',
     -- auto_suggestions_provider = 'copilot',
     -- add any opts here
