@@ -63,6 +63,7 @@ return {
             'json',
             'jsonc',
             'yaml',
+            'mdx',
             'markdown',
             'markdown.mdx',
             'graphql',

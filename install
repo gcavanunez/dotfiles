@@ -30,5 +30,9 @@ ln -s $DOTFILES/wezterm $HOME/.config/wezterm
 rm -rf $HOME/.config/lazygit
 ln -s $DOTFILES/lazygit $HOME/.config/lazygit
 
+# ghostty
+rm -rf $HOME/.config/ghostty
+ln -s $DOTFILES/ghostty $HOME/.config/ghostty
+
 # Starship
 ln -sf $DOTFILES/starship/starship.toml $HOME/.config/starship.toml

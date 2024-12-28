@@ -1,7 +1,7 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
-config.font_size = 16
+config.font_size = 18
 -- config.line_height = 1.1
 
 config.enable_tab_bar = false

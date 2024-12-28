@@ -165,6 +165,13 @@ require('lazy').setup({
   -- Show file and LSP context in a bar at the top of the screen.
   { import = 'user.plugins.barbecue' },
 
+  {
+    'olrtg/nvim-emmet',
+    config = function()
+      vim.keymap.set({ 'n', 'v' }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
+    end,
+  },
+
   -- Virtual scrollbar
   { import = 'user.plugins.nvim-scrollbar' },
 
