@@ -105,7 +105,7 @@ return {
             callback = function()
               -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
               -- on later neovim version, you should use vim.lsp.buf.format({ async = false }) instead
-              vim.lsp.buf.format({ async = false })
+              vim.lsp.buf.format({ async = false, timeout_ms = 2000 })
               -- vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
               -- vim.lsp.buf.formatting_sync()
               -- async_formatting(bufnr)

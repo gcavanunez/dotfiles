@@ -171,6 +171,9 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 'v' }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
     end,
   },
+  {
+    import = 'user.plugins.silicon',
+  },
 
   -- Virtual scrollbar
   { import = 'user.plugins.nvim-scrollbar' },
