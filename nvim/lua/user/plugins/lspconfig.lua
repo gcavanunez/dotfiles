@@ -2,6 +2,7 @@ return {
   'neovim/nvim-lspconfig',
   event = 'VeryLazy',
   dependencies = {
+    'saghen/blink.cmp',
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'b0o/schemastore.nvim',
@@ -25,13 +26,13 @@ return {
 
     -- local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-    local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     local mason_registry = require('mason-registry')
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
-    '/node_modules/@vue/language-server'
+    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
     require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
@@ -52,6 +53,10 @@ return {
           },
         },
       },
+      -- https://github.com/LazyVim/LazyVim/discussions/2150
+      root_dir = function(...)
+        return require('lspconfig.util').root_pattern('.git')(...)
+      end,
       filetypes = {
         -- "javascript",
         -- "typescript",
@@ -289,6 +294,9 @@ return {
           schemas = require('schemastore').json.schemas(),
         },
       },
+      root_dir = function(...)
+        return require('lspconfig.util').root_pattern('.git')(...)
+      end,
     })
     require('lspconfig').emmet_language_server.setup({
       filetypes = { 'css', 'eruby', 'html', 'javascript', 'javascriptreact', 'less', 'sass', 'scss', 'pug', 'typescriptreact', 'blade' },

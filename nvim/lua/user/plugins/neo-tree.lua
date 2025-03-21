@@ -10,6 +10,7 @@ return {
     'MunifTanjim/nui.nvim',
     {
       's1n7ax/nvim-window-picker',
+      version = '2.*',
       opts = {
 
         hint = 'floating-big-letter',

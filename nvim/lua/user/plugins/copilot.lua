@@ -6,6 +6,7 @@ return {
     vim.keymap.set('i', '<C-j>', 'copilot#Accept("\\<CR>")', {
       expr = true,
       replace_keycodes = false,
+      silent = true,
     })
     --
     -- vim.keymap.set('i', '<C-j>', '<cmd>lua require("copilot").accept()<CR>', {

@@ -49,6 +49,14 @@ return {
 
         null_ls.builtins.formatting.stylua,
         null_ls.builtins.formatting.prettier.with({
+
+          condition = function(utils)
+            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js',
+              'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
+          end,
+          -- condition = function(utils)
+          --   return not utils.root_has_file({ 'vendor/bin/pint' }) == false
+          -- end,
           -- extra_filetypes = { 'blade.php' },
           filetypes = {
             'javascript',

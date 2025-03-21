@@ -33,15 +33,32 @@ require('lazy').setup({
   { 'tpope/vim-surround' },
 
   -- https://github.com/mg979/vim-visual-multi
+  -- {
+  --   'mg979/vim-visual-multi', -- See https://github.com/mg979/vim-visual-multi/issues/241
+  --   init = function()
+  --     vim.g.VM_default_mappings = 0
+  --     vim.g.VM_maps = {
+  --       ['Find Under'] = '',
+  --     }
+  --     vim.g.VM_add_cursor_at_pos_no_mappings = 1
+  --   end,
+  -- },
   {
-    'mg979/vim-visual-multi', -- See https://github.com/mg979/vim-visual-multi/issues/241
-    init = function()
-      vim.g.VM_default_mappings = 0
-      vim.g.VM_maps = {
-        ['Find Under'] = '',
-      }
-      vim.g.VM_add_cursor_at_pos_no_mappings = 1
-    end,
+    "smoka7/multicursors.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      'nvimtools/hydra.nvim',
+    },
+    opts = {},
+    cmd = { 'MCstart', 'MCvisual', 'MCclear', 'MCpattern', 'MCvisualPattern', 'MCunderCursor' },
+    keys = {
+      {
+        mode = { 'v', 'n' },
+        '<Leader>m',
+        '<cmd>MCstart<cr>',
+        desc = 'Create a selection for selected text or word under the cursor',
+      },
+    },
   },
 
   -- Useful commands like :Rename and :SudoWrite.
@@ -142,7 +159,8 @@ require('lazy').setup({
   { import = 'user.plugins.none-ls' },
 
   -- Completion
-  { import = 'user.plugins.cmp' },
+  -- { import = 'user.plugins.cmp' },
+  { import = 'user.plugins.blink' },
 
   -- PHP Refactoring Tools
   { import = 'user.plugins.phpactor' },

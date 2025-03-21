@@ -2,6 +2,7 @@ return {
   'nvim-telescope/telescope.nvim',
   dependencies = {
     'nvim-lua/plenary.nvim',
+    'debugloop/telescope-undo.nvim',
     'ThePrimeagen/harpoon',
     'ahmedkhalf/project.nvim',
     'nvim-tree/nvim-web-devicons',
@@ -259,6 +260,9 @@ return {
     vim.keymap.set('n', '<leader>4', function()
       ui.nav_file(4)
     end, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>5', function()
+      ui.nav_file(5)
+    end, { noremap = true, silent = true })
     vim.keymap.set('n', '<leader><Tab>', function()
       ui.nav_next()
     end)
@@ -274,6 +278,7 @@ return {
     --     vim.wo[winid].number = true
     --   end,
     -- })
+    require('telescope').load_extension('undo')
     require('telescope').load_extension('projects')
     require('telescope').load_extension('noice')
     require('project_nvim').setup()

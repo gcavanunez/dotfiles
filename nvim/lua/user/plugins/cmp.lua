@@ -45,6 +45,8 @@ return {
       return s:match('^%s*(.*)')
     end
 
+    local cmp_select = { behavior = cmp.SelectBehavior.Insert }
+
     cmp.setup({
       preselect = false,
       snippet = {
@@ -93,6 +95,9 @@ return {
         }),
       },
       mapping = {
+        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
         ['<Tab>'] = cmp.mapping.select_next_item({ behaviour = cmp.SelectBehavior.Insert }),
         ['<S-Tab>'] = cmp.mapping.select_prev_item({ behaviour = cmp.SelectBehavior.Insert }),
         -- ['<Tab>'] = cmp.mapping(function(fallback)
@@ -122,7 +127,7 @@ return {
       },
       sources = {
         { name = 'nvim_lsp' },
-        { name = 'nvim_lsp_signature_help' },
+        -- { name = 'nvim_lsp_signature_help' },
         { name = 'luasnip' },
         { name = 'copilot' },
         { name = 'buffer' },
