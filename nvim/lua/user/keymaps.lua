@@ -105,8 +105,74 @@ local function change_wezterm_font_size()
   end
 end
 
+local function change_ghostty_font_size()
+  local file_path = vim.fn.expand('~/dotfiles/ghostty/config')
+
+  -- Check if file exists
+  if vim.fn.filereadable(file_path) == 0 then
+    vim.notify("Error: The file '" .. file_path .. "' does not exist.", vim.log.levels.ERROR)
+    return
+  end
+
+  -- Read file content
+  local content = vim.fn.readfile(file_path)
+  local content_str = table.concat(content, '\n')
+
+  -- Define the font size transitions
+  local size_changes = {
+    -- [14] = 16,
+    [16] = 18,
+    [18] = 20,
+    [20] = 24,
+    [24] = 16,
+  }
+
+  -- Find current font size with more permissive pattern
+  local current_size = string.match(content_str, 'font%-size%s*=%s*"(%d+)"')
+
+  -- Debug output
+  if not current_size then
+    vim.notify('No font size found in config', vim.log.levels.WARN)
+    -- Print a portion of the content for debugging
+    local preview = string.sub(content_str, 1, 500)
+    vim.notify('File content preview: ' .. preview, vim.log.levels.DEBUG)
+    return
+  end
+
+  current_size = tonumber(current_size)
+  -- vim.notify('Found font size: ' .. tostring(current_size))
+
+  if current_size and size_changes[current_size] then
+    local new_size = size_changes[current_size]
+    local new_content = string.gsub(content_str, 'font%-size%s*=%s*"' .. current_size .. '"',
+      'font-size = "' .. new_size .. '"')
+
+    -- Write changes back to file
+    local file = io.open(file_path, 'w')
+    if file then
+      file:write(new_content)
+      file:close()
+
+      -- Trigger key combinations to reload the configuration
+      -- First: Cmd+Shift+,
+      vim.fn.system(
+      [[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
+      -- Small delay to ensure the first command completes
+      vim.defer_fn(function()
+        -- Second: Cmd+0
+        vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "0" using {command down}']])
+        vim.notify(string.format('Changed font size from %d to %d', current_size, new_size))
+      end, 100) -- 100ms delay
+    else
+      vim.notify('Failed to write to file', vim.log.levels.ERROR)
+    end
+  else
+    vim.notify('No valid font size found for transition', vim.log.levels.WARN)
+  end
+end
+
 -- Font size toggle keybinding
-vim.keymap.set('n', '<leader>KK', change_wezterm_font_size,
+vim.keymap.set('n', '<leader>KK', change_ghostty_font_size,
   { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
 
 -- Close all open buffers.
