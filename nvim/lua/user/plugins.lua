@@ -44,8 +44,8 @@ require('lazy').setup({
   --   end,
   -- },
   {
-    "smoka7/multicursors.nvim",
-    event = "VeryLazy",
+    'smoka7/multicursors.nvim',
+    event = 'VeryLazy',
     dependencies = {
       'nvimtools/hydra.nvim',
     },
@@ -54,7 +54,7 @@ require('lazy').setup({
     keys = {
       {
         mode = { 'v', 'n' },
-        '<Leader>m',
+        '<leader>m',
         '<cmd>MCstart<cr>',
         desc = 'Create a selection for selected text or word under the cursor',
       },
@@ -111,6 +111,7 @@ require('lazy').setup({
 
   -- Fuzzy finder
   { import = 'user.plugins.telescope' },
+  { import = 'user.plugins.harpoon' },
 
   -- File tree sidebar
   { import = 'user.plugins.neo-tree' },

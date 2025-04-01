@@ -133,6 +133,7 @@ return {
     })
 
     vim.keymap.set('n', '<leader>gf', vim.lsp.buf.format, {})
+    vim.keymap.set('v', '<leader>gf', vim.lsp.buf.format, {})
 
     -- local autocmd_group_duster = vim.api.nvim_create_augroup('CustomAutocommands', { clear = true })
 

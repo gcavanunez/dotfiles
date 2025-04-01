@@ -32,7 +32,8 @@ return {
     local mason_registry = require('mason-registry')
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
+    '/node_modules/@vue/language-server'
 
     require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
@@ -475,10 +476,10 @@ autocmd FileType php set iskeyword+=$
     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
     vim.keymap.set('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 
-    -- Commands
-    vim.api.nvim_create_user_command('Format', function()
-      vim.lsp.buf.format({ timeout_ms = 5000 })
-    end, {})
+    -- -- Commands
+    -- vim.api.nvim_create_user_command('Format', function()
+    --   vim.lsp.buf.format({ timeout_ms = 5000 })
+    -- end, {})
 
     -- Diagnostic configuration
     vim.diagnostic.config({
@@ -489,9 +490,27 @@ autocmd FileType php set iskeyword+=$
     })
 
     -- Sign configuration
-    vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
-    vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
-    vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
-    vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
+    -- vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
+    -- vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
+    -- vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
+    -- vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
+    --
+    -- ' ', ' ', '󰋼 ', ' ',
+    vim.diagnostic.config({
+      signs = {
+        text = {
+          [vim.diagnostic.severity.ERROR] = '',
+          [vim.diagnostic.severity.WARN] = '',
+          [vim.diagnostic.severity.INFO] = '󰋼',
+          [vim.diagnostic.severity.HINT] = '',
+        },
+        numhl = {
+          [vim.diagnostic.severity.ERROR] = '',
+          [vim.diagnostic.severity.WARN] = '',
+          [vim.diagnostic.severity.HINT] = '',
+          [vim.diagnostic.severity.INFO] = '',
+        },
+      },
+    })
   end,
 }

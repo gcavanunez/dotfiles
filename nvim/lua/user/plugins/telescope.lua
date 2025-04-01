@@ -3,8 +3,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'debugloop/telescope-undo.nvim',
-    'ThePrimeagen/harpoon',
-    'ahmedkhalf/project.nvim',
+    -- 'ahmedkhalf/project.nvim', <- Rebuilt myself
     'nvim-tree/nvim-web-devicons',
     'nvim-telescope/telescope-live-grep-args.nvim',
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
@@ -119,11 +118,11 @@ return {
         sorting_strategy = 'ascending',
         mappings = {
           n = {
-            ['<C-p>'] = require('telescope.actions.layout').toggle_preview,
+            ['<C-l>'] = require('telescope.actions.layout').toggle_preview,
             ['<Tab>'] = focus_preview,
           },
           i = {
-            ['<C-p>'] = require('telescope.actions.layout').toggle_preview,
+            ['<C-l>'] = require('telescope.actions.layout').toggle_preview,
             ['<esc>'] = actions.close,
             ['<S-Down>'] = actions.cycle_history_next,
             ['<S-Up>'] = actions.cycle_history_prev,
@@ -192,7 +191,6 @@ return {
     })
 
     require('telescope').load_extension('fzf')
-    require('telescope').load_extension('harpoon')
 
     local live_grep_args_shortcuts = require('telescope-live-grep-args.shortcuts')
     vim.keymap.set('v', '<leader>H', live_grep_args_shortcuts.grep_visual_selection)
@@ -243,44 +241,9 @@ return {
       })
     end)
 
-    local mark = require('harpoon.mark')
-    local ui = require('harpoon.ui')
-
-    vim.keymap.set('n', '<leader>a', mark.add_file)
-    vim.keymap.set('n', '<C-e>', ui.toggle_quick_menu, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader>1', function()
-      ui.nav_file(1)
-    end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader>2', function()
-      ui.nav_file(2)
-    end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader>3', function()
-      ui.nav_file(3)
-    end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader>4', function()
-      ui.nav_file(4)
-    end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader>5', function()
-      ui.nav_file(5)
-    end, { noremap = true, silent = true })
-    vim.keymap.set('n', '<leader><Tab>', function()
-      ui.nav_next()
-    end)
-    vim.keymap.set('n', '<leader><S-Tab>', function()
-      ui.nav_prev()
-    end)
-
-    -- vim.keymap.set("n","<leader>hc", function() mark.clear_all() end)
-    -- vim.api.nvim_create_autocmd({ 'User' }, {
-    --   pattern = 'TelescopePreviewerLoaded',
-    --   callback = function(data)
-    --     local winid = data.data.winid
-    --     vim.wo[winid].number = true
-    --   end,
-    -- })
     require('telescope').load_extension('undo')
-    require('telescope').load_extension('projects')
+    -- require('telescope').load_extension('projects')
     require('telescope').load_extension('noice')
-    require('project_nvim').setup()
+    -- require('project_nvim').setup()
   end,
 }
