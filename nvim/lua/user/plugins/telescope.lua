@@ -6,6 +6,7 @@ return {
     -- 'ahmedkhalf/project.nvim', <- Rebuilt myself
     'nvim-tree/nvim-web-devicons',
     'nvim-telescope/telescope-live-grep-args.nvim',
+    'nvim-telescope/telescope-ui-select.nvim',
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   },
   keys = {
@@ -33,7 +34,42 @@ return {
     {
       '<leader>gg',
       function()
-        require('telescope').extensions.live_grep_args.live_grep_args()
+        require('telescope').extensions.live_grep_args.live_grep_args({
+          -- prompt_title = 'Grep Project',
+          --     vimgrep_arguments = {
+          --       "rg",
+          --       "--hidden",
+          --       "-L",
+          --       "--color=never",
+          --       "--sort=path",
+          --       "--no-heading",
+          --       "--with-filename",
+          --       "--line-number",
+          --       "--column",
+          --       "--smart-case",
+          --     }
+        })
+      end,
+    },
+    {
+      '<leader>gG',
+      function()
+        require('telescope').extensions.live_grep_args.live_grep_args({
+          prompt_title = 'Grep All Files',
+          vimgrep_arguments = {
+            'rg',
+            '--hidden',
+            '--no-ignore',
+            '-L',
+            '--color=never',
+            '--sort=path',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+          },
+        })
       end,
     },
     {
@@ -150,6 +186,9 @@ return {
             },
           },
         },
+        ['ui-select'] = {
+          require('telescope.themes').get_dropdown(),
+        },
       },
       pickers = {
         find_files = {
@@ -244,6 +283,7 @@ return {
     require('telescope').load_extension('undo')
     -- require('telescope').load_extension('projects')
     require('telescope').load_extension('noice')
+    require('telescope').load_extension('ui-select')
     -- require('project_nvim').setup()
   end,
 }
