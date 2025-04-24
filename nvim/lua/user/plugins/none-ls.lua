@@ -51,8 +51,7 @@ return {
         null_ls.builtins.formatting.prettier.with({
 
           condition = function(utils)
-            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js',
-              'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
+            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
           end,
           -- condition = function(utils)
           --   return not utils.root_has_file({ 'vendor/bin/pint' }) == false
@@ -103,7 +102,7 @@ return {
         -- require('none-ls.formatting.eslint'),
       },
       on_attach = function(client, bufnr)
-        if client.supports_method('textDocument/formatting') then
+        if client:supports_method('textDocument/formatting') then
           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
           -- vim.api.nvim_buf_set_option(bufnr, 'formatexpr', '')
 

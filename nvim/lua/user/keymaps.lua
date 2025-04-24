@@ -3,7 +3,6 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Quickly clear search highlighting.
--- vim.keymap.set('n', '<leader>k', ':nohlsearch<CR>')
 vim.keymap.set('n', '<leader>k', '<cmd>nohlsearch<CR>')
 
 -- local change_font_script = [[
@@ -88,8 +87,7 @@ local function change_wezterm_font_size()
 
   if current_size and size_changes[current_size] then
     local new_size = size_changes[current_size]
-    local new_content = string.gsub(content_str, 'config%.font_size%s*=%s*' .. current_size,
-      'config.font_size = ' .. new_size)
+    local new_content = string.gsub(content_str, 'config%.font_size%s*=%s*' .. current_size, 'config.font_size = ' .. new_size)
 
     -- Write changes back to file
     local file = io.open(file_path, 'w')
@@ -144,8 +142,7 @@ local function change_ghostty_font_size()
 
   if current_size and size_changes[current_size] then
     local new_size = size_changes[current_size]
-    local new_content = string.gsub(content_str, 'font%-size%s*=%s*"' .. current_size .. '"',
-      'font-size = "' .. new_size .. '"')
+    local new_content = string.gsub(content_str, 'font%-size%s*=%s*"' .. current_size .. '"', 'font-size = "' .. new_size .. '"')
 
     -- Write changes back to file
     local file = io.open(file_path, 'w')
@@ -155,8 +152,7 @@ local function change_ghostty_font_size()
 
       -- Trigger key combinations to reload the configuration
       -- First: Cmd+Shift+,
-      vim.fn.system(
-      [[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
+      vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
       -- Small delay to ensure the first command completes
       vim.defer_fn(function()
         -- Second: Cmd+0
@@ -172,8 +168,7 @@ local function change_ghostty_font_size()
 end
 
 -- Font size toggle keybinding
-vim.keymap.set('n', '<leader>KK', change_ghostty_font_size,
-  { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
+vim.keymap.set('n', '<leader>KK', change_ghostty_font_size, { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
 
 -- Close all open buffers.
 -- vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
@@ -211,7 +206,8 @@ vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('i', ',,', '<Esc>A,<Esc>')
 
 -- Open the current file in the default program (on Mac this should just be just `open`).
-vim.keymap.set('n', '<leader>x', ':!xdg-open %<cr><cr>')
+-- vim.keymap.set('n', '<leader>x', ':!xdg-open %<cr><cr>')
+vim.keymap.set('n', '<leader>x', ':!open %<cr><cr>')
 
 -- Disable annoying command line thing.
 vim.keymap.set('n', 'q:', ':q<CR>')
@@ -223,15 +219,15 @@ vim.keymap.set('n', '<C-Left>', ':vertical resize -2<CR>')
 vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>')
 
 -- vim.keymap.set('n', ']g', vim.diagnostic.goto_next)
-vim.keymap.set('n', ']g', function()
-  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { desc = 'Go to next diagnostic warning' })
-vim.keymap.set('n', '[d', function()
-  vim.diagnostic.goto_next()
-end)
-vim.keymap.set('n', ']d', function()
-  vim.diagnostic.goto_prev()
-end)
+-- vim.keymap.set('n', ']g', function()
+--   vim.lsp.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+-- end, { desc = 'Go to next diagnostic warning' })
+-- vim.keymap.set('n', '[d', function()
+--   vim.lsp.diagnostic.goto_next()
+-- end)
+-- vim.keymap.set('n', ']d', function()
+--   vim.lsp.diagnostic.goto_prev()
+-- end)
 
 -- vim.keymap.set('n', '<leader><c-s>', ':noa w<CR>')
 vim.keymap.set('n', '<leader><c-s>', '<cmd>noautocmd write<CR>')
@@ -299,7 +295,7 @@ local toggle_surrounding_quote_style = function()
   end
 end
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { noremap = true })
-vim.keymap.set('t', 'jk', [[<C-\><C-n>]], { noremap = true })
+vim.keymap.set('t', '<leader>jk', [[<C-\><C-n>]], { noremap = true })
 vim.keymap.set('n', "<Leader>'", toggle_surrounding_quote_style)
 
 vim.keymap.set('n', '<leader>tb', '<cmd>DapToggleBreakpoint<CR>', { desc = 'Add breakpoint at line' })

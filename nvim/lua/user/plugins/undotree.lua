@@ -5,7 +5,7 @@ return {
     --     vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
     -- end
     keys = {
-        { '<Leader>u', '<Cmd>UndotreeToggle<CR>', desc = 'Toggle undotree window', mode = 'n', silent = true },
+        { '<Leader>uu', '<Cmd>UndotreeToggle<CR>', desc = 'Toggle undotree window', mode = 'n', silent = true },
     },
     -- config = function()
     --     vim.g.undotree_WindowLayout = 4

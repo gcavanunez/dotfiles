@@ -23,17 +23,14 @@ return {
         -- 'js-debug-adapter',
       },
     })
-
     -- local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
     -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
     local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     local mason_registry = require('mason-registry')
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
-    '/node_modules/@vue/language-server'
+    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
 
     require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
@@ -59,9 +56,6 @@ return {
         return require('lspconfig.util').root_pattern('.git')(...)
       end,
       filetypes = {
-        -- "javascript",
-        -- "typescript",
-        -- "vue",
         'javascript',
         'javascriptreact',
         'javascript.jsx',
@@ -76,21 +70,33 @@ return {
     require('lspconfig').lua_ls.setup({
       capabilities = capabilities,
 
+      on_attach = function(client, bufnr)
+        -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
+      end,
       settings = {
         Lua = {
           -- runtime = {
           --   version = 'LuaJIT',
           --   path = vim.split(package.path, ';'),
           -- },
+          runtime = { version = 'LuaJIT' },
           diagnostics = {
             globals = { 'vim' },
           },
           workspace = {
+            checkThirdParty = false,
+            -- library = vim.api.nvim_get_runtime_file('', true),
             library = {
-              [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-              -- [vim.fn.stdpath('config' .. '/lua')] = true,
-              -- [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+              '${3rd}/luv/library',
+              unpack(vim.api.nvim_get_runtime_file('', true)),
             },
+            -- library = {
+            --   [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+            --   -- [vim.fn.stdpath('config' .. '/lua')] = true,
+            --   -- [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+            -- },
           },
         },
       },
@@ -109,7 +115,6 @@ return {
         'templ',
       },
       capabilities = capabilities,
-
       on_attach = function(client)
         -- client.resolved_capabilities.document_formatting = false
         client.server_capabilities.documentFormattingProvider = false
@@ -154,6 +159,7 @@ return {
     --     client.server_capabilities.documentRangeFormattingProvider = false
     --   end,
     -- })
+
     -- Elixir
     require('lspconfig').elixirls.setup({
       capabilities = capabilities,
@@ -172,14 +178,16 @@ return {
       commands = {
         IntelephenseIndex = {
           function()
-            vim.lsp.buf.execute_command({ command = 'intelephense.index.workspace' })
+            -- vim.lsp.buf.execute_command({ command = 'intelephense.index.workspace' })
+            vim.lsp.client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
           end,
         },
       },
       on_attach = function(client, bufnr)
+        -- client.server_capabilities.completionProvider = false
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
-
+        -- client.server_capabilities.typeDefinitionProvider = false
         -- if client.server_capabilities.inlayHintProvider then
         --   vim.lsp.buf.inlay_hint(bufnr, true)
         -- end
@@ -469,16 +477,25 @@ autocmd FileType php set iskeyword+=$
     --require('mason-null-ls').setup({ automatic_installation = true })
 
     -- Keymaps
-    vim.keymap.set('n', '<Leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>')
-    vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
-    vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>')
+    vim.keymap.set('n', '<leader>d', '<cmd>lua vim.diagnostic.open_float()<CR>')
+    -- vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
+    -- vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.jump()<CR>')
+    -- vim.keymap.set('n', ']g', function()
+    --   vim.lsp.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+    -- end, { desc = 'Go to next diagnostic warning' })
+    vim.keymap.set('n', ']d', function()
+      vim.diagnostic.jump({ count = 1 })
+    end)
+    vim.keymap.set('n', '[d', function()
+      vim.diagnostic.jump({ count = -1 })
+    end)
     vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<CR>')
     vim.keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
     vim.keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>')
     vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>')
-    vim.keymap.set('n', '<Leader>lr', '<cmd>LspRestart<CR>')
+    vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>')
     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-    vim.keymap.set('n', '<Leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+    vim.keymap.set('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 
     -- -- Commands
     -- vim.api.nvim_create_user_command('Format', function()
@@ -487,7 +504,7 @@ autocmd FileType php set iskeyword+=$
 
     -- Diagnostic configuration
     vim.diagnostic.config({
-      virtual_text = false,
+      virtual_text = true,
       float = {
         source = true,
       },
@@ -498,7 +515,7 @@ autocmd FileType php set iskeyword+=$
     -- vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
     -- vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
     -- vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
-    --
+
     -- ' ', ' ', '󰋼 ', ' ',
     vim.diagnostic.config({
       signs = {

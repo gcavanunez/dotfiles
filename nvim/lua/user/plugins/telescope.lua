@@ -13,7 +13,7 @@ return {
     {
       '<leader>f',
       function()
-        require('telescope.builtin').find_files()
+        require('telescope.builtin').find_files({})
         -- require('telescope.builtin').find_files({
         --   default_text = vim.fn.expand('<cword>'),
         -- })
@@ -176,7 +176,7 @@ return {
           fuzzy = true,
           override_generic_sorter = true,
           override_file_sorter = true,
-          case_mode = 'smart_case',
+          case_mode = 'ignore_case',
         },
         live_grep_args = {
           mappings = {
