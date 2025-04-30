@@ -87,7 +87,8 @@ return {
           end,
         }),
 
-        require('user.plugins.duster').with({
+        -- require('user.plugins.duster')
+        null_ls.builtins.formatting.duster.with({
           condition = function(utils)
             return utils.root_has_file({ 'vendor/bin/duster' })
           end,

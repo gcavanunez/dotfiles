@@ -235,12 +235,12 @@ vim.keymap.set('n', '<c-s>', '<cmd>write<CR>')
 
 -- vim.keymap.set("n", "[g", vim.diagnostic.goto_prev)
 -- Move text up and down
-vim.keymap.set('i', '<A-j>', '<Esc>:move .+1<CR>==gi')
-vim.keymap.set('i', '<A-k>', '<Esc>:move .-2<CR>==gi')
-vim.keymap.set('n', '<A-j>', ':move .+1<CR>==')
-vim.keymap.set('n', '<A-k>', ':move .-2<CR>==')
-vim.keymap.set('v', '<A-j>', ":move '>+1<CR>gv=gv")
-vim.keymap.set('v', '<A-k>', ":move '<-2<CR>gv=gv")
+vim.keymap.set('i', '<A-j>', '<Esc><cmd>move .+1<CR>==gi')
+vim.keymap.set('i', '<A-k>', '<Esc><cmd>move .-2<CR>==gi')
+vim.keymap.set('n', '<A-j>', '<cmd>move .+1<CR>==')
+vim.keymap.set('n', '<A-k>', '<cmd>move .-2<CR>==')
+vim.keymap.set('v', '<A-j>', "<cmd>move '>+1<CR>gv=gv")
+vim.keymap.set('v', '<A-k>', "<cmd>move '<-2<CR>gv=gv")
 
 -- https://www.lazyvim.org/configuration/tips
 vim.keymap.set('n', '<S-h>', '<cmd>bprevious<cr>', { desc = 'Prev Buffer' })
@@ -305,17 +305,22 @@ vim.keymap.set('n', '<leader>kd', '<cmd>NoiceDismiss<CR>', { desc = 'Dismiss Noi
 -- vim visual mode keybindings
 --
 -- https://github.com/alextricity25/nvim_weekly_plugin_configs/blob/main/lua/keymappings.lua
--- local function visual_cursors_with_delay()
---   -- Execute the vm-visual-cursors command.
---   vim.cmd('silent! execute "normal! \\<Plug>(VM-Visual-Cursors)"')
---   -- Introduce delay via VimScript's 'sleep' (set to 500 milliseconds here).
---   vim.cmd('sleep 200m')
---   -- Press 'A' in normal mode after the delay.
---   vim.cmd('silent! execute "normal! A"')
--- end
--- vim.keymap.set('n', '<leader>ma', '<Plug>(VM-Select-All)<Tab>', { desc = 'Select All' })
--- vim.keymap.set('n', '<leader>mr', '<Plug>(VM-Start-Regex-Search)', { desc = 'Start Regex Search' })
--- vim.keymap.set('n', '<leader>mp', '<Plug>(VM-Add-Cursor-At-Pos)', { desc = 'Add Cursor At Pos' })
--- vim.keymap.set('v', '<leader>mv', visual_cursors_with_delay, { desc = 'Visual Cursors' })
--- vim.keymap.set('n', '<leader>mo', '<Plug>(VM-Toggle-Mappings)', { desc = 'Toggle Mapping' })
+local function visual_cursors_with_delay()
+  -- Execute the vm-visual-cursors command.
+  vim.cmd('silent! execute "normal! \\<Plug>(VM-Visual-Cursors)"')
+  -- Introduce delay via VimScript's 'sleep' (set to 500 milliseconds here).
+  vim.cmd('sleep 200m')
+  -- Press 'A' in normal mode after the delay.
+  vim.cmd('silent! execute "normal! A"')
+end
+vim.keymap.set('n', '<leader>ma', '<Plug>(VM-Select-All)<Tab>', { desc = 'Select All' })
+vim.keymap.set('n', '<leader>mr', '<Plug>(VM-Start-Regex-Search)', { desc = 'Start Regex Search' })
+vim.keymap.set('n', '<leader>mp', '<Plug>(VM-Add-Cursor-At-Pos)', { desc = 'Add Cursor At Pos' })
+vim.keymap.set('v', '<leader>mv', visual_cursors_with_delay, { desc = 'Visual Cursors' })
+-- vim.keymap.set('v', '<leader>mv', '<Plug>(VM-Visual-Cursors)', { desc = 'Add cursors' })
+vim.keymap.set('n', '<leader>mo', '<Plug>(VM-Toggle-Mappings)', { desc = 'Toggle Mapping' })
+
 -- vim.keymap.set('n', '<leader>A', '<Plug>(VM-Toggle-Mappings)', { desc = 'Toggle Mapping' })
+-- vim.keymap.set('n', '<leader>mn', '<Plug>(VM-Add-Cursor-Down)', { desc = 'Add Cursor Down' })
+-- { "<C-Down>", "<Plug>(VM-Add-Cursor-Down)", desc = "Add Cursor Down", mode = { "n" } },
+-- { "<C-Up>", "<Plug>(VM-Add-Cursor-Up)", desc = "Add Cursor Up", mode = { "n" } },

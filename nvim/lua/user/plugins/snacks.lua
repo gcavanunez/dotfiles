@@ -457,6 +457,14 @@ return {
       end,
       desc = 'Lazygit',
     },
+    {
+      '<leader>lG',
+      function()
+        ---@param opts? snacks.lazygit.Config
+        Snacks.lazygit.log_file()
+      end,
+      desc = 'Lazygit',
+    },
     -- {
     --   '<leader>un',
     --   function()

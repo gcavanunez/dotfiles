@@ -1,7 +1,14 @@
 return {
   'saghen/blink.cmp',
   -- optional: provides snippets for the snippet source
-  dependencies = { 'rafamadriz/friendly-snippets', 'onsails/lspkind-nvim' },
+  dependencies = { 'rafamadriz/friendly-snippets', 'onsails/lspkind-nvim', {
+    'L3MON4D3/LuaSnip',
+    version = 'v2.*',
+    config = function()
+      require('luasnip/loaders/from_vscode').lazy_load()
+      require('luasnip/loaders/from_snipmate').lazy_load()
+    end,
+  } },
 
   -- use a release tag to download pre-built binaries
   version = '*',
@@ -13,6 +20,8 @@ return {
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config
   opts = {
+
+    snippets = { preset = 'luasnip' },
     -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
     -- 'super-tab' for mappings similar to vscode (tab to accept)
     -- 'enter' for enter to accept
