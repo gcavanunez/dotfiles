@@ -152,13 +152,15 @@ local function change_ghostty_font_size()
 
       -- Trigger key combinations to reload the configuration
       -- First: Cmd+Shift+,
-      vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
-      -- Small delay to ensure the first command completes
+      vim.defer_fn(function()
+        vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
+        -- Small delay to ensure the first command completes
+      end, 150) -- 100ms delay
       vim.defer_fn(function()
         -- Second: Cmd+0
         vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "0" using {command down}']])
         vim.notify(string.format('Changed font size from %d to %d', current_size, new_size))
-      end, 100) -- 100ms delay
+      end, 250) -- 100ms delay
     else
       vim.notify('Failed to write to file', vim.log.levels.ERROR)
     end

@@ -5,6 +5,7 @@ vim.opt.softtabstop = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.opt.number = true
+vim.opt.swapfile = false
 vim.opt.relativenumber = true
 vim.opt.title = true
 vim.opt.termguicolors = true

@@ -46,7 +46,7 @@ return {
             return not utils.root_has_file({ 'vendor/bin/pint' }) == false
           end,
         }),
-
+        null_ls.builtins.formatting.gofmt,
         null_ls.builtins.formatting.stylua,
         null_ls.builtins.formatting.prettier.with({
 
@@ -96,7 +96,7 @@ return {
 
         require('none-ls.diagnostics.eslint').with({
           condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml' })
+            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml', 'eslint.config.js' })
           end,
         }),
         -- require('none-ls.formatting.eslint'),
