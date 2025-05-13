@@ -3,7 +3,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'debugloop/telescope-undo.nvim',
-    -- 'ahmedkhalf/project.nvim', <- Rebuilt myself
+    -- 'ahmedkhalf/project.nvim', <- Rebuild myself
     'nvim-tree/nvim-web-devicons',
     'nvim-telescope/telescope-live-grep-args.nvim',
     'nvim-telescope/telescope-ui-select.nvim',
@@ -25,12 +25,12 @@ return {
         require('telescope.builtin').find_files({ no_ignore = true, prompt_title = 'All Files' })
       end,
     },
-    {
-      '<leader>b',
-      function()
-        require('telescope.builtin').buffers()
-      end,
-    },
+    -- {
+    --   '<leader>b',
+    --   function()
+    --     require('telescope.builtin').buffers()
+    --   end,
+    -- },
     {
       '<leader>gg',
       function()

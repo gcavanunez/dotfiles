@@ -35,13 +35,36 @@ return {
     --   end,
     --   desc = 'Smart Find Files',
     -- },
-    -- {
-    --   '<leader>,',
-    --   function()
-    --     Snacks.picker.buffers()
-    --   end,
-    --   desc = 'Buffers',
-    -- },
+    {
+      '<leader>b',
+      function()
+        Snacks.picker.buffers({
+          -- on_show = function()
+          --   vim.cmd.stopinsert()
+          -- end,
+          finder = 'buffers',
+          format = 'buffer',
+          hidden = false,
+          unloaded = true,
+          current = true,
+          sort_lastused = true,
+          layout = 'ivy',
+          win = {
+            input = {
+              keys = {
+                ['d'] = 'bufdelete',
+              },
+            },
+            list = {
+              keys = {
+                ['d'] = 'bufdelete',
+              },
+            },
+          },
+        })
+      end,
+      desc = 'Buffers',
+    },
     -- {
     --   '<leader>/',
     --   function()
@@ -267,7 +290,9 @@ return {
     {
       '<leader>si',
       function()
-        Snacks.picker.icons()
+        Snacks.picker.icons({
+          layout = 'ivy',
+        })
       end,
       desc = 'Icons',
     },

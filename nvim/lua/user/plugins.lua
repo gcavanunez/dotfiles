@@ -18,6 +18,7 @@ require('lazy').setup({
   { import = 'user.themes.solarized-osaka' },
   { import = 'user.themes.poimandres' },
   { import = 'user.themes.nord' },
+  { import = 'user.themes.github' },
   { import = 'user.themes.vesper' },
   { import = 'user.themes.mellow' },
   { import = 'user.themes.catppuccin' },
@@ -184,6 +185,7 @@ require('lazy').setup({
 
   -- rendering md
   { import = 'user.plugins.render-markdown' },
+  -- { import = 'user.plugins.present' },
 }, {
   checker = {
     enabled = true,

@@ -1,6 +1,5 @@
 return {
   'gbprod/nord.nvim',
-  enabled = false,
   lazy = false,
   priority = 1000,
   config = function()
@@ -69,6 +68,6 @@ return {
         NvimTreeWinSeparator = { fg = '#232831', bg = '#232831' },
       },
     })
-    vim.cmd('colorscheme nord')
+    -- vim.cmd('colorscheme nord')
   end,
 }
