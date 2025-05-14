@@ -51,7 +51,8 @@ return {
         null_ls.builtins.formatting.prettier.with({
 
           condition = function(utils)
-            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
+            return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js',
+              'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
           end,
           -- condition = function(utils)
           --   return not utils.root_has_file({ 'vendor/bin/pint' }) == false
@@ -94,11 +95,19 @@ return {
           end,
         }),
 
-        require('none-ls.diagnostics.eslint').with({
-          condition = function(utils)
-            return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml', 'eslint.config.js' })
-          end,
-        }),
+        -- require('none-ls.diagnostics.eslint').with({
+        --   condition = function(utils)
+        --     return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml',
+        --       'eslint.config.js' })
+        --   end,
+        -- }),
+
+        -- require('none-ls.code_actions.eslint').with({
+        --   condition = function(utils)
+        --     return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml',
+        --       'eslint.config.js' })
+        --   end,
+        -- }),
         -- require('none-ls.formatting.eslint'),
         -- require('none-ls.formatting.eslint'),
       },

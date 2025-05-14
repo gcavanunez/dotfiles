@@ -89,7 +89,15 @@ return {
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer' },
+      default = { 'lsp', 'path', 'snippets', 'buffer', 'blade-nav' },
+      providers = {
+        ['blade-nav'] = {
+          module = 'blade-nav.blink',
+          opts = {
+            close_tag_on_complete = true, -- default: true,
+          },
+        },
+      },
       -- providers = {
       --   blade_nav = {
       --     name = 'blade-nav',

@@ -42,7 +42,7 @@ require('lazy').setup({
   --   opts = {},
   -- },
   -- Pairs of handy bracket mappings, like [b and ]b.
-  { 'tpope/vim-unimpaired', event = 'VeryLazy' },
+  { 'tpope/vim-unimpaired',                  event = 'VeryLazy' },
 
   -- Indent autodetection with editorconfig support.
   { 'tpope/vim-sleuth' },
@@ -63,13 +63,13 @@ require('lazy').setup({
   { 'jessarcher/vim-heritage' },
 
   -- Text objects for HTML attributes.
-  { 'whatyouhide/vim-textobj-xmlattr', dependencies = 'kana/vim-textobj-user' },
+  { 'whatyouhide/vim-textobj-xmlattr',       dependencies = 'kana/vim-textobj-user' },
 
   -- Automatically set the working directory to the project root.
   { import = 'user.plugins.vim-rooter' },
 
   -- Automatically add closing brackets, quotes, etc.
-  { 'windwp/nvim-autopairs', config = true },
+  { 'windwp/nvim-autopairs',                 config = true },
 
   -- Add smooth scrolling to avoid jarring jumps
   -- { 'karb94/neoscroll.nvim', config = true },
@@ -106,7 +106,7 @@ require('lazy').setup({
   { import = 'user.plugins.gitsigns' },
 
   -- Git commands.
-  { 'tpope/vim-fugitive', dependencies = 'tpope/vim-rhubarb' },
+  { 'tpope/vim-fugitive',                    dependencies = 'tpope/vim-rhubarb' },
 
   --- Floating terminal.
   { import = 'user.plugins.floaterm' },

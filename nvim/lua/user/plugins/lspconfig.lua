@@ -30,7 +30,13 @@ return {
     local mason_registry = require('mason-registry')
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+    -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+    -- local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
+    -- '/vue-language-server' .. '/node_modules/@vue/language-server'
+
+    local vue_language_server_path = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server'
+
+    -- vim.notify(vue_language_server_path)
 
     require('lspconfig').ts_ls.setup({
       capabilities = capabilities,
