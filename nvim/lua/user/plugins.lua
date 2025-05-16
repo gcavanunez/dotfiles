@@ -180,6 +180,9 @@ require('lazy').setup({
   -- Nicer Code folding.
   { import = 'user.plugins.ufo' },
 
+  -- Em todos
+  { import = 'user.plugins.todo-comments' },
+
   -- Lazygit.
   -- { import = 'user.plugins.lazygit' },
 
