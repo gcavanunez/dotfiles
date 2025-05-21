@@ -20,28 +20,20 @@ return {
       automatic_installation = true,
       ensure_installed = {
         'lua_ls',
+        'volar',
         -- 'js-debug-adapter',
       },
     })
-    -- local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-    -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
     local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-    local mason_registry = require('mason-registry')
-
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    -- local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
-    -- local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
-    -- '/vue-language-server' .. '/node_modules/@vue/language-server'
+    local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
+    '/vue-language-server' .. '/node_modules/@vue/language-server'
 
-    local vue_language_server_path = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server'
-
-    -- vim.notify(vue_language_server_path)
-
-    require('lspconfig').ts_ls.setup({
+    -- require('lspconfig').ts_ls.setup({
+    vim.lsp.config('ts_ls', {
       capabilities = capabilities,
       on_attach = function(client)
-        -- client.resolved_capabilities.document_formatting = false
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentFormattingRangeProvider = false
       end,
@@ -52,7 +44,6 @@ return {
             -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
             -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
             location = vue_language_server_path,
-
             languages = { 'vue' },
           },
         },
@@ -73,50 +64,97 @@ return {
       },
     })
 
-    require('lspconfig').ruby_lsp.setup({
-      capabilities = capabilities,
-    })
+    vim.lsp.enable('ruby_lsp')
+    -- require('lspconfig').ruby_lsp.setup({
+    --   capabilities = capabilities,
+    -- })
 
-    require('lspconfig').lua_ls.setup({
-      capabilities = capabilities,
+    -- require('lspconfig').lua_ls.setup({
+    --   capabilities = capabilities,
 
-      on_attach = function(client, bufnr)
-        -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-      end,
-      settings = {
-        Lua = {
-          -- runtime = {
-          --   version = 'LuaJIT',
-          --   path = vim.split(package.path, ';'),
-          -- },
-          runtime = { version = 'LuaJIT' },
-          diagnostics = {
-            globals = { 'vim' },
+    --   on_attach = function(client, bufnr)
+    --     -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
+    --     client.server_capabilities.documentFormattingProvider = false
+    --     client.server_capabilities.documentRangeFormattingProvider = false
+    --   end,
+    --   settings = {
+    --     Lua = {
+    --       -- runtime = {
+    --       --   version = 'LuaJIT',
+    --       --   path = vim.split(package.path, ';'),
+    --       -- },
+    --       runtime = { version = 'LuaJIT' },
+    --       diagnostics = {
+    --         globals = { 'vim' },
+    --       },
+    --       workspace = {
+    --         checkThirdParty = false,
+    --         -- library = vim.api.nvim_get_runtime_file('', true),
+    --         library = {
+    --           '${3rd}/luv/library',
+    --           unpack(vim.api.nvim_get_runtime_file('', true)),
+    --         },
+    --         -- library = {
+    --         --   [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+    --         --   -- [vim.fn.stdpath('config' .. '/lua')] = true,
+    --         --   -- [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+    --         -- },
+    --       },
+    --     },
+    --   },
+    -- })
+    vim.lsp.config('lua_ls', {
+      on_init = function(client)
+        if client.workspace_folders then
+          local path = client.workspace_folders[1].name
+          if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then
+            return
+          end
+        end
+
+        client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+          runtime = {
+            -- Tell the language server which version of Lua you're using (most
+            -- likely LuaJIT in the case of Neovim)
+            version = 'LuaJIT',
+            -- Tell the language server how to find Lua modules same way as Neovim
+            -- (see `:h lua-module-load`)
+            path = {
+              'lua/?.lua',
+              'lua/?/init.lua',
+            },
           },
+          -- Make the server aware of Neovim runtime files
           workspace = {
             checkThirdParty = false,
-            -- library = vim.api.nvim_get_runtime_file('', true),
             library = {
-              '${3rd}/luv/library',
-              unpack(vim.api.nvim_get_runtime_file('', true)),
+              vim.env.VIMRUNTIME,
+              -- Depending on the usage, you might want to add additional paths
+              -- here.
+              -- '${3rd}/luv/library'
+              -- '${3rd}/busted/library'
             },
+            -- Or pull in all of 'runtimepath'.
+            -- NOTE: this is a lot slower and will cause issues when working on
+            -- your own configuration.
+            -- See https://github.com/neovim/nvim-lspconfig/issues/3189
             -- library = {
-            --   [vim.fn.expand('$VIMRUNTIME/lua')] = true,
-            --   -- [vim.fn.stdpath('config' .. '/lua')] = true,
-            --   -- [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-            -- },
+            --   vim.api.nvim_get_runtime_file('', true),
+            -- }
           },
-        },
+        })
+      end,
+      settings = {
+        Lua = {},
       },
     })
 
     -- HTML
-    local capabilities_html = vim.lsp.protocol.make_client_capabilities()
-    capabilities_html.textDocument.completion.completionItem.snippetSupport = true
+    -- local capabilities_html = vim.lsp.protocol.make_client_capabilities()
+    -- capabilities_html.textDocument.completion.completionItem.snippetSupport = true
 
-    require('lspconfig').html.setup({
+    -- require('lspconfig').html.setup({
+    vim.lsp.config('html', {
       filetypes = {
         'html',
         'heex',
@@ -126,7 +164,6 @@ return {
       },
       capabilities = capabilities,
       on_attach = function(client)
-        -- client.resolved_capabilities.document_formatting = false
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentFormattingRangeProvider = false
       end,
@@ -136,12 +173,14 @@ return {
     --   capabilities = capabilities,
     -- })
     --
-    require('lspconfig').stimulus_ls.setup({
-      capabilities = capabilities,
-    })
+    -- require('lspconfig').stimulus_ls.setup({
+    --   capabilities = capabilities,
+    -- })
+    vim.lsp.enable('stimulus_ls')
 
     -- GoLang
-    require('lspconfig').gopls.setup({
+    -- require('lspconfig').gopls.setup({
+    vim.lsp.config('gopls', {
       capabilities = capabilities,
       cmd = { 'gopls' },
       filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
@@ -171,7 +210,9 @@ return {
     -- })
 
     -- Elixir
-    require('lspconfig').elixirls.setup({
+    -- require('lspconfig').elixirls.setup({
+
+    vim.lsp.config('elixirls', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
@@ -180,7 +221,8 @@ return {
     })
 
     -- PHP
-    require('lspconfig').intelephense.setup({
+    -- require('lspconfig').intelephense.setup({
+    vim.lsp.config('intelephense', {
       init_options = {
         globalStoragePath = os.getenv('HOME') .. '/.local/share/intelephense',
         storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
@@ -205,7 +247,8 @@ return {
       capabilities = capabilities,
     })
 
-    require('lspconfig').phpactor.setup({
+    -- require('lspconfig').phpactor.setup({
+    vim.lsp.config('phpactor', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         client.server_capabilities.completionProvider = false
@@ -253,7 +296,8 @@ return {
     --   end
     -- end
     -- Vue, JavaScript, TypeScript
-    require('lspconfig').volar.setup({
+    -- require('lspconfig').volar.setup({
+    vim.lsp.config('volar', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
@@ -304,13 +348,16 @@ return {
     -- })
 
     -- Tailwind CSS
-    require('lspconfig').tailwindcss.setup({ capabilities = capabilities })
+    -- require('lspconfig').tailwindcss.setup({ capabilities = capabilities })
+    vim.lsp.config('tailwindcss', { capabilities = capabilities })
 
     -- Astro
-    require('lspconfig').astro.setup({ capabilities = capabilities })
+    -- require('lspconfig').astro.setup({ capabilities = capabilities })
+    vim.lsp.config('astro', { capabilities = capabilities })
 
     -- JSON
-    require('lspconfig').jsonls.setup({
+    -- require('lspconfig').jsonls.setup({
+    vim.lsp.config('jsonls', {
       capabilities = capabilities,
       settings = {
         json = {
@@ -321,7 +368,8 @@ return {
         return require('lspconfig.util').root_pattern('.git')(...)
       end,
     })
-    require('lspconfig').emmet_language_server.setup({
+    -- require('lspconfig').emmet_language_server.setup({
+    vim.lsp.config('emmet_language_server', {
       filetypes = { 'css', 'eruby', 'html', 'javascript', 'javascriptreact', 'less', 'sass', 'scss', 'pug', 'typescriptreact', 'blade' },
       -- Read more about this options in the [vscode docs](https://code.visualstudio.com/docs/editor/emmet#_emmet-configuration).
       -- **Note:** only the options listed in the table are supported.
@@ -347,7 +395,8 @@ return {
       },
     })
 
-    require('lspconfig').rust_analyzer.setup({
+    -- require('lspconfig').rust_analyzer.setup({
+    vim.lsp.config('rust_analyzer', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
