@@ -20,7 +20,7 @@ return {
       automatic_installation = true,
       ensure_installed = {
         'lua_ls',
-        'volar',
+        -- 'volar',
         -- 'js-debug-adapter',
       },
     })
@@ -29,7 +29,7 @@ return {
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
     local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
     '/vue-language-server' .. '/node_modules/@vue/language-server'
-
+    -- vim.lsp.enable('vue_ls')
     -- require('lspconfig').ts_ls.setup({
     vim.lsp.config('ts_ls', {
       capabilities = capabilities,
@@ -44,14 +44,14 @@ return {
             -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
             -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
             location = vue_language_server_path,
-            languages = { 'vue' },
+            languages = { 'javascript', 'typescript', 'vue' },
           },
         },
       },
       -- https://github.com/LazyVim/LazyVim/discussions/2150
-      root_dir = function(...)
-        return require('lspconfig.util').root_pattern('.git')(...)
-      end,
+      -- root_dir = function(...)
+      --   return require('lspconfig.util').root_pattern('.git')(...)
+      -- end,
       filetypes = {
         'javascript',
         'javascriptreact',
@@ -63,6 +63,8 @@ return {
         -- 'mdx',
       },
     })
+
+    -- vim.lsp.enable('ts_ls')
 
     vim.lsp.enable('ruby_lsp')
     -- require('lspconfig').ruby_lsp.setup({
@@ -296,8 +298,8 @@ return {
     --   end
     -- end
     -- Vue, JavaScript, TypeScript
-    -- require('lspconfig').volar.setup({
-    vim.lsp.config('volar', {
+    -- require('lspconfig').vue_ls.setup({
+    vim.lsp.config('vue_ls', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
         -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
