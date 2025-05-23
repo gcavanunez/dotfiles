@@ -124,7 +124,7 @@ require('lazy').setup({
   { import = 'user.plugins.blade-nav' },
 
   -- Avante lsp
-  { import = 'user.plugins.avante' },
+  -- { import = 'user.plugins.avante' },
 
   -- Formating & diagnostics.
   { import = 'user.plugins.none-ls' },

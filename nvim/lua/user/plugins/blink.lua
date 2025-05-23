@@ -1,14 +1,22 @@
 return {
   'saghen/blink.cmp',
   -- optional: provides snippets for the snippet source
-  dependencies = { 'rafamadriz/friendly-snippets', 'onsails/lspkind-nvim', {
-    'L3MON4D3/LuaSnip',
-    version = 'v2.*',
-    config = function()
-      require('luasnip/loaders/from_vscode').lazy_load()
-      require('luasnip/loaders/from_snipmate').lazy_load()
-    end,
-  } },
+  dependencies = {
+    'rafamadriz/friendly-snippets',
+    'onsails/lspkind-nvim',
+    {
+      'xzbdmw/colorful-menu.nvim',
+      opts = {},
+    },
+    {
+      'L3MON4D3/LuaSnip',
+      version = 'v2.*',
+      config = function()
+        require('luasnip/loaders/from_vscode').lazy_load()
+        require('luasnip/loaders/from_snipmate').lazy_load()
+      end,
+    },
+  },
 
   -- use a release tag to download pre-built binaries
   version = '*',
@@ -61,20 +69,73 @@ return {
     },
     completion = {
       menu = {
-        auto_show = true,
+        -- border = 'rounded',
         draw = {
+          -- Components to render, grouped by column
+          -- padding = { 0, 1 },
+          columns = { { 'kind_icon' }, { 'label', gap = 1 }, { 'source_name' } },
           components = {
             kind_icon = {
               text = function(ctx)
-                return require('lspkind').symbolic(ctx.kind, {
-                  mode = 'symbol',
-                  preset = 'codicons',
-                })
+                local icon = ctx.kind_icon
+
+                if ctx.source_name == 'Path' then
+                  local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
+                  if dev_icon then
+                    icon = dev_icon
+                  end
+                elseif ctx.source_name == 'Blade-nav' then
+                  icon = ''
+                else
+                  icon = require('lspkind').symbolic(ctx.kind, { mode = 'symbol' })
+                end
+
+                return icon .. ctx.icon_gap
+              end,
+              highlight = function(ctx)
+                local hl = 'BlinkCmpKind' .. ctx.kind or
+                require('blink.cmp.completion.windows.render.tailwind').get_hl(ctx)
+
+                if ctx.source_name == 'Path' then
+                  local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
+                  if dev_icon then
+                    hl = dev_hl
+                  end
+                elseif ctx.source_name == 'Blade-nav' then
+                  hl = 'BlinkCmpKindBladeNav'
+                end
+                return hl
+              end,
+            },
+            label = {
+              text = function(ctx)
+                return require('colorful-menu').blink_components_text(ctx)
+              end,
+              highlight = function(ctx)
+                return require('colorful-menu').blink_components_highlight(ctx)
               end,
             },
           },
+          -- Use treesitter to highlight the label text for the given list of sources
+          treesitter = { 'lsp' },
         },
+        max_height = 20,
       },
+      -- menu = {
+      --   auto_show = true,
+      --   draw = {
+      --     components = {
+      --       kind_icon = {
+      --         text = function(ctx)
+      --           return require('lspkind').symbolic(ctx.kind, {
+      --             mode = 'symbol',
+      --             preset = 'codicons',
+      --           })
+      --         end,
+      --       },
+      --     },
+      --   },
+      -- },
       documentation = {
         auto_show = true,
         auto_show_delay_ms = 0,
@@ -94,8 +155,10 @@ return {
         ['blade-nav'] = {
           module = 'blade-nav.blink',
           opts = {
-            close_tag_on_complete = true, -- default: true,
+            close_tag_on_complete = false, -- default: true,
           },
+
+          score_offset = 100,
         },
       },
       -- providers = {
