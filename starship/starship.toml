@@ -157,10 +157,15 @@ format = '[ $time ]($style) '
 #style = "#939594"
 #format = "[$time]($style)"
 
-#[aws]
-#style = "bg:#f9a600 fg:black"
-#symbol = "☁ "
-#format = "[](fg:black bg:#f9a600)[$symbol$profile]($style)[](fg:#f9a600 bg:black)"
+# [aws]
+# style = "bg:#f9a600 fg:black"
+# symbol = "☁ "
+# format = "[](fg:black bg:#f9a600)[$symbol$profile]($style)[](fg:#f9a600 bg:black)"
+
+[aws]
+format = 'on [$symbol ($profile )(\($region\) )]($style)'
+style = 'fg:#f9a600'
+symbol = ' '
 
 #[character]
 #success_symbol = "[❯](#ff9400)"
