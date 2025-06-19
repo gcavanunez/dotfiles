@@ -90,12 +90,12 @@ return {
         require('telescope.builtin').lsp_dynamic_workspace_symbols()
       end,
     },
-    {
-      '<leader>GG',
-      function()
-        require('telescope.builtin').git_status()
-      end,
-    },
+    -- {
+    --   '<leader>GG',
+    --   function()
+    --     require('telescope.builtin').git_status()
+    --   end,
+    -- },
   },
   config = function()
     local actions = require('telescope.actions')

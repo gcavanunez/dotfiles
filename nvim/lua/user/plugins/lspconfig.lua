@@ -6,7 +6,6 @@ return {
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'b0o/schemastore.nvim',
-    -- { 'jose-elias-alvarez/null-ls.nvim', dependencies = 'nvim-lua/plenary.nvim' },
     -- 'jayp0521/mason-null-ls.nvim',
   },
   config = function()
@@ -20,7 +19,26 @@ return {
       automatic_installation = true,
       ensure_installed = {
         'lua_ls',
-        -- 'volar',
+        'eslint',
+        'ts_ls',
+        'html',
+        'ruby_lsp',
+        'gopls',
+        'lua_ls',
+        -- 'prettier',
+        'cssls',
+        'bashls',
+        'dockerls',
+        'sqlls',
+        'elixirls',
+        'intelephense',
+        'phpactor',
+        'vue_ls',
+        'tailwindcss',
+        'astro',
+        'jsonls',
+        'emmet_language_server',
+        'rust_analyzer',
         -- 'js-debug-adapter',
       },
     })
@@ -29,7 +47,6 @@ return {
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
     local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
     '/vue-language-server' .. '/node_modules/@vue/language-server'
-    -- vim.lsp.enable('vue_ls')
     -- require('lspconfig').ts_ls.setup({
     vim.lsp.config('ts_ls', {
       capabilities = capabilities,
@@ -64,12 +81,8 @@ return {
       },
     })
 
-    -- vim.lsp.enable('ts_ls')
-
     vim.lsp.enable('ruby_lsp')
-    -- require('lspconfig').ruby_lsp.setup({
-    --   capabilities = capabilities,
-    -- })
+    -- vim.lsp.enable('prettier')
 
     -- require('lspconfig').lua_ls.setup({
     --   capabilities = capabilities,
@@ -178,7 +191,7 @@ return {
     -- require('lspconfig').stimulus_ls.setup({
     --   capabilities = capabilities,
     -- })
-    vim.lsp.enable('stimulus_ls')
+    -- vim.lsp.enable('stimulus_ls')
 
     -- GoLang
     -- require('lspconfig').gopls.setup({
@@ -279,7 +292,6 @@ return {
       },
     })
 
-    local util = require('lspconfig.util')
     -- local function get_typescript_server_path(root_dir)
     --   local global_ts = '/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/typescript/lib'
     --   -- Alternative location if installed as root:
@@ -435,69 +447,6 @@ return {
       -- }
     })
 
-    -- null-ls
-    --local null_ls = require('null-ls')
-    --local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
-    --null_ls.setup({
-    --  debug = true,
-    --  temp_dir = '/tmp',
-    --  sources = {
-    --    -- null_ls.builtins.formatting.gofmt,
-    --    -- null_ls.builtins.formatting.goimports_revisor,
-
-    --    null_ls.builtins.formatting.gofumpt,
-    --    -- null_ls.builtins.formatting.goimports_reviser,
-    --    null_ls.builtins.formatting.golines,
-
-    --    null_ls.builtins.diagnostics.eslint.with({
-    --      condition = function(utils)
-    --        return utils.root_has_file({ '.eslintrc.js', '.eslintrc.cjs' })
-    --      end,
-    --    }),
-    --    -- null_ls.builtins.diagnostics.phpstan, -- TODO: Only if config file
-    --    null_ls.builtins.diagnostics.trail_space.with({ disabled_filetypes = { 'NvimTree' } }),
-    --    null_ls.builtins.formatting.eslint.with({
-    --      condition = function(utils)
-    --        return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.cjs' })
-    --      end,
-    --    }),
-    --    null_ls.builtins.formatting.pint.with({
-    --      condition = function(utils)
-    --        return utils.root_has_file({ 'vendor/bin/pint' })
-    --      end,
-    --    }),
-
-    --    null_ls.builtins.formatting.prettier.with({
-    --      prefer_local = 'node_modules/.bin',
-    --      -- disabled_filetypes = { "vue" },
-    --      extra_filetypes = { 'astro' },
-    --      condition = function(utils)
-    --        return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js', 'prettier.config.js', 'prettier.config.cjs' })
-    --      end,
-    --    }),
-    --    null_ls.builtins.formatting.rustfmt,
-    --    -- null_ls.builtins.formatting.rustfmt.with({
-    --    --
-    --    --     return utils.is_executable("rustfmt")
-    --    -- end,
-    --    -- })
-    --  },
-    --  on_attach = function(client, bufnr)
-    --    if client.supports_method('textDocument/formatting') then
-    --      vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-    --      vim.api.nvim_buf_set_option(bufnr, 'formatexpr', '')
-
-    --      vim.api.nvim_create_autocmd('BufWritePre', {
-    --        group = augroup,
-    --        buffer = bufnr,
-    --        callback = function()
-    --          vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
-    --        end,
-    --      })
-    --    end
-    --  end,
-    --})
-
     -- Define an autocmd group for the blade workaround
     local augroup = vim.api.nvim_create_augroup('lsp_blade_workaround', { clear = true })
 
@@ -518,9 +467,11 @@ return {
           -- Check if the attached client is 'intelephense'
           for _, client in ipairs(vim.lsp.get_clients()) do
             if client.name == 'intelephense' and client.attached_buffers[args.buf] then
-              vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
+              -- vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
+              vim.api.nvim_set_option_value('filetype', 'blade', { buf = args.buf })
               -- update treesitter parser to blade
-              vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
+              -- vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
+              vim.api.nvim_set_option_value('syntax', 'blade', { buf = args.buf })
               break
             end
           end
@@ -557,11 +508,6 @@ autocmd FileType php set iskeyword+=$
     vim.keymap.set('n', '<leader>lr', '<cmd>LspRestart<CR>')
     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
     vim.keymap.set('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
-
-    -- -- Commands
-    -- vim.api.nvim_create_user_command('Format', function()
-    --   vim.lsp.buf.format({ timeout_ms = 5000 })
-    -- end, {})
 
     -- Diagnostic configuration
     vim.diagnostic.config({

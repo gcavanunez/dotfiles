@@ -123,8 +123,11 @@ require('lazy').setup({
   -- Blade lsp
   { import = 'user.plugins.blade-nav' },
 
-  -- Avante lsp
+  -- Avante
   -- { import = 'user.plugins.avante' },
+
+  -- Codecompanion
+  { import = 'user.plugins.codecompanion' },
 
   -- Formating & diagnostics.
   { import = 'user.plugins.none-ls' },
@@ -146,7 +149,9 @@ require('lazy').setup({
   -- { import = 'user.plugins.nvim-window-picker' },
 
   -- GitHub Copilot
-  { import = 'user.plugins.copilot' },
+  -- { import = 'user.plugins.copilot' },
+  -- Supermaven
+  { import = 'user.plugins.supermaven' },
 
   -- Colorize Hex Codes
   { import = 'user.plugins.colorizer' },
@@ -185,6 +190,9 @@ require('lazy').setup({
 
   -- Lazygit.
   -- { import = 'user.plugins.lazygit' },
+  {
+    import = 'user.plugins.dev',
+  },
 
   -- rendering md
   { import = 'user.plugins.render-markdown' },

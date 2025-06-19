@@ -3,7 +3,7 @@ return {
   keys = {
     { '<Leader>tn', '<cmd>TestNearest<CR>' },
     { '<Leader>tf', '<cmd>TestFile<CR>' },
-    { '<Leader>ts', '<cmd>TestSuite<CR>' },
+    { '<Leader>tS', '<cmd>TestSuite<CR>' },
     { '<Leader>tl', '<cmd>TestLast<CR>' },
     { '<Leader>tv', '<cmd>TestVisit<CR>' },
   },
@@ -24,9 +24,11 @@ return {
     -- vim.cmd("let test#strategy = '" .. strategy .. "'")
 
     vim.api.nvim_set_var('test#strategy', strategy)
+
     vim.cmd([[let test#neovim#term_position = 'vert']])
     vim.cmd([[let g:test#php#phpunit#executable = "./vendor/bin/phpunit"]])
     vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/pest"]])
+    -- vim.cmd("let g:test#enabled_runners = ['php#phpunit']")
     --
     -- docker
     -- :let g:test#php#phpunit#executable = "./vendor/bin/sail bin phpunit"

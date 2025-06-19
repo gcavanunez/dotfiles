@@ -1,29 +1,3 @@
-local async_formatting = function(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-
-  vim.lsp.buf_request(bufnr, 'textDocument/formatting', vim.lsp.util.make_formatting_params({}), function(err, res, ctx)
-    if err then
-      local err_msg = type(err) == 'string' and err or err.message
-      -- you can modify the log message / level (or ignore it completely)
-      vim.notify('formatting: ' .. err_msg, vim.log.levels.WARN)
-      return
-    end
-
-    -- don't apply results if buffer is unloaded or has been modified
-    if not vim.api.nvim_buf_is_loaded(bufnr) or vim.api.nvim_buf_get_option(bufnr, 'modified') then
-      return
-    end
-
-    if res then
-      local client = vim.lsp.get_client_by_id(ctx.client_id)
-      vim.lsp.util.apply_text_edits(res, bufnr, client and client.offset_encoding or 'utf-16')
-      vim.api.nvim_buf_call(bufnr, function()
-        vim.cmd('silent noautocmd update')
-      end)
-    end
-  end)
-end
-
 return {
   'nvimtools/none-ls.nvim',
   dependencies = {
@@ -48,8 +22,9 @@ return {
         }),
         null_ls.builtins.formatting.gofmt,
         null_ls.builtins.formatting.stylua,
+        -- null_ls.builtins.formatting.rustfmt
         null_ls.builtins.formatting.prettier.with({
-
+          --      prefer_local = 'node_modules/.bin',
           condition = function(utils)
             return utils.root_has_file({ '.prettierrc', '.prettierrc.json', '.prettierrc.yml', '.prettierrc.js',
               'prettier.config.js', 'prettier.config.cjs', '.prettierrc.cjs' })
@@ -94,22 +69,6 @@ return {
             return utils.root_has_file({ 'vendor/bin/duster' })
           end,
         }),
-
-        -- require('none-ls.diagnostics.eslint').with({
-        --   condition = function(utils)
-        --     return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml',
-        --       'eslint.config.js' })
-        --   end,
-        -- }),
-
-        -- require('none-ls.code_actions.eslint').with({
-        --   condition = function(utils)
-        --     return utils.root_has_file({ '.eslintrc.js', '.eslintrc.json', '.eslintrc.yaml', '.eslintrc.yml',
-        --       'eslint.config.js' })
-        --   end,
-        -- }),
-        -- require('none-ls.formatting.eslint'),
-        -- require('none-ls.formatting.eslint'),
       },
       on_attach = function(client, bufnr)
         if client:supports_method('textDocument/formatting') then
