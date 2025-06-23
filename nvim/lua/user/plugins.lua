@@ -122,6 +122,8 @@ require('lazy').setup({
   { import = 'user.plugins.dap-ui' },
   -- Blade lsp
   { import = 'user.plugins.blade-nav' },
+  -- Laravel
+  { import = 'user.plugins.ada-laravel' },
 
   -- Avante
   -- { import = 'user.plugins.avante' },
