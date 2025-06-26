@@ -14,7 +14,29 @@ return {
       enabled = false,
       -- timeout = 3000,
     },
-    picker = { enabled = true },
+    picker = {
+      enabled = true,
+      layouts = {
+        ivy = {
+          layout = {
+            box = 'vertical',
+            backdrop = true,
+            row = -1,
+            width = 0,
+            height = 0.6,
+            border = 'top',
+            title = ' {title} {live} {flags}',
+            title_pos = 'left',
+            { win = 'input', height = 1, border = 'bottom' },
+            {
+              box = 'horizontal',
+              { win = 'list',    border = 'none' },
+              { win = 'preview', title = '{preview}', width = 0.6, border = 'left' },
+            },
+          },
+        },
+      },
+    },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },
@@ -147,21 +169,28 @@ return {
     {
       '<leader>gl',
       function()
-        Snacks.picker.git_log()
+        Snacks.picker.git_log({
+          previewers = { git = { native = true } },
+        })
       end,
       desc = 'Git Log',
     },
     {
       '<leader>gL',
       function()
-        Snacks.picker.git_log_line()
+        Snacks.picker.git_log_line({
+          previewers = { git = { native = true } },
+        })
       end,
       desc = 'Git Log Line',
     },
     {
       '<leader>gs',
       function()
-        Snacks.picker.git_status()
+        Snacks.picker.git_status({
+          layout = 'ivy',
+          previewers = { git = { native = true } },
+        })
       end,
       desc = 'Git Status',
     },
@@ -182,7 +211,10 @@ return {
     {
       '<leader>gF',
       function()
-        Snacks.picker.git_log_file()
+        Snacks.picker.git_log_file({
+          previewers = { git = { native = true } },
+          layout = 'ivy',
+        })
       end,
       desc = 'Git Log File',
     },
@@ -209,9 +241,11 @@ return {
       desc = 'Grep',
     },
     {
-      '<leader>sw',
+      '<leader>H',
       function()
-        Snacks.picker.grep_word()
+        Snacks.picker.grep_word({
+          layout = 'ivy',
+        })
       end,
       desc = 'Visual selection or word',
       mode = { 'n', 'x' },
@@ -355,7 +389,10 @@ return {
     {
       '<leader>su',
       function()
-        Snacks.picker.undo()
+        Snacks.picker.undo({
+          layout = 'ivy',
+          previewers = { diff = { native = true } },
+        })
       end,
       desc = 'Undo History',
     },

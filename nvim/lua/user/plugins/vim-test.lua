@@ -28,7 +28,7 @@ return {
     vim.cmd([[let test#neovim#term_position = 'vert']])
     vim.cmd([[let g:test#php#phpunit#executable = "./vendor/bin/phpunit"]])
     vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/pest"]])
-    -- vim.cmd("let g:test#enabled_runners = ['php#phpunit']")
+    vim.cmd("let g:test#enabled_runners = ['php#phpunit']")
     --
     -- docker
     -- :let g:test#php#phpunit#executable = "./vendor/bin/sail bin phpunit"

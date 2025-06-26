@@ -232,7 +232,7 @@ return {
     require('telescope').load_extension('fzf')
 
     local live_grep_args_shortcuts = require('telescope-live-grep-args.shortcuts')
-    vim.keymap.set('v', '<leader>H', live_grep_args_shortcuts.grep_visual_selection)
+    vim.keymap.set('v', '<leader>sw', live_grep_args_shortcuts.grep_visual_selection)
 
     -- https://github.com/rafi/vim-config/blob/814f312d92e97282913f4c3ef5f09712840b5604/lua/rafi/util/edit.lua#L10
     local get_visual_selection = function()
