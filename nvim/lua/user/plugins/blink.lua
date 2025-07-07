@@ -3,6 +3,7 @@ return {
   -- optional: provides snippets for the snippet source
   dependencies = {
     'rafamadriz/friendly-snippets',
+    { 'saghen/blink.compat', version = '*' },
     'onsails/lspkind-nvim',
     {
       'xzbdmw/colorful-menu.nvim',
@@ -150,12 +151,25 @@ return {
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer', 'blade-nav' },
+      default = {
+        'lsp',
+        'path',
+        'snippets',
+        'buffer',
+        'blade-nav',
+        'laravel',
+      },
       providers = {
+        laravel = {
+          name = 'laravel',
+          module = 'blink.compat.source',
+          score_offset = 95, -- show at a higher priority than lsp
+        },
         ['blade-nav'] = {
           module = 'blade-nav.blink',
           opts = {
             close_tag_on_complete = false, -- default: true,
+            include_routes = false,
           },
 
           score_offset = 100,

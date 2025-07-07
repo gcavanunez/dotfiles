@@ -1,5 +1,6 @@
 return {
   'adalessa/laravel.nvim',
+  -- dir = '~/nvim-plugins/laravel.nvim',
   dependencies = {
     'tpope/vim-dotenv',
     'nvim-telescope/telescope.nvim',
@@ -13,6 +14,10 @@ return {
     { '<leader>lm', '<cmd>Laravel related<cr>' },
   },
   event = { 'VeryLazy' },
-  opts = {},
+  opts = {
+    user_providers = {
+      require('user.plugins.laravel.provider_model_info'),
+    },
+  },
   config = true,
 }

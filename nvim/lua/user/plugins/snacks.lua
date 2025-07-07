@@ -463,9 +463,16 @@ return {
       desc = 'Toggle Zen Mode',
     },
     {
-      '<leader>Z',
+      '<leader>ZZ',
       function()
         Snacks.zen.zoom()
+      end,
+      desc = 'Toggle Zoom',
+    },
+    {
+      '<leader>Zz',
+      function()
+        Snacks.picker.zoxide()
       end,
       desc = 'Toggle Zoom',
     },
