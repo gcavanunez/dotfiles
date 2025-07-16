@@ -73,18 +73,11 @@ return {
       on_attach = function(client, bufnr)
         if client:supports_method('textDocument/formatting') then
           vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-          -- vim.api.nvim_buf_set_option(bufnr, 'formatexpr', '')
-
           vim.api.nvim_create_autocmd('BufWritePre', {
             group = augroup,
             buffer = bufnr,
             callback = function()
-              -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
-              -- on later neovim version, you should use vim.lsp.buf.format({ async = false }) instead
               vim.lsp.buf.format({ async = false, timeout_ms = 2000 })
-              -- vim.lsp.buf.format({ bufnr = bufnr, timeout_ms = 5000 })
-              -- vim.lsp.buf.formatting_sync()
-              -- async_formatting(bufnr)
             end,
           })
 
@@ -102,49 +95,5 @@ return {
 
     vim.keymap.set('n', '<leader>gf', vim.lsp.buf.format, {})
     vim.keymap.set('v', '<leader>gf', vim.lsp.buf.format, {})
-
-    -- local autocmd_group_duster = vim.api.nvim_create_augroup('CustomAutocommands', { clear = true })
-
-    -- vim.api.nvim_create_autocmd('BufWritePost', {
-    --   group = autocmd_group_duster,
-    --   pattern = '*.php', -- Trigger only for PHP files
-    --   callback = function()
-    --     local duster_path = vim.fn.getcwd() .. '/vendor/bin/duster'
-
-    --     -- return not utils.root_has_file({ 'vendor/bin/pint' }) == false
-    --     local file_path = vim.fn.expand('%:p')
-
-    --     -- Check if Duster exists in the project
-    --     if vim.fn.filereadable(duster_path) == 1 then
-    --       local cmd = string.format('%s fix %s', duster_path, file_path)
-
-    --       vim.fn.jobstart(cmd, {
-    --         cwd = vim.fn.getcwd(),
-    --         on_exit = function(_, exit_code)
-    --           if exit_code == 0 then
-    --             print('Duster fix completed successfully for ' .. file_path)
-    --             -- Reload the file
-    --             -- vim.cmd('edit!')
-    --             -- Save cursor position
-    --             -- local cursor_pos = vim.api.nvim_win_get_cursor(0)
-
-    --             -- Reload the file
-    --             vim.cmd('edit!')
-
-    --             -- -- Restore cursor position
-    --             -- vim.api.nvim_win_set_cursor(0, cursor_pos)
-
-    --             print('File reloaded, cursor position restored')
-
-    --           else
-    --             print('Duster fix encountered an error for ' .. file_path)
-    --           end
-    --         end,
-    --       })
-    --     else
-    --       print('Duster not found in this project. Skipping fix.')
-    --     end
-    --   end,
-    -- })
   end,
 }

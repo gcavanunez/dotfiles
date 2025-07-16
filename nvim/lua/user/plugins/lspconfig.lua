@@ -20,7 +20,8 @@ return {
       ensure_installed = {
         'lua_ls',
         'eslint',
-        'ts_ls',
+        -- 'ts_ls',
+        'vtsls',
         'html',
         'ruby_lsp',
         'gopls',
@@ -48,37 +49,64 @@ return {
     local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
     '/vue-language-server' .. '/node_modules/@vue/language-server'
     -- require('lspconfig').ts_ls.setup({
-    vim.lsp.config('ts_ls', {
+    -- vim.lsp.config('ts_ls', {
+    --   capabilities = capabilities,
+    --   on_attach = function(client)
+    --     client.server_capabilities.documentFormattingProvider = false
+    --     client.server_capabilities.documentFormattingRangeProvider = false
+    --   end,
+    --   init_options = {
+    --     plugins = {
+    --       {
+    --         name = '@vue/typescript-plugin',
+    --         -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
+    --         -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
+    --         location = vue_language_server_path,
+    --         languages = { 'javascript', 'typescript', 'vue' },
+    --       },
+    --     },
+    --   },
+    --   -- https://github.com/LazyVim/LazyVim/discussions/2150
+    --   -- root_dir = function(...)
+    --   --   return require('lspconfig.util').root_pattern('.git')(...)
+    --   -- end,
+    --   filetypes = {
+    --     'javascript',
+    --     'javascriptreact',
+    --     'javascript.jsx',
+    --     'typescript',
+    --     'typescriptreact',
+    --     'typescript.tsx',
+    --     'vue',
+    --     -- 'mdx',
+    --   },
+    -- })
+    --
+
+    local vue_plugin = {
+      name = '@vue/typescript-plugin',
+      location = vue_language_server_path,
+      languages = { 'vue' },
+      configNamespace = 'typescript',
+    }
+
+    vim.lsp.config('vtsls', {
       capabilities = capabilities,
       on_attach = function(client)
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentFormattingRangeProvider = false
       end,
-      init_options = {
-        plugins = {
-          {
-            name = '@vue/typescript-plugin',
-            -- os.getenv("HOME") .. "/.fnm/node-versions/v20.10.0/installation/bin/node",
-            -- location = "/Users/guillermocava/Library/Application Support/fnm/node-versions/v20.10.0/installation/lib/node_modules/@vue/vue-language-server",
-            location = vue_language_server_path,
-            languages = { 'javascript', 'typescript', 'vue' },
+      settings = {
+        vtsls = {
+          tsserver = {
+            globalPlugins = {
+              vue_plugin,
+            },
+            maxTsServerMemory = 12288,
           },
         },
       },
-      -- https://github.com/LazyVim/LazyVim/discussions/2150
-      -- root_dir = function(...)
-      --   return require('lspconfig.util').root_pattern('.git')(...)
-      -- end,
-      filetypes = {
-        'javascript',
-        'javascriptreact',
-        'javascript.jsx',
-        'typescript',
-        'typescriptreact',
-        'typescript.tsx',
-        'vue',
-        -- 'mdx',
-      },
+      filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
     })
 
     vim.lsp.enable('ruby_lsp')
@@ -362,11 +390,9 @@ return {
     -- })
 
     -- Tailwind CSS
-    -- require('lspconfig').tailwindcss.setup({ capabilities = capabilities })
     vim.lsp.config('tailwindcss', { capabilities = capabilities })
 
     -- Astro
-    -- require('lspconfig').astro.setup({ capabilities = capabilities })
     vim.lsp.config('astro', { capabilities = capabilities })
 
     -- JSON
