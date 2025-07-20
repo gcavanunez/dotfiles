@@ -72,24 +72,24 @@ return {
         })
       end,
     },
-    {
-      '<leader>h',
-      function()
-        require('telescope.builtin').oldfiles()
-      end,
-    },
-    {
-      '<leader>ss',
-      function()
-        require('telescope.builtin').lsp_document_symbols()
-      end,
-    },
-    {
-      '<leader>sS',
-      function()
-        require('telescope.builtin').lsp_dynamic_workspace_symbols()
-      end,
-    },
+    -- {
+    --   '<leader>h',
+    --   function()
+    --     require('telescope.builtin').oldfiles()
+    --   end,
+    -- },
+    -- {
+    --   '<leader>ss',
+    --   function()
+    --     require('telescope.builtin').lsp_document_symbols()
+    --   end,
+    -- },
+    -- {
+    --   '<leader>sS',
+    --   function()
+    --     require('telescope.builtin').lsp_dynamic_workspace_symbols()
+    --   end,
+    -- },
     -- {
     --   '<leader>GG',
     --   function()
