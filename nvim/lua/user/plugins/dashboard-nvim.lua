@@ -1,5 +1,5 @@
 local function get_random_header()
-  local headers = { 'hack', 'gengar', 'pirate', 'gear-5', 'luffy', 'spades', 'protos', '404' }
+  local headers = { 'hack', 'gengar', 'pirate', 'gear-5', 'luffy', 'spades', 'protos', '404', 'blackbird', 'ragrats' }
 
   math.randomseed(os.time())
   local random_header = headers[math.random(#headers)]
@@ -22,8 +22,8 @@ return {
         { icon = '  ', desc = 'New file', action = 'enew' },
         { icon = '  ', desc = 'Find file               ', key = 'Space + f', action = 'Telescope find_files' },
         { icon = '  ', desc = 'Recent files            ', key = 'Space + h', action = 'Telescope oldfiles' },
-        { icon = '  ', desc = 'Find Word               ', key = 'Space + g', action = 'Telescope live_grep' },
-        -- { icon = '  ', desc = 'Find Project            ', action = 'Telescope projects' },
+        { icon = '  ', desc = 'Find Word               ', key = 'Space + gg', action = 'Telescope live_grep' },
+        { icon = '  ', desc = 'Find Project            ', action = 'lua Snacks.picker.projects()' },
       },
       footer = { '' },
     },

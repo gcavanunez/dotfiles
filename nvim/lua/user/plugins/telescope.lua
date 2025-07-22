@@ -8,70 +8,72 @@ return {
     'nvim-telescope/telescope-live-grep-args.nvim',
     'nvim-telescope/telescope-ui-select.nvim',
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+
+    -- downstream -> harpoon, codecompanion, text-case and adalaravel
   },
   keys = {
-    {
-      '<leader>f',
-      function()
-        require('telescope.builtin').find_files({})
-        -- require('telescope.builtin').find_files({
-        --   default_text = vim.fn.expand('<cword>'),
-        -- })
-      end,
-    },
-    {
-      '<leader>F',
-      function()
-        require('telescope.builtin').find_files({ no_ignore = true, prompt_title = 'All Files' })
-      end,
-    },
     -- {
-    --   '<leader>b',
+    --   '<leader>f',
+    --   function()
+    --     require('telescope.builtin').find_files({})
+    --     -- require('telescope.builtin').find_files({
+    --     --   default_text = vim.fn.expand('<cword>'),
+    --     -- })
+    --   end,
+    -- },
+    -- {
+    --   '<leader>F',
+    --   function()
+    --     require('telescope.builtin').find_files({ no_ignore = true, prompt_title = 'All Files' })
+    --   end,
+    -- },
+    -- {
+    --   '<leader>b',text-case and adalaravel
     --   function()
     --     require('telescope.builtin').buffers()
     --   end,
     -- },
-    {
-      '<leader>gg',
-      function()
-        require('telescope').extensions.live_grep_args.live_grep_args({
-          -- prompt_title = 'Grep Project',
-          --     vimgrep_arguments = {
-          --       "rg",
-          --       "--hidden",
-          --       "-L",
-          --       "--color=never",
-          --       "--sort=path",
-          --       "--no-heading",
-          --       "--with-filename",
-          --       "--line-number",
-          --       "--column",
-          --       "--smart-case",
-          --     }
-        })
-      end,
-    },
-    {
-      '<leader>gG',
-      function()
-        require('telescope').extensions.live_grep_args.live_grep_args({
-          prompt_title = 'Grep All Files',
-          vimgrep_arguments = {
-            'rg',
-            '--hidden',
-            '--no-ignore',
-            '-L',
-            '--color=never',
-            '--sort=path',
-            '--no-heading',
-            '--with-filename',
-            '--line-number',
-            '--column',
-            '--smart-case',
-          },
-        })
-      end,
-    },
+    -- {
+    --   '<leader>gg',
+    --   function()
+    --     require('telescope').extensions.live_grep_args.live_grep_args({
+    --       -- prompt_title = 'Grep Project',
+    --       --     vimgrep_arguments = {
+    --       --       "rg",
+    --       --       "--hidden",
+    --       --       "-L",
+    --       --       "--color=never",
+    --       --       "--sort=path",
+    --       --       "--no-heading",
+    --       --       "--with-filename",
+    --       --       "--line-number",
+    --       --       "--column",
+    --       --       "--smart-case",
+    --       --     }
+    --     })
+    --   end,
+    -- },
+    -- {
+    --   '<leader>gG',
+    --   function()
+    --     require('telescope').extensions.live_grep_args.live_grep_args({
+    --       prompt_title = 'Grep All Files',
+    --       vimgrep_arguments = {
+    --         'rg',
+    --         '--hidden',
+    --         '--no-ignore',
+    --         '-L',
+    --         '--color=never',
+    --         '--sort=path',
+    --         '--no-heading',
+    --         '--with-filename',
+    --         '--line-number',
+    --         '--column',
+    --         '--smart-case',
+    --       },
+    --     })
+    --   end,
+    -- },
     -- {
     --   '<leader>h',
     --   function()
@@ -274,11 +276,11 @@ return {
       return table.concat(lines, '\n')
     end
 
-    vim.keymap.set('v', '<leader>F', function()
-      require('telescope.builtin').find_files({
-        default_text = get_visual_selection(),
-      })
-    end)
+    -- vim.keymap.set('v', '<leader>F', function()
+    --   require('telescope.builtin').find_files({
+    --     default_text = get_visual_selection(),
+    --   })
+    -- end)
 
     require('telescope').load_extension('undo')
     -- require('telescope').load_extension('projects')

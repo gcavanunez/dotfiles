@@ -167,6 +167,34 @@ return {
         fg = util.darken(c.bg_dark, 0.85, '#000000'),
         bg = util.darken(c.bg_dark, 0.85, '#000000'),
       }
+
+      -- local prompt = '#2d3149'
+      -- hl.SnacksPickerInput = {
+      --   bg = prompt,
+      --   fg = c.fg_dark,
+      -- }
+      -- hl.SnacksPickerInputBorder = {
+      --   bg = prompt,
+      --   fg = prompt,
+      -- }
+      -- hl.SnacksPickerPrompt = {
+      --   bg = prompt,
+      -- }
+      -- hl.NormalFloat = {
+      --   bg = c.bg,
+      -- }
+      -- hl.SnacksPickerBoxTitle = {
+      --   bg = prompt,
+      --   fg = prompt,
+      -- }
+      -- hl.SnacksPickerBoxBorder = hl.SnacksPickerBoxTitle
+      -- hl.SnacksPickerBorder = {
+      --   bg = c.bg,
+      --   fg = c.bg,
+      -- }
+      -- hl.SnacksPickerPreviewTitle = hl.SnacksPickerBorder
+      -- hl.SnacksPickerResultsTitle = hl.SnacksPickerBorder
+      -- hl.SnacksPickerListTitle = hl.SnacksPickerBorder
     end,
   },
   config = function(plugin, opts)

@@ -25,7 +25,6 @@ return {
         'html',
         'ruby_lsp',
         'gopls',
-        'lua_ls',
         -- 'prettier',
         'cssls',
         'bashls',
@@ -172,9 +171,11 @@ return {
             checkThirdParty = false,
             library = {
               vim.env.VIMRUNTIME,
+              vim.fn.stdpath('data') .. '/lazy', -- if using lazy.nvim
+
               -- Depending on the usage, you might want to add additional paths
               -- here.
-              -- '${3rd}/luv/library'
+              '${3rd}/luv/library'
               -- '${3rd}/busted/library'
             },
             -- Or pull in all of 'runtimepath'.

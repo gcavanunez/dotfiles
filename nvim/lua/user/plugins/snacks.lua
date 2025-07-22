@@ -1,8 +1,8 @@
+---@module 'snacks'
 return {
   'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
-  ---@module 'snacks.nvim'
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
@@ -20,7 +20,7 @@ return {
         ivy = {
           layout = {
             box = 'vertical',
-            backdrop = true,
+            backdrop = 60,
             row = -1,
             width = 0,
             height = 0.6,
@@ -138,13 +138,54 @@ return {
     --   end,
     --   desc = 'Find Config File',
     -- },
-    -- {
-    --   '<leader>ff',
-    --   function()
-    --     Snacks.picker.files()
-    --   end,
-    --   desc = 'Find Files',
-    -- },
+    {
+      '<leader>F',
+      function()
+        Snacks.picker.files({
+          layout = 'ivy',
+          ignored = true,
+        })
+      end,
+      desc = 'All Files',
+    },
+    {
+      '<leader>F',
+      function()
+        Snacks.picker.files({
+          layout = 'ivy',
+          ignored = true,
+          on_show = function(picker)
+            vim.api.nvim_input(picker:word())
+            -- picker.input.win.opts.actions.insert_cword.action()
+          end,
+        })
+      end,
+      desc = 'All Files',
+      mode = { 'x' },
+    },
+    {
+      '<leader>f',
+      function()
+        Snacks.picker.files({
+          layout = 'ivy',
+        })
+      end,
+      desc = 'Files',
+    },
+    {
+      '<leader>f',
+      function()
+        Snacks.picker.files({
+          layout = 'ivy',
+          on_show = function(picker)
+            vim.api.nvim_input(picker:word())
+            -- picker.input.win.opts.actions.insert_cword.action()
+          end,
+        })
+      end,
+      desc = 'Files',
+      mode = { 'x' },
+    },
     {
       '<leader>GG',
       function()
@@ -162,7 +203,9 @@ return {
     {
       '<leader>h',
       function()
-        Snacks.picker.recent()
+        Snacks.picker.recent({
+          filter = { cwd = true },
+        })
       end,
       desc = 'Recent',
     },
@@ -242,9 +285,54 @@ return {
       desc = 'Grep Open Buffers',
     },
     {
-      '<leader>sg',
+      '<leader>gg',
       function()
-        Snacks.picker.grep()
+        Snacks.picker.grep({
+          layout = 'ivy',
+        })
+      end,
+      desc = 'Grep',
+    },
+    {
+      '<leader>gg',
+      function()
+        Snacks.picker.grep_word({
+          layout = 'ivy',
+          live = true,
+        })
+      end,
+      desc = 'Grep',
+      mode = { 'x' },
+    },
+    {
+      '<leader>gG',
+      function()
+        Snacks.picker.grep({
+          layout = 'ivy',
+          ignored = true,
+        })
+      end,
+      desc = 'Grep',
+    },
+    {
+      '<leader>gG',
+      function()
+        Snacks.picker.grep_word({
+          layout = 'ivy',
+          ignored = true,
+          live = true,
+        })
+      end,
+      desc = 'Grep',
+      mode = { 'x' },
+    },
+    {
+      '<leader>sO',
+      function()
+        Snacks.picker.grep({
+          cwd = '~/My Drive/_cloudBrain/',
+          title = 'Obsidian vault',
+        })
       end,
       desc = 'Grep',
     },

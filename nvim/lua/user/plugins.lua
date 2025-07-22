@@ -159,7 +159,7 @@ require('lazy').setup({
   { import = 'user.plugins.colorizer' },
 
   -- Show file and LSP context in a bar at the top of the screen.
-  { import = 'user.plugins.barbecue' },
+  -- { import = 'user.plugins.barbecue' },
 
   {
     'olrtg/nvim-emmet',
