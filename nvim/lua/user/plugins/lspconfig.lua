@@ -82,14 +82,38 @@ return {
     -- })
     --
 
+    -- local vue_plugin = {
+    --   name = '@vue/typescript-plugin',
+    --   location = vue_language_server_path,
+    --   languages = { 'vue' },
+    --   configNamespace = 'typescript',
+    -- }
+
+    -- vim.lsp.config('vtsls', {
+    --   capabilities = capabilities,
+    --   on_attach = function(client)
+    --     client.server_capabilities.documentFormattingProvider = false
+    --     client.server_capabilities.documentFormattingRangeProvider = false
+    --   end,
+    --   settings = {
+    --     vtsls = {
+    --       tsserver = {
+    --         globalPlugins = {
+    --           vue_plugin,
+    --         },
+    --         maxTsServerMemory = 12288,
+    --       },
+    --     },
+    --   },
+    --   filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+    -- })
     local vue_plugin = {
       name = '@vue/typescript-plugin',
       location = vue_language_server_path,
       languages = { 'vue' },
       configNamespace = 'typescript',
     }
-
-    vim.lsp.config('vtsls', {
+    local vtsls_config = {
       capabilities = capabilities,
       on_attach = function(client)
         client.server_capabilities.documentFormattingProvider = false
@@ -101,12 +125,57 @@ return {
             globalPlugins = {
               vue_plugin,
             },
+
             maxTsServerMemory = 12288,
           },
         },
       },
       filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-    })
+    }
+
+    local tsdk_path = vim.fn.expand('$MASON/packages') ..
+    '/vtsls' .. '/node_modules/@vtsls/language-server/node_modules/typescript/lib'
+    local vue_ls_config = {
+      capabilities = capabilities,
+      init_options = {
+        typescript = {
+          -- tsdk = vim.fn.getcwd() .. '/node_modules/typescript/lib',
+          tsdk = tsdk_path,
+        },
+      },
+      on_attach = function(client)
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentFormattingRangeProvider = false
+      end,
+      on_init = function(client)
+        client.handlers['tsserver/request'] = function(_, result, context)
+          local clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = 'vtsls' })
+          if #clients == 0 then
+            vim.notify('Could not find `vtsls` lsp client, `vue_ls` would not work without it.', vim.log.levels.ERROR)
+            return
+          end
+          local ts_client = clients[1]
+
+          local param = unpack(result)
+          local id, command, payload = unpack(param)
+          ts_client:exec_cmd({
+            title = 'vue_request_forward', -- You can give title anything as it's used to represent a command in the UI, `:h Client:exec_cmd`
+            command = 'typescript.tsserverRequest',
+            arguments = {
+              command,
+              payload,
+            },
+          }, { bufnr = context.bufnr }, function(_, r)
+            local response_data = { { id, r.body } }
+            ---@diagnostic disable-next-line: param-type-mismatch
+            client:notify('tsserver/response', response_data)
+          end)
+        end
+      end,
+    }
+    vim.lsp.config('vtsls', vtsls_config)
+    vim.lsp.config('vue_ls', vue_ls_config)
+    vim.lsp.enable({ 'vtsls', 'vue_ls' })
 
     vim.lsp.enable('ruby_lsp')
     -- vim.lsp.enable('prettier')
@@ -175,7 +244,7 @@ return {
 
               -- Depending on the usage, you might want to add additional paths
               -- here.
-              '${3rd}/luv/library'
+              '${3rd}/luv/library',
               -- '${3rd}/busted/library'
             },
             -- Or pull in all of 'runtimepath'.
@@ -340,14 +409,14 @@ return {
     -- end
     -- Vue, JavaScript, TypeScript
     -- require('lspconfig').vue_ls.setup({
-    vim.lsp.config('vue_ls', {
-      capabilities = capabilities,
-      on_attach = function(client, bufnr)
-        -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-      end,
-    })
+    -- vim.lsp.config('vue_ls', {
+    --   capabilities = capabilities,
+    --   on_attach = function(client, bufnr)
+    --     -- https://github.com/nvimtools/none-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts
+    --     client.server_capabilities.documentFormattingProvider = false
+    --     client.server_capabilities.documentRangeFormattingProvider = false
+    --   end,
+    -- })
 
     -- require('lspconfig').volar.setup({
     --   on_attach = function(client, bufnr)
