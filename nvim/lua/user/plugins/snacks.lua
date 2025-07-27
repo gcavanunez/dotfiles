@@ -31,7 +31,7 @@ return {
             {
               box = 'horizontal',
               { win = 'list',    border = 'none' },
-              { win = 'preview', title = '{preview}', width = 0.6, border = 'left' },
+              { win = 'preview', title = '{preview}', width = 0.65, border = 'left' },
             },
           },
         },
@@ -255,7 +255,10 @@ return {
     {
       '<leader>gd',
       function()
-        Snacks.picker.git_diff()
+        Snacks.picker.git_diff({
+          layout = 'ivy',
+          previewers = { git = { native = true } },
+        })
       end,
       desc = 'Git Diff (Hunks)',
     },
