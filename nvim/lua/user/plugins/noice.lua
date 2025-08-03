@@ -22,6 +22,7 @@ local routes = {
 
   -- write/deletion messages
   { filter = { event = 'msg_show', find = '%d+B written$' }, view = 'mini' },
+  { filter = { event = 'msg_show', any = { { find = '%d+L, %d+B' }, { find = '; after #%d+' }, { find = '; before #%d+' } } }, view = 'mini' },
   -- { filter = { event = 'msg_show', find = '%d+L, %d+B$' }, view = 'mini' },
   -- { filter = { event = 'msg_show', find = '%-%-No lines in buffer%-%-' }, view = 'mini' },
 

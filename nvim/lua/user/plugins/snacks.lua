@@ -8,8 +8,12 @@ return {
     bigfile = { enabled = true },
     dashboard = { enabled = false },
     explorer = { enabled = false },
-    indent = { enabled = false },
-    input = { enabled = false },
+    indent = {
+      enabled = false,
+    },
+    input = {
+      -- enabled = true,
+    },
     notifier = {
       enabled = false,
       -- timeout = 3000,
@@ -44,6 +48,15 @@ return {
           },
         },
       },
+      win = {
+        -- input window
+        input = {
+          keys = {
+            -- https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/docs/picker.md?plain=1#L200
+            ['<a-o>'] = { 'toggle_modified', mode = { 'i', 'n' } },
+          },
+        },
+      },
     },
     quickfile = { enabled = true },
     scope = { enabled = true },
@@ -69,6 +82,7 @@ return {
       '<leader>b',
       function()
         Snacks.picker.buffers({
+
           -- on_show = function()
           --   vim.cmd.stopinsert()
           -- end,

@@ -284,7 +284,7 @@ return {
 
     require('telescope').load_extension('undo')
     -- require('telescope').load_extension('projects')
-    require('telescope').load_extension('noice')
+    -- require('telescope').load_extension('noice')
     require('telescope').load_extension('ui-select')
     -- require('project_nvim').setup()
   end,

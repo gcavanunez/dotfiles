@@ -1,5 +1,17 @@
 local function get_random_header()
-  local headers = { 'hack', 'gengar', 'pirate', 'gear-5', 'luffy', 'spades', 'protos', '404', 'blackbird', 'ragrats' }
+  local headers = {
+    'hack',
+    'gengar',
+    'pirate',
+    'gear-5',
+    'luffy',
+    'spades',
+    'protos',
+    '404',
+    'blackbird',
+    'ragrats',
+    'tighten',
+  }
 
   math.randomseed(os.time())
   local random_header = headers[math.random(#headers)]

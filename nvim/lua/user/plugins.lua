@@ -91,10 +91,11 @@ require('lazy').setup({
   { import = 'user.plugins.neo-tree' },
 
   -- A Status line.
-  { import = 'user.plugins.lualine' },
+  -- { import = 'user.plugins.lualine' },
+  { import = 'user.plugins.windline' },
 
   -- Display buffers as tabs.
-  { import = 'user.plugins.bufferline' },
+  -- { import = 'user.plugins.bufferline' },
 
   -- Display indentation lines.
   { import = 'user.plugins.indent-blankline' },
