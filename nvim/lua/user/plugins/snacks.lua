@@ -41,6 +41,7 @@ return {
         },
       },
       sources = {
+        -- https://github.com/folke/snacks.nvim/issues/871
         projects = {
           dev = {
             '~/_www',
