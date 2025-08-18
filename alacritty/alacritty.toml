@@ -1,71 +1,21 @@
-# import = ["~/.config/alacritty/themes/nord.toml"]
-# import = ["~/.config/alacritty/themes/nvim-tokyo-moon.toml"]
-import = ["~/.config/alacritty/themes/cappuchin-mocha.toml"]
-# import = ["~/.config/alacritty/themes/tokyo-night-storm.toml"]
-# import = ["~/.config/alacritty/themes/tokyo-night.toml"]
-# import = ["~/.config/alacritty/themes/mellow.toml"]
-# import = ["~/.config/alacritty/themes/tokyo.toml"]
+general.import = [ "~/.config/omarchy/current/theme/alacritty.toml" ]
 
 [env]
-# TERM = "tmux-256color"
 TERM = "xterm-256color"
 
 [font]
-# size = 14.0
-# size = 18.0
-size = 16
-# size = 14
-# size = 12.0
-
-[font.offset]
-# y=8
-# y=24
-
-[font.bold]
-family = "JetBrainsMono Nerd Font"
-# family = "BlexMono Nerd Font Mono"
-# family = "GeistMono Nerd Font"
-# family = "FiraCode Nerd Font Mono"
-# family = "MonaspiceNe Nerd Font"
-# family = "MonaspiceAr Nerd Font"
-# family = "MonaspiceKr Nerd Font"
-# family = "Hack Nerd Font Mono"
-style = "Bold"
-
-[font.italic]
-family = "JetBrainsMono Nerd Font"
-# family = "BlexMono Nerd Font Mono"
-# family = "GeistMono Nerd Font"
-# family = "FiraCode Nerd Font Mono"
-# family = "MonaspiceNe Nerd Font"
-# family = "MonaspiceAr Nerd Font"
-# family = "MonaspiceKr Nerd Font"
-# family = "Hack Nerd Font Mono"
-style = "Italic"
-
-[font.normal]
-family = "JetBrainsMono Nerd Font"
-# family = "BlexMono Nerd Font Mono"
-# family = "GeistMono Nerd Font"
-# family = "FiraCode Nerd Font Mono"
-# family = "MonaspiceNe Nerd Font"
-# family = "MonaspiceAr Nerd Font"
-# family = "MonaspiceKr Nerd Font"
-# family = "Hack Nerd Font Mono"
-style = "Regular"
-
-[scrolling]
-history = 100000
-multiplier = 3
+normal = { family = "JetBrains Mono" }
+bold = { family = "JetBrains Mono" }
+italic = { family = "JetBrains Mono" }
+size = 12
 
 [window]
-dynamic_padding = false
-decorations = "full"
-dynamic_title = false
-opacity = 1
-title = "👨‍💻"
-option_as_alt = "OnlyLeft"
+padding.x = 0
+padding.y = 0
+decorations = "None"
+opacity = 0.98
 
-[window.padding]
-x = 0
-y = 0
+[keyboard]
+bindings = [
+{ key = "F11", action = "ToggleFullscreen" }
+]
