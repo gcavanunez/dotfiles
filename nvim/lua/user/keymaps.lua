@@ -87,7 +87,8 @@ local function change_wezterm_font_size()
 
   if current_size and size_changes[current_size] then
     local new_size = size_changes[current_size]
-    local new_content = string.gsub(content_str, 'config%.font_size%s*=%s*' .. current_size, 'config.font_size = ' .. new_size)
+    local new_content = string.gsub(content_str, 'config%.font_size%s*=%s*' .. current_size,
+      'config.font_size = ' .. new_size)
 
     -- Write changes back to file
     local file = io.open(file_path, 'w')
@@ -142,7 +143,8 @@ local function change_ghostty_font_size()
 
   if current_size and size_changes[current_size] then
     local new_size = size_changes[current_size]
-    local new_content = string.gsub(content_str, 'font%-size%s*=%s*"' .. current_size .. '"', 'font-size = "' .. new_size .. '"')
+    local new_content = string.gsub(content_str, 'font%-size%s*=%s*"' .. current_size .. '"',
+      'font-size = "' .. new_size .. '"')
 
     -- Write changes back to file
     local file = io.open(file_path, 'w')
@@ -153,7 +155,8 @@ local function change_ghostty_font_size()
       -- Trigger key combinations to reload the configuration
       -- First: Cmd+Shift+,
       vim.defer_fn(function()
-        vim.fn.system([[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
+        vim.fn.system(
+        [[osascript -e 'tell application "System Events" to keystroke "," using {command down, shift down}']])
         -- Small delay to ensure the first command completes
       end, 150) -- 100ms delay
       vim.defer_fn(function()
@@ -170,7 +173,8 @@ local function change_ghostty_font_size()
 end
 
 -- Font size toggle keybinding
-vim.keymap.set('n', '<leader>KK', change_ghostty_font_size, { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
+vim.keymap.set('n', '<leader>KK', change_ghostty_font_size,
+  { desc = 'Change font size in Wezterm config', noremap = true, silent = false })
 
 -- Close all open buffers.
 -- vim.keymap.set('n', '<leader>Q', ':bufdo bdelete<CR>')
@@ -326,3 +330,89 @@ vim.keymap.set('n', '<leader>mo', '<Plug>(VM-Toggle-Mappings)', { desc = 'Toggle
 -- vim.keymap.set('n', '<leader>mn', '<Plug>(VM-Add-Cursor-Down)', { desc = 'Add Cursor Down' })
 -- { "<C-Down>", "<Plug>(VM-Add-Cursor-Down)", desc = "Add Cursor Down", mode = { "n" } },
 -- { "<C-Up>", "<Plug>(VM-Add-Cursor-Up)", desc = "Add Cursor Up", mode = { "n" } },
+
+-- Enhanced version with branch selection
+vim.keymap.set('n', '<Leader>gD', function()
+  local base_branch = 'main'
+  local target_branch = 'HEAD'
+  local cmd = string.format('git diff --name-status %s..%s', base_branch, target_branch)
+  local result = vim.fn.system(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    vim.notify('Error running git diff: ' .. result, vim.log.levels.ERROR)
+    return
+  end
+
+  local items = {}
+  local longest_status = 0
+
+  for line in result:gmatch('[^\n]+') do
+    if line ~= '' then
+      local status, filename = line:match('^(%S+)\t(.+)$')
+      if status and filename then
+        -- Generate preview content immediately when creating the item
+        local escaped_filename = vim.fn.shellescape(filename)
+        local preview_cmd = string.format('git diff %s..%s -- %s', base_branch, target_branch, escaped_filename)
+        local preview_content = vim.fn.system(preview_cmd)
+
+        -- If no diff content, try showing file content for added files
+        if preview_content == '' and status == 'A' then
+          preview_cmd = string.format('git show HEAD:%s', escaped_filename)
+          preview_content = vim.fn.system(preview_cmd)
+        end
+
+        table.insert(items, {
+          idx = #items + 1,
+          score = #items + 1,
+          text = filename,
+          status = status,
+          base_branch = base_branch,
+          target_branch = target_branch,
+          diff = preview_content, -- Store diff content here
+          preview = {
+            text = preview_content,
+            ft = 'diff',
+            loc = false,
+          },
+        })
+        longest_status = math.max(longest_status, #status)
+      end
+    end
+  end
+
+  if #items == 0 then
+    vim.notify(string.format('No differences between %s and %s', base_branch, target_branch))
+    return
+  end
+
+  longest_status = longest_status + 2
+
+  return Snacks.picker({
+    items = items,
+    format = function(item)
+      local ret = {}
+      local status_hl = 'SnacksPickerLabel'
+      if item.status == 'A' then
+        status_hl = 'DiffAdd'
+      elseif item.status == 'D' then
+        status_hl = 'DiffDelete'
+      elseif item.status == 'M' then
+        status_hl = 'DiffChange'
+      elseif item.status:match('^R') then
+        status_hl = 'DiffText'
+      end
+
+      ret[#ret + 1] = { ('%-' .. longest_status .. 's'):format(item.status), status_hl }
+      ret[#ret + 1] = { item.text, 'SnacksPickerComment' }
+      return ret
+    end,
+    confirm = function(picker, item)
+      picker:close()
+      vim.cmd('edit ' .. item.text)
+    end,
+
+    layout = 'ivy',
+    previewers = { git = { native = true }, diff = { native = true } },
+    preview = 'diff', -- Use built-in diff previewer
+  })
+end)
