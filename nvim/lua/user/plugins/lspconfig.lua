@@ -270,6 +270,7 @@ return {
     vim.lsp.config('html', {
       filetypes = {
         'html',
+        'blade',
         'heex',
         'eex',
         'elixir',
@@ -336,6 +337,7 @@ return {
     -- PHP
     -- require('lspconfig').intelephense.setup({
     vim.lsp.config('intelephense', {
+      filetypes = { 'php', 'blade' },
       init_options = {
         globalStoragePath = os.getenv('HOME') .. '/.local/share/intelephense',
         storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
@@ -564,10 +566,14 @@ return {
           for _, client in ipairs(vim.lsp.get_clients()) do
             if client.name == 'intelephense' and client.attached_buffers[args.buf] then
               -- vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
-              vim.api.nvim_set_option_value('filetype', 'blade', { buf = args.buf })
-              -- update treesitter parser to blade
+              -- vim.api.nvim_set_option_value('filetype', 'blade', { buf = args.buf })
+              -- -- update treesitter parser to blade
               -- vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
-              vim.api.nvim_set_option_value('syntax', 'blade', { buf = args.buf })
+              -- vim.api.nvim_set_option_value('syntax', 'blade', { buf = args.buf })
+
+              vim.api.nvim_set_option_value('filetype', 'blade', { scope = 'local' })
+              -- update treesitter parser to blade
+              vim.api.nvim_set_option_value('syntax', 'blade', { scope = 'local' })
               break
             end
           end
@@ -576,12 +582,7 @@ return {
     })
 
     -- make $ part of the keyword for php.
-    vim.api.nvim_exec(
-      [[
-autocmd FileType php set iskeyword+=$
-]],
-      false
-    )
+    vim.api.nvim_exec2([[ autocmd FileType php set iskeyword+=$ ]], {})
     --require('mason-null-ls').setup({ automatic_installation = true })
 
     -- Keymaps

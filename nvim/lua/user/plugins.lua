@@ -32,9 +32,9 @@ require('lazy').setup({
 
   -- Add, change, and delete surrounding text.
   { 'tpope/vim-surround' },
-  {
-    import = 'user.plugins.multicursors',
-  },
+  -- {
+  --   import = 'user.plugins.multicursors',
+  -- },
   -- Useful commands like :Rename and :SudoWrite.
   { 'tpope/vim-eunuch' },
   -- {

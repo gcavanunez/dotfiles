@@ -10,6 +10,7 @@ local headers = {
   'blackbird',
   'ragrats',
   'tighten',
+  'tighten-melt',
 }
 
 local function get_random_header()
