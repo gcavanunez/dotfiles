@@ -1,6 +1,6 @@
 font-family = "JetBrainsMono Nerd Font"
 font-size = "18"
-theme = tokyonight-storm
+theme = TokyoNight Storm
 shell-integration = zsh
 macos-option-as-alt = left
 macos-titlebar-style = hidden
@@ -8,3 +8,4 @@ gtk-titlebar = false
 cursor-style = block
 cursor-style-blink = false
 shell-integration-features = no-cursor
+custom-shader = ./cursor_blade.glsl

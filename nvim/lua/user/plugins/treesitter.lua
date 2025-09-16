@@ -136,6 +136,7 @@ end
 
 local parsers = {
   'bash',
+  'sh',
   'blade',
   'c',
   'comment',
