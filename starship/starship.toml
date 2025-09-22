@@ -115,6 +115,7 @@ read_only = " "
 # symbol = "  ✎     ⚛︎                       "
 # symbol = "•"
 symbol = '─'
+# symbol = '·'
 style = "bright-black"
 
 [nodejs]
