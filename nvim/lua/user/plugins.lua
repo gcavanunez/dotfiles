@@ -119,8 +119,8 @@ require('lazy').setup({
   { import = 'user.plugins.lspconfig' },
 
   -- Debugging
-  { import = 'user.plugins.dap' },
-  { import = 'user.plugins.dap-ui' },
+  -- { import = 'user.plugins.dap' },
+  -- { import = 'user.plugins.dap-ui' },
   -- Blade lsp
   { import = 'user.plugins.blade-nav' },
   -- Laravel
