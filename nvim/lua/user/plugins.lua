@@ -24,7 +24,7 @@ require('lazy').setup({
   { import = 'user.themes.catppuccin' },
   { import = 'user.themes.noirbuddy' },
   -- Commenting support.
-  { import = 'user.plugins.vim-commentary' },
+  -- { import = 'user.plugins.vim-commentary' },
 
   -- Notifications
   { import = 'user.plugins.noice' },
