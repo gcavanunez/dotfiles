@@ -39,6 +39,29 @@ return {
       end,
       desc = 'Laravel: View related',
     },
+    {
+      '<leader>le',
+      function()
+        Laravel.commands.run('env:configure:open')
+      end,
+      desc = 'Laravel: View related',
+    },
+    {
+      'gf',
+      function()
+        local ok, res = pcall(function()
+          if Laravel.app('gf').cursorOnResource() then
+            return "<cmd>lua Laravel.commands.run('gf')<cr>"
+          end
+        end)
+        if not ok or not res then
+          return 'gf'
+        end
+        return res
+      end,
+      expr = true,
+      noremap = true,
+    },
   },
   event = { 'VeryLazy' },
   opts = {

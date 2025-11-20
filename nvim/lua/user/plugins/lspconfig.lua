@@ -45,8 +45,7 @@ return {
     local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
-    '/vue-language-server' .. '/node_modules/@vue/language-server'
+    local vue_language_server_path = vim.fn.expand('$MASON/packages') .. '/vue-language-server' .. '/node_modules/@vue/language-server'
     -- require('lspconfig').ts_ls.setup({
     -- vim.lsp.config('ts_ls', {
     --   capabilities = capabilities,
@@ -579,6 +578,21 @@ return {
         end)
       end,
     })
+    -- vim.api.nvim_create_autocmd('LspAttach', {
+    --   callback = function(args)
+    --     local bufnr = args.buf
+    --     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+    --
+    --     if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
+    --       vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
+    --
+    --       vim.keymap.set('i', '<C-F>', vim.lsp.inline_completion.get, { desc = 'LSP: accept inline completion', buffer = bufnr })
+    --       vim.keymap.set('i', '<C-G>', vim.lsp.inline_completion.select, { desc = 'LSP: switch inline completion', buffer = bufnr })
+    --     end
+    --   end,
+    -- })
+
+    -- vim.lsp.enable('copilot')
 
     -- make $ part of the keyword for php.
     vim.api.nvim_exec2([[ autocmd FileType php set iskeyword+=$ ]], {})

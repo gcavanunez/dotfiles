@@ -54,6 +54,16 @@ return {
         'show_and_insert',
         'select_next',
       },
+      -- ['<Tab>'] = {
+      --   'snippet_forward',
+      --   function() -- sidekick next edit suggestion
+      --     return require('sidekick').nes_jump_or_apply()
+      --   end,
+      --   function() -- if you are using Neovim's native inline completions
+      --     return vim.lsp.inline_completion.get()
+      --   end,
+      --   'fallback',
+      -- },
       ['<S-Tab>'] = { 'show_and_insert', 'select_prev' },
     },
     -- cmdline = {
@@ -80,6 +90,10 @@ return {
               text = function(ctx)
                 local icon = ctx.kind_icon
 
+                -- if require('blink.cmp.sources.lsp.hacks.tailwind').get_hex_color(ctx.item) then
+                --   return Icons.lsp.kinds.tailwind_color
+                -- end
+
                 if ctx.source_name == 'Path' then
                   local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
                   if dev_icon then
@@ -94,8 +108,11 @@ return {
                 return icon .. ctx.icon_gap
               end,
               highlight = function(ctx)
-                local hl = 'BlinkCmpKind' .. ctx.kind or
-                require('blink.cmp.completion.windows.render.tailwind').get_hl(ctx)
+                local hl = 'BlinkCmpKind' .. ctx.kind
+
+                if require('blink.cmp.sources.lsp.hacks.tailwind').get_hex_color(ctx.item) then
+                  hl = ctx.kind_hl
+                end
 
                 if ctx.source_name == 'Path' then
                   local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
@@ -156,7 +173,7 @@ return {
         'path',
         'snippets',
         'buffer',
-        'blade-nav',
+        -- 'blade-nav',
         'laravel',
       },
       providers = {
@@ -165,15 +182,15 @@ return {
           module = 'blink.compat.source',
           score_offset = 95, -- show at a higher priority than lsp
         },
-        ['blade-nav'] = {
-          module = 'blade-nav.blink',
-          opts = {
-            close_tag_on_complete = false, -- default: true,
-            include_routes = false,
-          },
-
-          score_offset = 100,
-        },
+        -- ['blade-nav'] = {
+        --   module = 'blade-nav.blink',
+        --   opts = {
+        --     close_tag_on_complete = false, -- default: true,
+        --     include_routes = false,
+        --   },
+        --
+        --   score_offset = 100,
+        -- },
       },
       -- providers = {
       --   blade_nav = {
