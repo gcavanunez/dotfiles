@@ -151,7 +151,7 @@ require('lazy').setup({
   -- { import = 'user.plugins.avante' },
 
   -- Codecompanion
-  { import = 'user.plugins.codecompanion' },
+  -- { import = 'user.plugins.codecompanion' },
 
   -- GitHub Copilot
   -- { import = 'user.plugins.copilot' },
