@@ -11,6 +11,7 @@ return {
   keys = {
     -- lua Laravel.commands.run("tinker:open")
     -- lua Laravel.commands.run("env:configure:open")
+    { "<leader>ll", function() Laravel.pickers.laravel() end,              desc = "Laravel: Open Laravel Picker" },
     {
       '<leader>la',
       function()
@@ -18,6 +19,7 @@ return {
       end,
       desc = 'Laravel: Open Artisan Picker',
     },
+    { "<leader>lt", function() Laravel.commands.run("actions") end,        desc = "Laravel: Open Actions Picker" },
     {
       '<leader>lr',
       function()
@@ -46,6 +48,7 @@ return {
       end,
       desc = 'Laravel: View related',
     },
+    { "<leader>lp", function() Laravel.commands.run("command_center") end, desc = "Laravel: Open Command Center" },
     {
       'gf',
       function()
