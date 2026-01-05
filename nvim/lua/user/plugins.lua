@@ -192,7 +192,7 @@ require('lazy').setup({
   { import = 'user.plugins.undotree' },
 
   -- Nicer Code folding.
-  { import = 'user.plugins.ufo' },
+  -- { import = 'user.plugins.ufo' },
 
   -- Em todos
   { import = 'user.plugins.todo-comments' },
