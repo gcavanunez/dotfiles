@@ -177,7 +177,7 @@ local parsers = {
   'php_only',
   'phpdoc',
   'python',
-  -- 'typescriptreact',
+  'typescriptreact',
   'query',
   'regex',
   'ruby',
