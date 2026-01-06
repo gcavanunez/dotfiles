@@ -199,6 +199,9 @@ require('lazy').setup({
 
   -- Lazygit.
   -- { import = 'user.plugins.lazygit' },
+
+  -- Diff View
+  { import = 'user.plugins.diffview' },
   {
     import = 'user.plugins.dev',
   },
