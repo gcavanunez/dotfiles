@@ -15,14 +15,14 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- Color scheme
   { import = 'user.themes.tokyonight' },
-  { import = 'user.themes.solarized-osaka' },
-  { import = 'user.themes.poimandres' },
-  { import = 'user.themes.nord' },
-  { import = 'user.themes.github' },
-  { import = 'user.themes.vesper' },
-  { import = 'user.themes.mellow' },
-  { import = 'user.themes.catppuccin' },
-  { import = 'user.themes.noirbuddy' },
+  -- { import = 'user.themes.solarized-osaka' },
+  -- { import = 'user.themes.poimandres' },
+  -- { import = 'user.themes.nord' },
+  -- { import = 'user.themes.github' },
+  -- { import = 'user.themes.vesper' },
+  -- { import = 'user.themes.mellow' },
+  -- { import = 'user.themes.catppuccin' },
+  -- { import = 'user.themes.noirbuddy' },
   -- Commenting support.
   -- { import = 'user.plugins.vim-commentary' },
 
@@ -81,7 +81,7 @@ require('lazy').setup({
   { import = 'user.plugins.treesj' },
 
   -- Automatically fix indentation when pasting code.
-  { import = 'user.plugins.vim-pasta' },
+  -- { import = 'user.plugins.vim-pasta' },
 
   -- Fuzzy finder
   { import = 'user.plugins.telescope' },
@@ -107,10 +107,10 @@ require('lazy').setup({
   { import = 'user.plugins.gitsigns' },
 
   -- Git commands.
-  { 'tpope/vim-fugitive', dependencies = 'tpope/vim-rhubarb' },
+  -- { 'tpope/vim-fugitive', dependencies = 'tpope/vim-rhubarb' },
 
   --- Floating terminal.
-  { import = 'user.plugins.floaterm' },
+  -- { import = 'user.plugins.floaterm' },
 
   -- Improved syntax highlighting
   { import = 'user.plugins.treesitter' },
@@ -160,7 +160,7 @@ require('lazy').setup({
   { import = 'user.plugins.supermaven' },
 
   -- Sidekick
-  { import = 'user.plugins.sidekick' },
+  -- { import = 'user.plugins.sidekick' },
 
   -- Colorize Hex Codes
   { import = 'user.plugins.colorizer' },
@@ -177,7 +177,7 @@ require('lazy').setup({
   { import = 'user.plugins.silicon' },
 
   -- Virtual scrollbar
-  { import = 'user.plugins.nvim-scrollbar' },
+  -- { import = 'user.plugins.nvim-scrollbar' },
 
   -- Highlight occurrences of the word under the cursor.
   { import = 'user.plugins.illuminate' },

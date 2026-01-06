@@ -221,7 +221,9 @@ return {
         pattern = parsers,
         callback = function()
           vim.treesitter.start()
-          vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+          vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+          vim.wo[0][0].foldmethod = 'expr'
+          -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
           vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end,
       })
@@ -260,7 +262,12 @@ return {
       })
 
       nts.setup(opts)
-      nts.install(parsers)
+
+      local exclude = { 'typescriptreact' }
+      local parsers_to_install = vim.tbl_filter(function(p)
+        return not vim.tbl_contains(exclude, p)
+      end, parsers)
+      nts.install(parsers_to_install)
 
       -- for filetype, lang in pairs(ft_map) do
       --   vim.treesitter.language.register(lang, filetype)
