@@ -68,9 +68,9 @@ return {
   },
   event = { 'VeryLazy' },
   opts = {
-    user_providers = {
-      require('user.plugins.laravel.provider_model_info'),
-    },
+    -- user_providers = {
+    --   require('user.plugins.laravel.provider_model_info'),
+    -- },
     lsp_server = 'phpactor', -- "phpactor | intelephense"
     features = {
       pickers = {
