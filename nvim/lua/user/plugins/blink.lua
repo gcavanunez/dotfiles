@@ -102,7 +102,8 @@ return {
                 elseif ctx.source_name == 'Blade-nav' then
                   icon = ''
                 else
-                  icon = require('lspkind').symbolic(ctx.kind, { mode = 'symbol' })
+                  -- icon = require('lspkind').symbolic(ctx.kind, { mode = 'symbol' })
+                  icon = require('lspkind').symbol_map[ctx.kind] or ''
                 end
 
                 return icon .. ctx.icon_gap
