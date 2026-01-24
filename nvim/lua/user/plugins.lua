@@ -202,9 +202,9 @@ require('lazy').setup({
 
   -- Diff View
   { import = 'user.plugins.diffview' },
-  {
-    import = 'user.plugins.dev',
-  },
+  -- {
+  --   import = 'user.plugins.dev',
+  -- },
 
   -- rendering md
   { import = 'user.plugins.render-markdown' },
