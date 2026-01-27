@@ -341,12 +341,22 @@ return {
         storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
       },
       commands = {
-        IntelephenseIndex = {
-          function()
-            -- vim.lsp.buf.execute_command({ command = 'intelephense.index.workspace' })
-            vim.lsp.client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
-          end,
-        },
+        -- IntelephenseIndex = {
+        --   function()
+        --     -- vim.lsp.buf.execute_command({ command = 'intelephense.index.workspace' })
+        --     vim.lsp.client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
+        --   end,
+        -- },
+        -- IntelephenseIndex = {
+        --   function()
+        --     local clients = vim.lsp.get_clients({ name = 'intelephense' })
+        --     if #clients > 0 then
+        --       clients[1]:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
+        --     else
+        --       vim.notify('Intelephense client not found', vim.log.levels.WARN)
+        --     end
+        --   end,
+        -- },
       },
       on_attach = function(client, bufnr)
         -- client.server_capabilities.completionProvider = false
@@ -356,6 +366,10 @@ return {
         -- if client.server_capabilities.inlayHintProvider then
         --   vim.lsp.buf.inlay_hint(bufnr, true)
         -- end
+        --
+        vim.api.nvim_buf_create_user_command(bufnr, 'IntelephenseIndex', function()
+          client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
+        end, {})
       end,
       capabilities = capabilities,
     })
