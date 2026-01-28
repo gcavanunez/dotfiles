@@ -58,6 +58,13 @@ return {
       desc = 'Laravel: View related',
     },
     {
+      '<leader>lE',
+      function()
+        Laravel.commands.run('env:configure')
+      end,
+      desc = 'Laravel: View related',
+    },
+    {
       '<leader>le',
       function()
         Laravel.commands.run('env:configure:open')
@@ -71,6 +78,7 @@ return {
       end,
       desc = 'Laravel: Open Command Center',
     },
+    { "<leader>lu", function() Laravel.commands.run("hub") end,            desc = "Laravel Artisan hub" },
     {
       'gf',
       function()
