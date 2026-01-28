@@ -332,6 +332,7 @@ return {
       end,
     })
 
+    vim.lsp.set_log_level('debug')
     -- PHP
     -- require('lspconfig').intelephense.setup({
     vim.lsp.config('intelephense', {
@@ -340,36 +341,38 @@ return {
         globalStoragePath = os.getenv('HOME') .. '/.local/share/intelephense',
         storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
       },
-      commands = {
-        -- IntelephenseIndex = {
-        --   function()
-        --     -- vim.lsp.buf.execute_command({ command = 'intelephense.index.workspace' })
-        --     vim.lsp.client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
-        --   end,
-        -- },
-        -- IntelephenseIndex = {
-        --   function()
-        --     local clients = vim.lsp.get_clients({ name = 'intelephense' })
-        --     if #clients > 0 then
-        --       clients[1]:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
-        --     else
-        --       vim.notify('Intelephense client not found', vim.log.levels.WARN)
-        --     end
-        --   end,
-        -- },
+      settings = {
+        intelephense = {
+          client = {
+            autoCloseDocCommentDoSuggest = true,
+          },
+          files = {
+            maxSize = 10000000, -- 10MB
+          },
+        },
       },
       on_attach = function(client, bufnr)
-        -- client.server_capabilities.completionProvider = false
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
-        -- client.server_capabilities.typeDefinitionProvider = false
-        -- if client.server_capabilities.inlayHintProvider then
-        --   vim.lsp.buf.inlay_hint(bufnr, true)
-        -- end
-        --
+
         vim.api.nvim_buf_create_user_command(bufnr, 'IntelephenseIndex', function()
-          client:exec_cmd({ command = 'intelephense.index.workspace', title = 'Intelephense: Index Workspace' })
-        end, {})
+          client:request('workspace/executeCommand', { command = 'intelephense.index.workspace' }, function(err, res)
+            if err then
+              vim.notify(err.message, vim.log.levels.ERROR)
+            else
+              vim.notify('Intelephense: Indexing workspace started', vim.log.levels.INFO)
+            end
+          end)
+        end, { desc = 'Re-index workspace' })
+
+        -- Intelephense custom notifications
+        client.handlers['indexingStarted'] = function()
+          vim.notify('Intelephense: Indexing started', vim.log.levels.INFO)
+        end
+
+        client.handlers['indexingEnded'] = function()
+          vim.notify('Intelephense: Indexing ended', vim.log.levels.INFO)
+        end
       end,
       capabilities = capabilities,
     })

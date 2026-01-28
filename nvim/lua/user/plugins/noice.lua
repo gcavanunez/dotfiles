@@ -39,6 +39,9 @@ local routes = {
   -- :LspRestart
   { filter = { event = 'notify', find = 'Restarting…' }, view = 'mini' },
 
+  -- Intelephense indexing
+  { filter = { event = 'notify', find = '^Intelephense:' }, view = 'mini' },
+
   { filter = { event = 'notify', find = '%[Neo%-tree INFO%]' }, view = 'mini' },
   -----------------------------------------------------------------------------
   -- SKIP
