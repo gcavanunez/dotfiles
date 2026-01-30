@@ -23,6 +23,13 @@ return {
       desc = 'Laravel: Open Laravel Picker',
     },
     {
+      '<leader>ts',
+      function()
+        Laravel.commands.run("tinker:open")
+      end,
+      desc = 'Laravel: Open Laravel Picker',
+    },
+    {
       '<leader>la',
       function()
         Laravel.pickers.artisan()
