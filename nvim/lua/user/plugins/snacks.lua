@@ -594,6 +594,11 @@ return {
       'gd',
       function()
         Snacks.picker.lsp_definitions({
+          filter = {
+            filter = function(item)
+              return not vim.endswith(item.file, '_model_helpers.php') -- for adalessa/laravel.nvim
+            end,
+          },
           layout = 'ivy',
         })
       end,

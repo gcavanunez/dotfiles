@@ -332,7 +332,7 @@ return {
       end,
     })
 
-    vim.lsp.set_log_level('debug')
+    -- vim.lsp.set_log_level('debug')
     -- PHP
     -- require('lspconfig').intelephense.setup({
     vim.lsp.config('intelephense', {
