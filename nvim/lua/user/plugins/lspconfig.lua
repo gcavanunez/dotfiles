@@ -14,6 +14,10 @@ return {
       ui = {
         height = 0.8,
       },
+      registries = {
+        'github:gcavanunez/blade-lsp-mason',
+        'github:mason-org/mason-registry',
+      },
     })
     require('mason-lspconfig').setup({
       automatic_installation = true,
@@ -332,6 +336,26 @@ return {
       end,
     })
 
+    vim.lsp.config('blade_lsp', {
+      -- cmd = { 'node', '/home/hl-mango/_code/gcavanunez/blade-lsp/dist/server.js', '--stdio' },
+      filetypes = { 'blade' },
+      -- root_markers = { 'composer.json', 'artisan', '.git' },
+      root_markers = { 'composer.json', 'artisan', 'config.php', '.git' },
+      -- Add initialization options here:
+      init_options = {
+        -- phpCommand = { 'docker', 'compose', 'exec', '-T', 'app', 'php' },
+        --
+        -- phpEnvironment = 'local',
+        enableLaravelIntegration = true, -- set to false to disable
+      },
+    })
+
+    -- phpPath = '/usr/bin/php',  -- or your custom path like '/opt/homebrew/bin/php'
+    -- phpPath = 'docker compose exec -it app php',  -- or your custom path like '/opt/homebrew/bin/php'
+
+    -- phpCommand = { 'sail', 'php' },
+    -- phpCommand = { 'php' },
+    vim.lsp.enable('blade_lsp')
     -- vim.lsp.set_log_level('debug')
     -- PHP
     -- require('lspconfig').intelephense.setup({
