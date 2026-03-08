@@ -127,7 +127,9 @@ require('lazy').setup({
   { import = 'user.plugins.ada-laravel' },
 
   -- Formating & diagnostics.
-  { import = 'user.plugins.none-ls' },
+  -- { import = 'user.plugins.none-ls' },
+  { import = 'user.plugins.conform' },
+  { import = 'user.plugins.nvim-lint' },
 
   -- Completion
   -- { import = 'user.plugins.cmp' },

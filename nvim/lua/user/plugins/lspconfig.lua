@@ -49,7 +49,8 @@ return {
     local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     -- https://github.com/vuejs/language-tools/issues/3791#issuecomment-2081488147
-    local vue_language_server_path = vim.fn.expand('$MASON/packages') .. '/vue-language-server' .. '/node_modules/@vue/language-server'
+    local vue_language_server_path = vim.fn.expand('$MASON/packages') ..
+    '/vue-language-server' .. '/node_modules/@vue/language-server'
     -- require('lspconfig').ts_ls.setup({
     -- vim.lsp.config('ts_ls', {
     --   capabilities = capabilities,
@@ -180,6 +181,8 @@ return {
     vim.lsp.enable({ 'vtsls', 'vue_ls' })
 
     vim.lsp.enable('ruby_lsp')
+    vim.lsp.enable('oxlint')
+    vim.lsp.enable('oxfmt')
     -- vim.lsp.enable('prettier')
 
     -- require('lspconfig').lua_ls.setup({
@@ -338,6 +341,7 @@ return {
 
     vim.lsp.config('blade_lsp', {
       -- cmd = { 'node', '/home/hl-mango/_code/gcavanunez/blade-lsp/dist/server.js', '--stdio' },
+      cmd = { 'blade-lsp', '--stdio' },
       filetypes = { 'blade' },
       -- root_markers = { 'composer.json', 'artisan', '.git' },
       root_markers = { 'composer.json', 'artisan', 'config.php', '.git' },
