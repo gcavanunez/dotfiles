@@ -17,6 +17,15 @@ ln -s $DOTFILES/kitty $HOME/.config/kitty
 # Tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
+# tmux-sessionizer
+mkdir -p $HOME/.local/bin
+ln -sf $DOTFILES/tmux/tmux-sessionizer $HOME/.local/bin/tmux-sessionizer
+mkdir -p $HOME/.config/tmux-sessionizer
+if [[ ! -f $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf ]]; then
+    cp $DOTFILES/tmux/tmux-sessionizer.conf $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf
+    echo "Created default tmux-sessionizer config — edit ~/.config/tmux-sessionizer/tmux-sessionizer.conf to customize"
+fi
+
 # https://gist.github.com/dhh/159b129f511f76db3ae8adb463f70d05
 # zellij
 rm -rf $HOME/.config/zellij
