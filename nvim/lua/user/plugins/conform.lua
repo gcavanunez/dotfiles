@@ -62,6 +62,15 @@ return {
           }, { path = ctx.dirname, upward = true })[1] ~= nil
         end,
       },
+      oxfmt = {
+        condition = function(self, ctx)
+          return vim.fs.find({
+            '.oxfmt.json',
+            '.oxlintrc.json',
+            'oxlint.config.ts',
+          }, { path = ctx.dirname, upward = true })[1] ~= nil
+        end,
+      },
       pint = {
         command = 'vendor/bin/pint',
       },
