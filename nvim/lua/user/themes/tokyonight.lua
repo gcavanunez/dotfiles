@@ -168,6 +168,10 @@ return {
         bg = util.darken(c.bg_dark, 0.85, '#000000'),
       }
 
+      hl.NormalNC = {
+        bg = util.darken(c.bg, 0.82, '#000000'),
+      }
+
       -- https://github.com/folke/snacks.nvim/blob/main/lua/snacks/picker/config/highlights.lua
       -- local prompt = '#2d3149'
       -- hl.SnacksPickerInput = {

@@ -344,10 +344,33 @@ return {
         Snacks.picker.git_diff({
           layout = 'ivy',
           previewers = { git = { native = true }, diff = { native = true } },
-          -- base = 'trunk',
         })
       end,
       desc = 'Git Diff (Hunks)',
+    },
+    {
+      '<leader>gD',
+      function()
+        Snacks.picker.git_branches({
+          title = 'Diff Against Branch',
+          confirm = function(picker, item)
+            picker:close()
+            if not item or not item.branch then
+              return
+            end
+            vim.schedule(function()
+              Snacks.picker.git_diff({
+                base = item.branch,
+                group = true,
+                layout = 'ivy',
+                title = 'Diff vs ' .. item.branch,
+                previewers = { git = { native = true }, diff = { native = true } },
+              })
+            end)
+          end,
+        })
+      end,
+      desc = 'Git Diff Branch',
     },
     {
       '<leader>gF',
