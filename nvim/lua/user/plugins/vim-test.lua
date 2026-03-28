@@ -9,30 +9,29 @@ return {
   },
   dependencies = { 'voldikss/vim-floaterm', 'preservim/vimux' },
   config = function()
-    -- .vimtest.json = { "command": "npx vitest" }
-    -- vim.g.test_config = { strategy = "vimux" }
-    -- local value = vim.api.nvim_get_var('hey')
-
     -- neovim | vimux
     local strategy = vim.tbl_get(vim.g, 'test_config', 'strategy') or 'neovim'
-    -- local strategy = 'neovim'
-
-    -- vim.cmd([[let g:test#javascript#vuetestutils#file_pattern = '']])
-    -- vim.cmd([[let g:test#javascript#vuetestutils#executable = "npx vitest"]])
-    --
-    -- vim.g.test_strategy = strategy
-    -- vim.cmd("let test#strategy = '" .. strategy .. "'")
 
     vim.api.nvim_set_var('test#strategy', strategy)
-
     vim.cmd([[let test#neovim#term_position = 'vert']])
+
+    -- Dynamically pick vitest vs playwright based on file path.
+    -- This prevents vuetestutils from matching (it detects @vue/test-utils
+    -- and hardcodes vue-cli-service test:unit).
+    vim.api.nvim_create_autocmd('BufEnter', {
+      pattern = { '*.spec.ts', '*.spec.js', '*.test.ts', '*.test.js' },
+      callback = function()
+        local file = vim.fn.expand('%:p')
+        if file:match('/e2e/') then
+          vim.g['test#javascript#runner'] = 'playwright'
+        else
+          vim.g['test#javascript#runner'] = 'vitest'
+        end
+      end,
+    })
+
+    -- PHP
     vim.cmd([[let g:test#php#phpunit#executable = "./vendor/bin/phpunit"]])
-    vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/pest"]])
-    -- vim.cmd("let g:test#enabled_runners = ['php#phpunit']")
-    --
-    -- docker
-    -- :let g:test#php#phpunit#executable = "./vendor/bin/sail bin phpunit"
-    -- vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/sail bin pest"]])
-    -- vim.cmd([[let g:test#php#phpunit#executable = "docker compose exec php ./vendor/bin/pest"]])
+    vim.cmd([[let g:test#php#pest#executable = "./vendor/bin/phpunit"]])
   end,
 }

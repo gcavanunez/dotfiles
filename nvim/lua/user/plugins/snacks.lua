@@ -1,4 +1,49 @@
 ---@module 'snacks'
+
+local git_diff_base = nil
+local git_diff_pick_branch
+
+local function git_diff_open(branch)
+  git_diff_base = branch
+  Snacks.picker.git_diff({
+    base = branch,
+    group = true,
+    layout = 'ivy',
+    title = 'Diff vs ' .. branch,
+    previewers = { git = { native = true }, diff = { native = true } },
+    win = {
+      input = {
+        keys = {
+          ['<a-b>'] = {
+            function(picker)
+              picker:close()
+              git_diff_base = nil
+              vim.schedule(git_diff_pick_branch)
+            end,
+            mode = { 'i', 'n' },
+            desc = 'Change base branch',
+          },
+        },
+      },
+    },
+  })
+end
+
+git_diff_pick_branch = function()
+  Snacks.picker.git_branches({
+    title = 'Diff Against Branch',
+    confirm = function(picker, item)
+      picker:close()
+      if not item or not item.branch then
+        return
+      end
+      vim.schedule(function()
+        git_diff_open(item.branch)
+      end)
+    end,
+  })
+end
+
 return {
   'folke/snacks.nvim',
   priority = 1000,
@@ -351,24 +396,11 @@ return {
     {
       '<leader>gD',
       function()
-        Snacks.picker.git_branches({
-          title = 'Diff Against Branch',
-          confirm = function(picker, item)
-            picker:close()
-            if not item or not item.branch then
-              return
-            end
-            vim.schedule(function()
-              Snacks.picker.git_diff({
-                base = item.branch,
-                group = true,
-                layout = 'ivy',
-                title = 'Diff vs ' .. item.branch,
-                previewers = { git = { native = true }, diff = { native = true } },
-              })
-            end)
-          end,
-        })
+        if git_diff_base then
+          git_diff_open(git_diff_base)
+        else
+          git_diff_pick_branch()
+        end
       end,
       desc = 'Git Diff Branch',
     },
