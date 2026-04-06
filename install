@@ -45,3 +45,13 @@ ln -s $DOTFILES/ghostty $HOME/.config/ghostty
 
 # Starship
 ln -sf $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
+
+# Git
+ln -sf $DOTFILES/git/gitconfig-delta $HOME/.gitconfig-delta
+mkdir -p $HOME/.config/git
+ln -sf $DOTFILES/git/ignore $HOME/.config/git/ignore
+
+# Zsh functions and aliases (symlinked — .zshrc itself is machine-specific)
+mkdir -p $HOME/.config/zsh
+ln -sf $DOTFILES/zsh/functions.zsh $HOME/.config/zsh/functions.zsh
+ln -sf $DOTFILES/zsh/aliases.zsh $HOME/.config/zsh/aliases.zsh

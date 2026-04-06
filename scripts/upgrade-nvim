@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+INSTALL_DIR="/opt/nvim-linux-x86_64"
+REPO="neovim/neovim"
+ASSET="nvim-linux-x86_64.tar.gz"
+
+current_version() {
+  if command -v nvim &>/dev/null; then
+    nvim --version | head -1 | awk '{print $2}'
+  else
+    echo "none"
+  fi
+}
+
+latest_version() {
+  gh release view --repo "$REPO" --json tagName --jq '.tagName'
+}
+
+main() {
+  local current latest
+
+  current=$(current_version)
+  latest=$(latest_version)
+
+  echo "Current: $current"
+  echo "Latest:  $latest"
+
+  if [[ "$current" == "$latest" ]]; then
+    echo "Already up to date."
+    exit 0
+  fi
+
+  local tmpdir
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf "$tmpdir"' EXIT
+
+  echo "Downloading $ASSET ($latest)..."
+  gh release download "$latest" --repo "$REPO" --pattern "$ASSET" --dir "$tmpdir"
+
+  echo "Installing to $INSTALL_DIR..."
+  sudo rm -rf "$INSTALL_DIR"
+  sudo tar -xzf "$tmpdir/$ASSET" -C "$(dirname "$INSTALL_DIR")"
+
+  echo "Done: $(nvim --version | head -1)"
+}
+
+main "$@"

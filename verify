@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+# Ensure mise-installed tools are on PATH
+if [ -d "$HOME/.local/share/mise/shims" ]; then
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+TOOLS=(
+  zoxide
+  ripgrep:rg
+  fzf
+  atuin
+  lazygit
+  starship
+  lazydocker
+  tree-sitter
+)
+
+missing=0
+
+echo "Checking required tools..."
+echo ""
+
+for entry in "${TOOLS[@]}"; do
+  name="${entry%%:*}"
+  bin="${entry##*:}"
+
+  if command -v "$bin" &>/dev/null; then
+    version=$("$bin" --version 2>&1 | head -1)
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "$name" "$version"
+  else
+    printf "  ${RED}✗${NC} %-14s ${RED}not found${NC}\n" "$name"
+    missing=$((missing + 1))
+  fi
+done
+
+echo ""
+
+if [ $missing -eq 0 ]; then
+  echo -e "${GREEN}All tools installed.${NC}"
+else
+  echo -e "${YELLOW}${missing} tool(s) missing.${NC} Install via mise:"
+  echo ""
+  echo "  mise use -g zoxide ripgrep fzf atuin lazygit lazydocker"
+  echo "  curl -sS https://starship.rs/install.sh | sh"
+fi
+
+# --- System-wide tools (not managed by mise) ---
+
+SYSTEM_TOOLS=(
+  docker
+  gh
+)
+
+sys_missing=0
+
+echo ""
+echo "Checking system-wide tools..."
+echo ""
+
+for bin in "${SYSTEM_TOOLS[@]}"; do
+  if command -v "$bin" &>/dev/null; then
+    version=$("$bin" --version 2>&1 | head -1)
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "$bin" "$version"
+  else
+    printf "  ${RED}✗${NC} %-14s ${RED}not found${NC}\n" "$bin"
+    sys_missing=$((sys_missing + 1))
+  fi
+done
+
+# Extra: check if docker daemon is reachable
+if command -v docker &>/dev/null; then
+  if docker info &>/dev/null 2>&1; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "docker daemon" "running"
+  else
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}installed but daemon not reachable (try: sudo systemctl start docker)${NC}\n" "docker daemon"
+  fi
+fi
+
+echo ""
+
+if [ $sys_missing -eq 0 ]; then
+  echo -e "${GREEN}All system tools available.${NC}"
+else
+  echo -e "${YELLOW}${sys_missing} system tool(s) missing.${NC} Install via your package manager:"
+  echo ""
+  echo "  # Docker: https://docs.docker.com/engine/install/"
+  echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+fi
+
+exit $((missing + sys_missing))

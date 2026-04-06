@@ -166,6 +166,7 @@ return {
       win = {
         -- input window
         input = {
+          -- wo = { statusline = '%#WinSeparator#' .. string.rep('─', 300) }, -- Neovim 0.12: separator line in floats
           keys = {
             -- https://github.com/folke/snacks.nvim/blob/bc0630e43be5699bb94dadc302c0d21615421d93/docs/picker.md?plain=1#L200
             ['<a-o>'] = { 'toggle_modified', mode = { 'i', 'n' } },
@@ -173,6 +174,12 @@ return {
             ['<a-c>'] = { 'cycle_preview', mode = { 'i', 'n' } },
           },
         },
+        -- list = {
+        --   wo = { statusline = '%#WinSeparator#' .. string.rep('─', 300) }, -- Neovim 0.12: separator line in floats
+        -- },
+        -- preview = {
+        --   wo = { statusline = '%#WinSeparator#' .. string.rep('─', 300) }, -- Neovim 0.12: separator line in floats
+        -- },
       },
     },
     quickfile = { enabled = true },

@@ -1,0 +1,18 @@
+[user]
+	name = Guillermo Cava
+	email = gcavanunez@gmail.com
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+[merge]
+	conflictstyle = zdiff3
+[rerere]
+	enabled = true
+[include]
+	path = ~/.gitconfig-delta
+# [includeIf "gitdir:~/some/dir/"]
+# 	path = ~/.gitconfig-extra

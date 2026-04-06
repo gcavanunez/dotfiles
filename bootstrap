@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "==> Bootstrapping system..."
+
+DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+
+# Install mise if not present
+if ! command -v mise &>/dev/null; then
+  echo "==> Installing mise..."
+  curl https://mise.jdx.dev/install.sh | sh
+  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+fi
+
+# Install starship if not present
+if ! command -v starship &>/dev/null; then
+  echo "==> Installing starship..."
+  curl -sS https://starship.rs/install.sh -o /tmp/starship-install.sh
+  sudo sh /tmp/starship-install.sh -y
+  rm /tmp/starship-install.sh
+fi
+
+# Install neovim if not present
+if ! command -v nvim &>/dev/null; then
+  echo "==> Installing neovim..."
+  curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+  sudo rm -rf /opt/nvim-linux-x86_64
+  sudo tar -xzf nvim-linux-x86_64.tar.gz -C /opt/
+  rm nvim-linux-x86_64.tar.gz
+fi
+
+# Copy machine-specific templates (won't overwrite existing)
+echo "==> Copying templates..."
+if [[ ! -f $HOME/.zshrc ]]; then
+    cp "$DOTFILES/zsh/zshrc" $HOME/.zshrc
+    echo "  Created ~/.zshrc — edit paths as needed"
+fi
+if [[ ! -f $HOME/.gitconfig ]]; then
+    cp "$DOTFILES/git/gitconfig" $HOME/.gitconfig
+    echo "  Created ~/.gitconfig — edit user/includeIf as needed"
+fi
+
+# Run dotfiles install (symlinks configs that are safe to symlink)
+echo "==> Linking dotfiles..."
+bash "$DOTFILES/install"
+
+# Copy mise global config and install tools
+mkdir -p $HOME/.config/mise
+if [[ ! -f $HOME/.config/mise/config.toml ]]; then
+    cp "$DOTFILES/mise/config.toml" $HOME/.config/mise/config.toml
+    echo "  Created ~/.config/mise/config.toml — edit as needed"
+fi
+echo "==> Installing mise tools..."
+mise install
+
+# Build tree-sitter from source (needs rust from mise + libclang)
+if ! command -v tree-sitter &>/dev/null; then
+  echo "==> Building tree-sitter CLI from source..."
+  if ! dpkg -s libclang-dev &>/dev/null 2>&1; then
+    sudo apt-get install -y libclang-dev
+  fi
+  export PATH="$HOME/.cargo/bin:$PATH"
+  cargo install tree-sitter-cli
+fi
+
+# GitHub CLI auth reminder
+if command -v gh &>/dev/null; then
+  if ! gh auth status &>/dev/null 2>&1; then
+    echo ""
+    echo "==> Run 'gh auth login' to authenticate with GitHub"
+  fi
+else
+  echo ""
+  echo "==> gh CLI not found — install it: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+fi
+
+# Docker reminder
+if ! command -v docker &>/dev/null; then
+  echo "==> Docker not found — install it: https://docs.docker.com/engine/install/"
+fi
+
+# SSH key reminder
+if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
+  echo "==> Run 'ssh-keygen -t ed25519' to generate SSH keys"
+fi
+
+# Verify
+echo ""
+echo "==> Verifying tools..."
+bash "$DOTFILES/verify"
+
+echo ""
+echo "==> Done! Run 'exec zsh' to reload your shell."

@@ -47,3 +47,21 @@ vim.opt.updatetime = 50
 vim.opt.exrc = true
 vim.opt.secure = true
 vim.opt.titlestring = '%f // nvim'
+
+-- Neovim 0.12: floating windows now show statuslines by default.
+-- Hide them globally so plugins (noice, snacks, etc.) aren't affected.
+-- local float_stl = '%#WinSeparator#' .. string.rep('─', 300)
+-- vim.api.nvim_create_autocmd('WinNew', {
+--   callback = function()
+--     vim.schedule(function()
+--       for _, win in ipairs(vim.api.nvim_list_wins()) do
+--         if vim.api.nvim_win_is_valid(win) then
+--           local cfg = vim.api.nvim_win_get_config(win)
+--           if cfg.relative ~= '' and vim.wo[win].statusline ~= float_stl then
+--             vim.wo[win].statusline = float_stl
+--           end
+--         end
+--       end
+--     end)
+--   end,
+-- })

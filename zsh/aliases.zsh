@@ -1,0 +1,63 @@
+# Navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+# ls (eza if available)
+if command -v eza &>/dev/null; then
+  alias ls="eza"
+  alias ll="eza -la -g --icons --git"
+  alias lt="eza -la --tree --level=2"
+  alias llt="eza -1 --icons --tree --git-ignore"
+else
+  alias ll="ls -la"
+fi
+
+# Git
+alias gitconfig="nvim ~/.gitconfig"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gpl="git pull"
+alias gco="git checkout"
+alias gb="git branch"
+alias gst="git stash"
+alias gstp="git stash pop"
+alias gdiff="git diff master | diffstat"
+alias lines="git ls-files | xargs cat | wc -l"
+
+# Docker
+alias dc="docker compose"
+alias dcu="docker compose up -d"
+alias dcd="docker compose down"
+alias dcl="docker compose logs -f"
+alias dps="docker ps"
+alias lzd="lazydocker"
+
+# Laravel
+alias art="php artisan"
+alias sail="./vendor/bin/sail"
+alias takeout="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --add-host=host.docker.internal:host-gateway -it tighten/takeout:latest"
+
+# Tools
+alias lg="lazygit"
+alias gl="lazygit"
+alias v="nvim"
+alias c="claude"
+
+# AWS
+alias awsp="aws configure --profile"
+
+# Mise
+alias mup="mise upgrade --global"
+alias mls="mise list"
+
+# Archives
+alias decompress="tar -xzf"
+
+# Shell
+alias reloadshell="source \$HOME/.zshrc"
+alias reloadtmux="tmux source \$HOME/.tmux.conf"
+alias tsc="\${EDITOR:-nvim} ~/.config/tmux-sessionizer/tmux-sessionizer.conf"
+alias copyssh="pbcopy < \$HOME/.ssh/id_ed25519.pub"
+alias search="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"

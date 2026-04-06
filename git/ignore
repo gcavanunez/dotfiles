@@ -1,0 +1,31 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+.idea/
+.nvim.lua
+.vimtest.json
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+node_modules/
+venv/
+__pycache__/
+# .opencode
+.termai
+wellspack.config.json
+.agents/resources/
+
+**/.claude/settings.local.json
+compose.override.yml
