@@ -1,3 +1,9 @@
+[settings]
+legacy_version_file = true
+
+[settings.ruby]
+compile = false
+
 [tools]
 atuin = "latest"
 bun = "latest"
@@ -8,7 +14,7 @@ fzf = "latest"
 go = "latest"
 lazydocker = "latest"
 node = "lts"
-php = "8.3.30"
+"vfox:version-fox/vfox-php" = "8.3.30"
 ripgrep = "latest"
 ruby = "latest"
 rust = "latest"
