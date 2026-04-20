@@ -93,4 +93,22 @@ else
   echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
 fi
 
+# --- Ghostty terminfo ---
+
+echo ""
+echo "Checking Ghostty terminfo..."
+echo ""
+
+if infocmp -x xterm-ghostty &>/dev/null 2>&1; then
+  printf "  ${GREEN}✓${NC} %-14s %s\n" "xterm-ghostty" "terminfo installed"
+  echo ""
+  echo -e "  ${YELLOW}Tip:${NC} Propagate to remote servers with:"
+  echo "       infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -"
+else
+  printf "  ${RED}✗${NC} %-14s ${RED}terminfo not found${NC}\n" "xterm-ghostty"
+  echo ""
+  echo -e "  ${YELLOW}Install from Ghostty or manually:${NC}"
+  echo "       infocmp -x xterm-ghostty  # verify locally first"
+fi
+
 exit $((missing + sys_missing))

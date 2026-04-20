@@ -55,3 +55,8 @@ ln -sf $DOTFILES/git/ignore $HOME/.config/git/ignore
 mkdir -p $HOME/.config/zsh
 ln -sf $DOTFILES/zsh/functions.zsh $HOME/.config/zsh/functions.zsh
 ln -sf $DOTFILES/zsh/aliases.zsh $HOME/.config/zsh/aliases.zsh
+
+# Bash functions and aliases (shared files — .bashrc itself is machine-specific)
+mkdir -p $HOME/.config/bash
+ln -sf $DOTFILES/zsh/functions.zsh $HOME/.config/bash/functions.bash
+ln -sf $DOTFILES/zsh/aliases.zsh $HOME/.config/bash/aliases.bash

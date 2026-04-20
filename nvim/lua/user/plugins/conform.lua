@@ -78,6 +78,10 @@ return {
         command = 'vendor/bin/duster',
         args = { 'fix', '$FILENAME', '--no-interaction', '--quiet' },
         stdin = false,
+        exit_codes = { 0, 1 },
+        -- cwd = function(self, ctx)
+        --   return vim.fs.root(ctx.dirname, { 'duster.json', 'composer.json' })
+        -- end,
       },
     },
   },

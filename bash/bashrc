@@ -1,0 +1,20 @@
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/opt/nvim-linux-x86_64/bin:$PATH"
+
+# mise (version manager)
+eval "$(mise activate bash)"
+
+# starship prompt
+eval "$(starship init bash)"
+
+# zoxide (smarter cd)
+eval "$(zoxide init bash)"
+
+# fzf
+eval "$(fzf --bash)"
+
+# atuin (shell history)
+eval "$(atuin init bash)"
+
+# dotfiles
+[ -f ~/.config/bash/functions.bash ] && source ~/.config/bash/functions.bash
+[ -f ~/.config/bash/aliases.bash ] && source ~/.config/bash/aliases.bash

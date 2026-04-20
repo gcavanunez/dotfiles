@@ -1,3 +1,4 @@
+-- vim.opt.colorcolumn = '120'
 vim.opt.cmdheight = 0
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4

@@ -31,6 +31,10 @@ fi
 
 # Copy machine-specific templates (won't overwrite existing)
 echo "==> Copying templates..."
+if [[ ! -f $HOME/.bashrc ]]; then
+    cp "$DOTFILES/bash/bashrc" $HOME/.bashrc
+    echo "  Created ~/.bashrc — edit paths as needed"
+fi
 if [[ ! -f $HOME/.zshrc ]]; then
     cp "$DOTFILES/zsh/zshrc" $HOME/.zshrc
     echo "  Created ~/.zshrc — edit paths as needed"
@@ -84,10 +88,17 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
   echo "==> Run 'ssh-keygen -t ed25519' to generate SSH keys"
 fi
 
+# Ghostty terminfo reminder
+if infocmp -x xterm-ghostty &>/dev/null 2>&1; then
+  echo "==> Propagate Ghostty terminfo to remote servers:"
+  echo "     infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -"
+fi
+
 # Verify
 echo ""
 echo "==> Verifying tools..."
 bash "$DOTFILES/verify"
 
 echo ""
-echo "==> Done! Run 'exec zsh' to reload your shell."
+CURRENT_SHELL=$(basename "$SHELL")
+echo "==> Done! Run 'exec $CURRENT_SHELL' to reload your shell."

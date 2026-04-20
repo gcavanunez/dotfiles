@@ -97,8 +97,8 @@ local function lsp_diagnostics(ctx)
 end
 
 local function search(ctx)
-  local sc = search_count()
-  if sc == '' then return nil end
+  local ok, sc = pcall(search_count)
+  if not ok or sc == '' then return nil end
   return {
     { 'Stl_Search', esc(sc) },
   }

@@ -28,6 +28,7 @@ alias lines="git ls-files | xargs cat | wc -l"
 
 # Docker
 alias dc="docker compose"
+alias dcx="docker compose exec -it app"
 alias dcu="docker compose up -d"
 alias dcd="docker compose down"
 alias dcl="docker compose logs -f"
@@ -36,6 +37,7 @@ alias lzd="lazydocker"
 
 # Laravel
 alias art="php artisan"
+alias drt="docker compose exec -it app php artisan"
 alias sail="./vendor/bin/sail"
 alias takeout="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --add-host=host.docker.internal:host-gateway -it tighten/takeout:latest"
 
@@ -56,7 +58,12 @@ alias mls="mise list"
 alias decompress="tar -xzf"
 
 # Shell
-alias reloadshell="source \$HOME/.zshrc"
+if [ -n "$ZSH_VERSION" ]; then
+  alias reloadshell="source \$HOME/.zshrc"
+elif [ -n "$BASH_VERSION" ]; then
+  alias reloadshell="source \$HOME/.bashrc"
+fi
+alias editrc="nvim ~/dotfiles"
 alias reloadtmux="tmux source \$HOME/.tmux.conf"
 alias tsc="\${EDITOR:-nvim} ~/.config/tmux-sessionizer/tmux-sessionizer.conf"
 alias copyssh="pbcopy < \$HOME/.ssh/id_ed25519.pub"

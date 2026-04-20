@@ -4,9 +4,16 @@ legacy_version_file = true
 [settings.ruby]
 compile = false
 
+[env]
+ASDF_PHP_FPM = "1"
+
+[plugins]
+php = "https://github.com/ramsey/asdf-php.git"
+
 [tools]
 atuin = "latest"
 bun = "latest"
+"aqua:YS-L/csvlens" = "latest"
 delta = "latest"
 eza = "latest"
 fd = "latest"
@@ -14,7 +21,8 @@ fzf = "latest"
 go = "latest"
 lazydocker = "latest"
 node = "lts"
-"github:adwinying/php" = "8.3.30"
+# uses ramsey/asdf-php (static binaries, no phpize/php-config)
+php = "8.4"
 ripgrep = "latest"
 ruby = "latest"
 rust = "latest"
