@@ -51,7 +51,7 @@ alias c="claude"
 alias awsp="aws configure --profile"
 
 # Mise
-alias mup="mise upgrade --global"
+alias mup="mise upgrade -C ~"
 alias mls="mise list"
 
 # Archives
@@ -65,6 +65,8 @@ elif [ -n "$BASH_VERSION" ]; then
 fi
 alias editrc="nvim ~/dotfiles"
 alias reloadtmux="tmux source \$HOME/.tmux.conf"
+# Refresh tmux server's PATH from a fresh shell (no kill needed). Useful after `mise upgrade`.
+alias tmux-sync-env="tmux set-environment -g PATH \"\$(zsh -ic 'echo -n \$PATH')\""
 alias tsc="\${EDITOR:-nvim} ~/.config/tmux-sessionizer/tmux-sessionizer.conf"
 alias copyssh="pbcopy < \$HOME/.ssh/id_ed25519.pub"
 alias search="fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'"

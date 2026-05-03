@@ -51,7 +51,7 @@ bash "$DOTFILES/install"
 # Copy mise global config and install tools
 mkdir -p $HOME/.config/mise
 if [[ ! -f $HOME/.config/mise/config.toml ]]; then
-    cp "$DOTFILES/mise/config.toml" $HOME/.config/mise/config.toml
+    cp "$DOTFILES/mise/config.template.toml" $HOME/.config/mise/config.toml
     echo "  Created ~/.config/mise/config.toml — edit as needed"
 fi
 echo "==> Installing mise tools..."
