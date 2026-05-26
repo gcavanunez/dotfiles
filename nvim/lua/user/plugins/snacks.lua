@@ -391,7 +391,7 @@ return {
       desc = 'Git Stash',
     },
     {
-      '<leader>gd',
+      '<leader>gD',
       function()
         Snacks.picker.git_diff({
           layout = 'ivy',
@@ -401,7 +401,7 @@ return {
       desc = 'Git Diff (Hunks)',
     },
     {
-      '<leader>gD',
+      '<leader>gd',
       function()
         if git_diff_base then
           git_diff_open(git_diff_base)
