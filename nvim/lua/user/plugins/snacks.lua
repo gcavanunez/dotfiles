@@ -44,6 +44,55 @@ git_diff_pick_branch = function()
   })
 end
 
+local function git_diff_commit_open(item)
+  local commit = item.commit
+  local subject = item.msg or ''
+  Snacks.picker.pick({
+    source = 'git_diff',
+    finder = function(opts, ctx)
+      local cwd = ctx:git_root()
+      ctx.picker:set_cwd(cwd)
+      return require('snacks.picker.source.diff').diff(
+        vim.tbl_extend('force', {}, opts, {
+          cmd = 'git',
+          args = {
+            '--no-pager',
+            'show',
+            '--no-color',
+            '--format=',
+            '-m',
+            '--first-parent',
+            commit,
+          },
+          cwd = cwd,
+        }),
+        ctx
+      )
+    end,
+    group = true,
+    layout = 'ivy',
+    title = commit:sub(1, 8) .. ' ' .. subject,
+    previewers = { git = { native = true }, diff = { native = true } },
+  })
+end
+
+local function git_diff_pick_commit()
+  Snacks.picker.git_log({
+    layout = 'ivy',
+    title = 'Pick Commit',
+    previewers = { git = { native = true } },
+    confirm = function(picker, item)
+      picker:close()
+      if not item or not item.commit then
+        return
+      end
+      vim.schedule(function()
+        git_diff_commit_open(item)
+      end)
+    end,
+  })
+end
+
 return {
   'folke/snacks.nvim',
   priority = 1000,
@@ -410,6 +459,13 @@ return {
         end
       end,
       desc = 'Git Diff Branch',
+    },
+    {
+      '<leader>gc',
+      function()
+        git_diff_pick_commit()
+      end,
+      desc = 'Git Diff Commit',
     },
     {
       '<leader>gF',
