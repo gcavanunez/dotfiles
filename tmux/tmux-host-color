@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+#
+# tmux-host-color — manage the per-machine accent color for the tmux status line.
+#
+# Writes ~/.config/tmux/host-color, which tmux-host-style prefers over its
+# deterministic hash, then applies it to the running tmux server immediately.
+#
+# Usage:
+#   tmux-host-color blue        set a Tokyo Night palette color by name
+#   tmux-host-color '#aabbcc'   set an explicit hex color
+#   tmux-host-color random      pick a random palette color (different from current)
+#   tmux-host-color reset       remove the override (back to the deterministic hash)
+#   tmux-host-color show        print the current color and where it comes from
+#   tmux-host-color list        list palette colors with swatches
+
+set -euo pipefail
+
+config_dir="$HOME/.config/tmux"
+override_file="$config_dir/host-color"
+
+# Tokyo Night accents — keep in sync with the palette in tmux-host-style
+names=(blue green yellow red purple cyan orange teal)
+hexes=("#7aa2f7" "#9ece6a" "#e0af68" "#f7768e" "#bb9af7" "#7dcfff" "#ff9e64" "#73daca")
+
+usage() {
+    sed -n '/^# Usage:/,/^$/{s/^# \{0,1\}//p;}' "${BASH_SOURCE[0]}"
+}
+
+swatch() {
+    local hex="${1#\#}"
+    printf '\033[38;2;%d;%d;%dm██\033[0m' "$((16#${hex:0:2}))" "$((16#${hex:2:2}))" "$((16#${hex:4:2}))"
+}
+
+# Effective color as seen by the running tmux server, if any
+effective_color() {
+    local value
+    value="$(tmux show-options -gv @host_color 2>/dev/null || true)"
+    value="${value%\"}"
+    value="${value#\"}"
+    [[ -n "$value" ]] && printf '%s\n' "$value" || cat "$override_file" 2>/dev/null || true
+}
+
+# Re-run tmux-host-style so the change is live without a manual reload
+apply() {
+    if tmux has-session 2>/dev/null && command -v tmux-host-style >/dev/null 2>&1; then
+        tmux-host-style
+    fi
+}
+
+set_color() {
+    local hex="$1"
+    mkdir -p "$config_dir"
+    printf '%s\n' "$hex" >"$override_file"
+    apply
+    printf 'host color set to %s %s\n' "$hex" "$(swatch "$hex")"
+}
+
+name_to_hex() {
+    local i
+    for i in "${!names[@]}"; do
+        if [[ "${names[i]}" == "$1" ]]; then
+            printf '%s\n' "${hexes[i]}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+cmd="${1:-}"
+case "$cmd" in
+    '' | -h | --help)
+        usage
+        ;;
+    list)
+        for i in "${!names[@]}"; do
+            printf '%s  %-7s %s\n' "$(swatch "${hexes[i]}")" "${names[i]}" "${hexes[i]}"
+        done
+        ;;
+    show)
+        color="$(effective_color)"
+        if [[ -z "$color" ]]; then
+            echo "no tmux server running and no override set (color comes from the hash in tmux-host-style)"
+            exit 0
+        fi
+        if [[ -f "$override_file" ]]; then
+            source_desc="override ($override_file)"
+        else
+            source_desc="deterministic hash (tmux-host-style)"
+        fi
+        printf '%s %s  via %s\n' "$(swatch "$color")" "$color" "$source_desc"
+        ;;
+    reset | clear)
+        rm -f "$override_file"
+        apply
+        echo "override removed — back to the deterministic hash"
+        ;;
+    random)
+        current="$(effective_color)"
+        candidates=()
+        for hex in "${hexes[@]}"; do
+            [[ "$hex" == "$current" ]] || candidates+=("$hex")
+        done
+        set_color "${candidates[RANDOM % ${#candidates[@]}]}"
+        ;;
+    *)
+        if hex="$(name_to_hex "$cmd")"; then
+            set_color "$hex"
+        elif [[ "$cmd" =~ ^#?[0-9a-fA-F]{6}$ ]]; then
+            set_color "#${cmd#\#}"
+        else
+            echo "unknown color '$cmd' — use a palette name, a hex value, or a command:" >&2
+            usage >&2
+            exit 1
+        fi
+        ;;
+esac
