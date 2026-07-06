@@ -16,6 +16,8 @@ ln -s $DOTFILES/kitty $HOME/.config/kitty
 
 # Tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+mkdir -p $HOME/.local/bin
+ln -sf $DOTFILES/tmux/tmux-host-style $HOME/.local/bin/tmux-host-style
 
 # tmux-sessionizer
 mkdir -p $HOME/.local/bin

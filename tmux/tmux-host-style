@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# tmux-host-style — per-machine identity for the tmux status line.
+#
+# Sets two tmux user options consumed by tmux.conf:
+#   @host_name   stable machine name (avoids #{host_short} showing a DHCP IP)
+#   @host_color  accent color, deterministically hashed from the machine name
+#                so every machine gets its own color with zero configuration
+#
+# Optional per-machine overrides (plain text, single line):
+#   ~/.config/tmux/host-name    e.g. "work-mbp"
+#   ~/.config/tmux/host-color   e.g. "#9ece6a"
+
+set -euo pipefail
+
+config_dir="$HOME/.config/tmux"
+
+# --- Machine name ---------------------------------------------------------
+host_name=""
+if [[ -r "$config_dir/host-name" ]]; then
+    host_name="$(<"$config_dir/host-name")"
+elif command -v scutil >/dev/null 2>&1; then
+    # macOS: LocalHostName is stable; `hostname` can resolve to a DHCP IP
+    host_name="$(scutil --get LocalHostName 2>/dev/null || true)"
+fi
+[[ -n "$host_name" ]] || host_name="$(hostname -s 2>/dev/null || true)"
+[[ -n "$host_name" ]] || host_name="$(uname -n | cut -d. -f1)"  # POSIX fallback (minimal Linux/containers)
+
+# --- Accent color ---------------------------------------------------------
+if [[ -r "$config_dir/host-color" ]]; then
+    host_color="$(<"$config_dir/host-color")"
+else
+    # Tokyo Night accents
+    palette=(
+        "#7aa2f7" # blue
+        "#9ece6a" # green
+        "#e0af68" # yellow
+        "#f7768e" # red
+        "#bb9af7" # purple
+        "#7dcfff" # cyan
+        "#ff9e64" # orange
+        "#73daca" # teal
+    )
+    hash="$(printf '%s' "$host_name" | cksum | cut -d' ' -f1)"
+    host_color="${palette[hash % ${#palette[@]}]}"
+fi
+
+tmux set-option -g @host_name "$host_name" \; set-option -g @host_color "$host_color"
