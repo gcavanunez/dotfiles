@@ -112,3 +112,23 @@ rgfzf() {
         --preview-window ~8,+{2}-5 \
     | awk -F':' '{print $1}'
 }
+
+# Diff this host's mise config against the bootstrap template for this OS.
+misediff() {
+    local template
+
+    case "$(uname -s)" in
+        Darwin)
+            template="$HOME/dotfiles/mise/config.macos.template.toml"
+            ;;
+        Linux)
+            template="$HOME/dotfiles/mise/config.linux.template.toml"
+            ;;
+        *)
+            echo "Unsupported OS: $(uname -s)" >&2
+            return 1
+            ;;
+    esac
+
+    diff -u "$template" "$HOME/.config/mise/config.toml"
+}

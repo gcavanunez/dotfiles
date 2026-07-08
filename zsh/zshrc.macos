@@ -1,4 +1,11 @@
-export PATH="$HOME/.local/bin:/opt/nvim-linux-x86_64/bin:$PATH"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# opencode
+export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
 # mise (version manager)
 eval "$(mise activate zsh)"

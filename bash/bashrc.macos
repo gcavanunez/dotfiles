@@ -1,0 +1,27 @@
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# opencode
+export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
+
+# mise (version manager)
+eval "$(mise activate bash)"
+
+# starship prompt
+eval "$(starship init bash)"
+
+# zoxide (smarter cd)
+eval "$(zoxide init bash)"
+
+# fzf
+eval "$(fzf --bash)"
+
+# atuin (shell history)
+eval "$(atuin init bash)"
+
+# dotfiles
+[ -f ~/.config/bash/functions.bash ] && source ~/.config/bash/functions.bash
+[ -f ~/.config/bash/aliases.bash ] && source ~/.config/bash/aliases.bash

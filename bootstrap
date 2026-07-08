@@ -3,44 +3,85 @@ set -euo pipefail
 
 echo "==> Bootstrapping system..."
 
-DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OS=$(uname -s)
+
+setup_homebrew() {
+  if [[ "$OS" != "Darwin" ]]; then
+    return
+  fi
+
+  if command -v brew &>/dev/null; then
+    eval "$(brew shellenv)"
+  elif [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  else
+    echo "Error: Homebrew is required on macOS." >&2
+    echo "Install it from https://brew.sh, then rerun this script." >&2
+    exit 1
+  fi
+}
+
+if [[ "$OS" == "Darwin" ]]; then
+  setup_homebrew
+  echo "==> Installing Homebrew packages..."
+  brew bundle --file="$DOTFILES/Brewfile"
+fi
 
 # Install mise if not present
 if ! command -v mise &>/dev/null; then
   echo "==> Installing mise..."
-  curl https://mise.jdx.dev/install.sh | sh
-  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install mise
+  else
+    curl https://mise.jdx.dev/install.sh | sh
+  fi
 fi
-
-# Install starship if not present
-if ! command -v starship &>/dev/null; then
-  echo "==> Installing starship..."
-  curl -sS https://starship.rs/install.sh -o /tmp/starship-install.sh
-  sudo sh /tmp/starship-install.sh -y
-  rm /tmp/starship-install.sh
-fi
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 # Install neovim if not present
 if ! command -v nvim &>/dev/null; then
   echo "==> Installing neovim..."
-  curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
-  sudo rm -rf /opt/nvim-linux-x86_64
-  sudo tar -xzf nvim-linux-x86_64.tar.gz -C /opt/
-  rm nvim-linux-x86_64.tar.gz
+  if [[ "$OS" == "Darwin" ]]; then
+    brew install neovim
+  else
+    curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+    sudo rm -rf /opt/nvim-linux-x86_64
+    sudo tar -xzf nvim-linux-x86_64.tar.gz -C /opt/
+    rm nvim-linux-x86_64.tar.gz
+  fi
 fi
 
 # Copy machine-specific templates (won't overwrite existing)
 echo "==> Copying templates..."
 if [[ ! -f $HOME/.bashrc ]]; then
-    cp "$DOTFILES/bash/bashrc" $HOME/.bashrc
+    if [[ "$OS" == "Darwin" ]]; then
+      BASHRC_TEMPLATE="$DOTFILES/bash/bashrc.macos"
+    elif [[ "$OS" == "Linux" ]]; then
+      BASHRC_TEMPLATE="$DOTFILES/bash/bashrc.linux"
+    else
+      echo "Error: no bash template for $OS" >&2
+      exit 1
+    fi
+    cp "$BASHRC_TEMPLATE" "$HOME/.bashrc"
     echo "  Created ~/.bashrc — edit paths as needed"
 fi
 if [[ ! -f $HOME/.zshrc ]]; then
-    cp "$DOTFILES/zsh/zshrc" $HOME/.zshrc
+    if [[ "$OS" == "Darwin" ]]; then
+      ZSHRC_TEMPLATE="$DOTFILES/zsh/zshrc.macos"
+    elif [[ "$OS" == "Linux" ]]; then
+      ZSHRC_TEMPLATE="$DOTFILES/zsh/zshrc.linux"
+    else
+      echo "Error: no zsh template for $OS" >&2
+      exit 1
+    fi
+    cp "$ZSHRC_TEMPLATE" "$HOME/.zshrc"
     echo "  Created ~/.zshrc — edit paths as needed"
 fi
 if [[ ! -f $HOME/.gitconfig ]]; then
-    cp "$DOTFILES/git/gitconfig" $HOME/.gitconfig
+    cp "$DOTFILES/git/gitconfig" "$HOME/.gitconfig"
     echo "  Created ~/.gitconfig — edit user/includeIf as needed"
 fi
 
@@ -49,20 +90,26 @@ echo "==> Linking dotfiles..."
 bash "$DOTFILES/install"
 
 # Copy mise global config and install tools
-mkdir -p $HOME/.config/mise
+if [[ "$OS" == "Darwin" ]]; then
+  MISE_TEMPLATE="$DOTFILES/mise/config.macos.template.toml"
+elif [[ "$OS" == "Linux" ]]; then
+  MISE_TEMPLATE="$DOTFILES/mise/config.linux.template.toml"
+else
+  echo "Error: no mise template for $OS" >&2
+  exit 1
+fi
+
+mkdir -p "$HOME/.config/mise"
 if [[ ! -f $HOME/.config/mise/config.toml ]]; then
-    cp "$DOTFILES/mise/config.template.toml" $HOME/.config/mise/config.toml
-    echo "  Created ~/.config/mise/config.toml — edit as needed"
+    cp "$MISE_TEMPLATE" "$HOME/.config/mise/config.toml"
+    echo "  Created ~/.config/mise/config.toml from $(basename "$MISE_TEMPLATE") — edit as needed"
 fi
 echo "==> Installing mise tools..."
 mise install
 
-# Build tree-sitter from source (needs rust from mise + libclang)
+# Build tree-sitter CLI from source.
 if ! command -v tree-sitter &>/dev/null; then
   echo "==> Building tree-sitter CLI from source..."
-  if ! dpkg -s libclang-dev &>/dev/null 2>&1; then
-    sudo apt-get install -y libclang-dev
-  fi
   export PATH="$HOME/.cargo/bin:$PATH"
   cargo install tree-sitter-cli
 fi
@@ -75,12 +122,25 @@ if command -v gh &>/dev/null; then
   fi
 else
   echo ""
-  echo "==> gh CLI not found — install it: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+  if [[ "$OS" == "Darwin" ]]; then
+    echo "==> gh CLI not found — install it with: brew install gh"
+  else
+    echo "==> gh CLI not found — install it: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+  fi
 fi
 
 # Docker reminder
 if ! command -v docker &>/dev/null; then
-  echo "==> Docker not found — install it: https://docs.docker.com/engine/install/"
+  if [[ "$OS" == "Darwin" ]]; then
+    echo "==> Docker not found — install Docker Desktop, OrbStack, or Colima"
+  else
+    echo "==> Docker not found — install it: https://docs.docker.com/engine/install/"
+  fi
+fi
+
+# OpenCode reminder
+if ! command -v opencode &>/dev/null; then
+  echo "==> opencode not found — install it with: curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path"
 fi
 
 # SSH key reminder

@@ -1,65 +1,66 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-DOTFILES=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+mkdir -p "$HOME/.config"
 
 # nvim
-rm -rf $HOME/.config/nvim
-ln -s $DOTFILES/nvim $HOME/.config/nvim
+rm -rf "$HOME/.config/nvim"
+ln -s "$DOTFILES/nvim" "$HOME/.config/nvim"
 
 # Alacritty
-rm -rf $HOME/.config/alacritty
-ln -s $DOTFILES/alacritty $HOME/.config/alacritty
+rm -rf "$HOME/.config/alacritty"
+ln -s "$DOTFILES/alacritty" "$HOME/.config/alacritty"
 
 # Kitty
-rm -rf $HOME/.config/kitty
-ln -s $DOTFILES/kitty $HOME/.config/kitty
+rm -rf "$HOME/.config/kitty"
+ln -s "$DOTFILES/kitty" "$HOME/.config/kitty"
 
 # Tmux
-ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
-mkdir -p $HOME/.local/bin
-ln -sf $DOTFILES/tmux/tmux-host-style $HOME/.local/bin/tmux-host-style
-ln -sf $DOTFILES/tmux/tmux-host-color $HOME/.local/bin/tmux-host-color
+ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
+mkdir -p "$HOME/.local/bin"
+ln -sf "$DOTFILES/tmux/tmux-host-style" "$HOME/.local/bin/tmux-host-style"
+ln -sf "$DOTFILES/tmux/tmux-host-color" "$HOME/.local/bin/tmux-host-color"
 
 # tmux-sessionizer
-mkdir -p $HOME/.local/bin
-ln -sf $DOTFILES/tmux/tmux-sessionizer $HOME/.local/bin/tmux-sessionizer
-mkdir -p $HOME/.config/tmux-sessionizer
+ln -sf "$DOTFILES/tmux/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
+mkdir -p "$HOME/.config/tmux-sessionizer"
 if [[ ! -f $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf ]]; then
-    cp $DOTFILES/tmux/tmux-sessionizer.conf $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf
+    cp "$DOTFILES/tmux/tmux-sessionizer.conf" "$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf"
     echo "Created default tmux-sessionizer config — edit ~/.config/tmux-sessionizer/tmux-sessionizer.conf to customize"
 fi
 
 # https://gist.github.com/dhh/159b129f511f76db3ae8adb463f70d05
 # zellij
-rm -rf $HOME/.config/zellij
-ln -sf $DOTFILES/zellij $HOME/.config/zellij
+rm -rf "$HOME/.config/zellij"
+ln -sf "$DOTFILES/zellij" "$HOME/.config/zellij"
 
 # wezterm
-rm -rf $HOME/.config/wezterm
-ln -s $DOTFILES/wezterm $HOME/.config/wezterm
+rm -rf "$HOME/.config/wezterm"
+ln -s "$DOTFILES/wezterm" "$HOME/.config/wezterm"
 
 # lazygit
-rm -rf $HOME/.config/lazygit
-ln -s $DOTFILES/lazygit $HOME/.config/lazygit
+rm -rf "$HOME/.config/lazygit"
+ln -s "$DOTFILES/lazygit" "$HOME/.config/lazygit"
 
 # ghostty
-rm -rf $HOME/.config/ghostty
-ln -s $DOTFILES/ghostty $HOME/.config/ghostty
+rm -rf "$HOME/.config/ghostty"
+ln -s "$DOTFILES/ghostty" "$HOME/.config/ghostty"
 
 # Starship
-ln -sf $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
+ln -sf "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
 
 # Git
-ln -sf $DOTFILES/git/gitconfig-delta $HOME/.gitconfig-delta
-mkdir -p $HOME/.config/git
-ln -sf $DOTFILES/git/ignore $HOME/.config/git/ignore
+ln -sf "$DOTFILES/git/gitconfig-delta" "$HOME/.gitconfig-delta"
+mkdir -p "$HOME/.config/git"
+ln -sf "$DOTFILES/git/ignore" "$HOME/.config/git/ignore"
 
 # Zsh functions and aliases (symlinked — .zshrc itself is machine-specific)
-mkdir -p $HOME/.config/zsh
-ln -sf $DOTFILES/zsh/functions.zsh $HOME/.config/zsh/functions.zsh
-ln -sf $DOTFILES/zsh/aliases.zsh $HOME/.config/zsh/aliases.zsh
+mkdir -p "$HOME/.config/zsh"
+ln -sf "$DOTFILES/zsh/functions.zsh" "$HOME/.config/zsh/functions.zsh"
+ln -sf "$DOTFILES/zsh/aliases.zsh" "$HOME/.config/zsh/aliases.zsh"
 
 # Bash functions and aliases (shared files — .bashrc itself is machine-specific)
-mkdir -p $HOME/.config/bash
-ln -sf $DOTFILES/zsh/functions.zsh $HOME/.config/bash/functions.bash
-ln -sf $DOTFILES/zsh/aliases.zsh $HOME/.config/bash/aliases.bash
+mkdir -p "$HOME/.config/bash"
+ln -sf "$DOTFILES/zsh/functions.zsh" "$HOME/.config/bash/functions.bash"
+ln -sf "$DOTFILES/zsh/aliases.zsh" "$HOME/.config/bash/aliases.bash"

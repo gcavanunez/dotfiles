@@ -4,6 +4,7 @@ set -euo pipefail
 INSTALL_DIR="/opt/nvim-linux-x86_64"
 REPO="neovim/neovim"
 ASSET="nvim-linux-x86_64.tar.gz"
+OS=$(uname -s)
 
 current_version() {
   if command -v nvim &>/dev/null; then
@@ -19,6 +20,14 @@ latest_version() {
 
 main() {
   local current latest
+
+  if [[ "$OS" == "Darwin" ]]; then
+    echo "Neovim is managed by Homebrew on macOS. Use: brew upgrade neovim"
+    exit 0
+  elif [[ "$OS" != "Linux" ]]; then
+    echo "Error: unsupported OS for this script: $OS" >&2
+    exit 1
+  fi
 
   current=$(current_version)
   latest=$(latest_version)

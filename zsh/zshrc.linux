@@ -1,0 +1,21 @@
+# opencode
+export PATH="$HOME/.opencode/bin:/opt/nvim-linux-x86_64/bin:$HOME/.local/bin:$PATH"
+
+# mise (version manager)
+eval "$(mise activate zsh)"
+
+# starship prompt
+eval "$(starship init zsh)"
+
+# zoxide (smarter cd)
+eval "$(zoxide init zsh)"
+
+# fzf
+eval "$(fzf --zsh)"
+
+# atuin (shell history)
+eval "$(atuin init zsh)"
+
+# dotfiles
+[ -f ~/.config/zsh/functions.zsh ] && source ~/.config/zsh/functions.zsh
+[ -f ~/.config/zsh/aliases.zsh ] && source ~/.config/zsh/aliases.zsh

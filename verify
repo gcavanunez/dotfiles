@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 
+DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OS=$(uname -s)
+
 # Ensure mise-installed tools are on PATH
 if [ -d "$HOME/.local/share/mise/shims" ]; then
   export PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
+if [[ "$OS" == "Darwin" ]]; then
+  if command -v brew &>/dev/null; then
+    eval "$(brew shellenv)"
+  elif [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 fi
 
 RED='\033[0;31m'
@@ -10,16 +23,55 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+tool_version() {
+  local bin="$1"
+
+  case "$bin" in
+    go)
+      go version 2>&1
+      ;;
+    nvim)
+      nvim --version 2>&1 | head -1
+      ;;
+    tmux)
+      tmux -V 2>&1
+      ;;
+    *)
+      "$bin" --version 2>&1 | head -1
+      ;;
+  esac
+}
+
 TOOLS=(
-  zoxide
-  ripgrep:rg
-  fzf
   atuin
-  lazygit
-  starship
+  bat
+  btop
+  bun
+  cloc
+  cloudflared
+  delta
+  eza
+  fd
+  ffmpeg
+  fzf
+  gnu-sed:gsed
+  go
   lazydocker
+  lazygit
+  node
+  ripgrep:rg
+  ruby
+  rust:rustc
+  starship
+  stats
   tree-sitter
+  tree
+  zoxide
 )
+
+if [[ "$OS" != "Darwin" ]]; then
+  TOOLS+=(php)
+fi
 
 missing=0
 
@@ -31,7 +83,7 @@ for entry in "${TOOLS[@]}"; do
   bin="${entry##*:}"
 
   if command -v "$bin" &>/dev/null; then
-    version=$("$bin" --version 2>&1 | head -1)
+    version=$(tool_version "$bin")
     printf "  ${GREEN}✓${NC} %-14s %s\n" "$name" "$version"
   else
     printf "  ${RED}✗${NC} %-14s ${RED}not found${NC}\n" "$name"
@@ -44,15 +96,24 @@ echo ""
 if [ $missing -eq 0 ]; then
   echo -e "${GREEN}All tools installed.${NC}"
 else
-  echo -e "${YELLOW}${missing} tool(s) missing.${NC} Install via mise:"
+  echo -e "${YELLOW}${missing} tool(s) missing.${NC} Install missing tools:"
   echo ""
-  echo "  mise use -g zoxide ripgrep fzf atuin lazygit lazydocker"
-  echo "  curl -sS https://starship.rs/install.sh | sh"
+  if [[ "$OS" == "Darwin" ]]; then
+    echo "  brew bundle --file=\"$DOTFILES/Brewfile\""
+    echo "  mise install"
+  else
+    echo "  mise install"
+  fi
 fi
 
 # --- System-wide tools (not managed by mise) ---
 
 SYSTEM_TOOLS=(
+  git
+  jq
+  mise
+  nvim
+  tmux
   docker
   gh
 )
@@ -65,7 +126,7 @@ echo ""
 
 for bin in "${SYSTEM_TOOLS[@]}"; do
   if command -v "$bin" &>/dev/null; then
-    version=$("$bin" --version 2>&1 | head -1)
+    version=$(tool_version "$bin")
     printf "  ${GREEN}✓${NC} %-14s %s\n" "$bin" "$version"
   else
     printf "  ${RED}✗${NC} %-14s ${RED}not found${NC}\n" "$bin"
@@ -78,7 +139,11 @@ if command -v docker &>/dev/null; then
   if docker info &>/dev/null 2>&1; then
     printf "  ${GREEN}✓${NC} %-14s %s\n" "docker daemon" "running"
   else
-    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}installed but daemon not reachable (try: sudo systemctl start docker)${NC}\n" "docker daemon"
+    if [[ "$OS" == "Darwin" ]]; then
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}installed but daemon not reachable (start Docker Desktop, OrbStack, or Colima)${NC}\n" "docker daemon"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}installed but daemon not reachable (try: sudo systemctl start docker)${NC}\n" "docker daemon"
+    fi
   fi
 fi
 
@@ -89,8 +154,27 @@ if [ $sys_missing -eq 0 ]; then
 else
   echo -e "${YELLOW}${sys_missing} system tool(s) missing.${NC} Install via your package manager:"
   echo ""
-  echo "  # Docker: https://docs.docker.com/engine/install/"
-  echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+  if [[ "$OS" == "Darwin" ]]; then
+    echo "  brew bundle --file=\"$DOTFILES/Brewfile\""
+    echo "  # Docker: install Docker Desktop, OrbStack, or Colima"
+  else
+    echo "  # ffmpeg: install via your distro package manager"
+    echo "  # Docker: https://docs.docker.com/engine/install/"
+    echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+  fi
+fi
+
+# --- Optional direct-installer tools ---
+
+echo ""
+echo "Checking direct-installer tools..."
+echo ""
+
+if command -v opencode &>/dev/null; then
+  version=$(tool_version opencode)
+  printf "  ${GREEN}✓${NC} %-14s %s\n" "opencode" "$version"
+else
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found (install with: curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path)${NC}\n" "opencode"
 fi
 
 # --- Ghostty terminfo ---

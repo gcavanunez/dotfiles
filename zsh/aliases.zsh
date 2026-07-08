@@ -53,6 +53,7 @@ alias awsp="aws configure --profile"
 # Mise
 alias mup="mise upgrade -C ~"
 alias mls="mise list"
+alias mic="${EDITOR:-nvim} ~/.config/mise/config.toml"
 
 # Archives
 alias decompress="tar -xzf"

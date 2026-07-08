@@ -1,4 +1,5 @@
-export PATH="$HOME/.local/bin:/opt/nvim-linux-x86_64/bin:$PATH"
+# opencode
+export PATH="$HOME/.opencode/bin:/opt/nvim-linux-x86_64/bin:$HOME/.local/bin:$PATH"
 
 # mise (version manager)
 eval "$(mise activate bash)"
