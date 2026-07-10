@@ -28,6 +28,7 @@ if [[ "$OS" == "Darwin" ]]; then
   setup_homebrew
   echo "==> Installing Homebrew packages..."
   brew bundle --file="$DOTFILES/Brewfile"
+  echo "==> macOS manual setup notes: $DOTFILES/setup/macos.md"
 fi
 
 # Install mise if not present

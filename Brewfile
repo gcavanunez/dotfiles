@@ -22,12 +22,12 @@ brew "mise"
 brew "neovim"
 brew "pinentry-mac"
 brew "ripgrep"
-brew "stats"
 brew "tmux"
 brew "tree"
 brew "zoxide"
 
 cask "font-jetbrains-mono-nerd-font"
+cask "stats"
 
 # Ghostty is intentionally omitted; install it with the direct installer.
 # Uncomment terminal casks if you want Homebrew to own them on this machine.

@@ -63,7 +63,6 @@ TOOLS=(
   ruby
   rust:rustc
   starship
-  stats
   tree-sitter
   tree
   zoxide
