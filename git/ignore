@@ -29,3 +29,4 @@ wellspack.config.json
 
 **/.claude/settings.local.json
 compose.override.yml
+docker-compose.override.yml

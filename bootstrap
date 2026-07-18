@@ -108,13 +108,6 @@ fi
 echo "==> Installing mise tools..."
 mise install
 
-# Build tree-sitter CLI from source.
-if ! command -v tree-sitter &>/dev/null; then
-  echo "==> Building tree-sitter CLI from source..."
-  export PATH="$HOME/.cargo/bin:$PATH"
-  cargo install tree-sitter-cli
-fi
-
 # GitHub CLI auth reminder
 if command -v gh &>/dev/null; then
   if ! gh auth status &>/dev/null 2>&1; then

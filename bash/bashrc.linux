@@ -1,6 +1,9 @@
 # opencode
 export PATH="$HOME/.opencode/bin:/opt/nvim-linux-x86_64/bin:$HOME/.local/bin:$PATH"
 
+# GPG signing is opt-in. Uncomment when using GPG-signed commits.
+# export GPG_TTY=$(tty)
+
 # mise (version manager)
 eval "$(mise activate bash)"
 

@@ -9,6 +9,7 @@ if command -v eza &>/dev/null; then
   alias ll="eza -la -g --icons --git"
   alias lt="eza -la --tree --level=2"
   alias llt="eza -1 --icons --tree --git-ignore"
+  alias lll="eza -Dl --icons --sort=created --time=created -r"
 else
   alias ll="ls -la"
 fi
