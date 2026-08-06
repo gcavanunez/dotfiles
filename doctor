@@ -42,6 +42,59 @@ tool_version() {
   esac
 }
 
+check_shell_rc() {
+  local shell_name="$1"
+  local extension="$2"
+  local rc_file="$HOME/.${shell_name}rc"
+  local rc_name=".${shell_name}rc"
+  local template="$DOTFILES/$shell_name/${shell_name}rc.$TEMPLATE_OS"
+  local template_reference="$shell_name/${shell_name}rc.$TEMPLATE_OS"
+  local missing_setup=""
+
+  if [[ ! -f "$rc_file" ]]; then
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found; bootstrap will create it${NC}\n" "$rc_name"
+    return
+  fi
+
+  if [[ "$rc_file" -ef "$template" ]] || grep -Fq "$template_reference" "$rc_file"; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "$rc_name" "uses the dotfiles template"
+    return
+  fi
+
+  if ! grep -Fq '.opencode/bin' "$rc_file"; then
+    missing_setup="OpenCode PATH"
+  fi
+  if ! grep -Fq "mise activate $shell_name" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }mise"
+  fi
+  if ! grep -Fq "starship init $shell_name" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }starship"
+  fi
+  if ! grep -Fq "zoxide init $shell_name" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }zoxide"
+  fi
+  if ! grep -Fq "fzf --$shell_name" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }fzf"
+  fi
+  if ! grep -Fq "atuin init $shell_name" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }atuin"
+  fi
+  if ! grep -Fq ".config/$shell_name/functions.$extension" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }shared functions"
+  fi
+  if ! grep -Fq ".config/$shell_name/aliases.$extension" "$rc_file"; then
+    missing_setup="${missing_setup:+$missing_setup, }shared aliases"
+  fi
+
+  if [[ -z "$missing_setup" ]]; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "$rc_name" "contains the dotfiles setup"
+  else
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}review recommended${NC}\n" "$rc_name"
+    echo "    Missing template setup: $missing_setup"
+    echo "    Compare with: diff -u \"$rc_file\" \"$template\""
+  fi
+}
+
 TOOLS=(
   atuin
   bat
@@ -54,8 +107,10 @@ TOOLS=(
   fd
   ffmpeg
   fzf
+  gh
   gnu-sed:gsed
   go
+  jq
   lazydocker
   lazygit
   node
@@ -63,6 +118,7 @@ TOOLS=(
   ruby
   rust:rustc
   starship
+  tmux
   tree-sitter
   tree
   zoxide
@@ -109,12 +165,9 @@ fi
 
 SYSTEM_TOOLS=(
   git
-  jq
   mise
   nvim
-  tmux
   docker
-  gh
 )
 
 sys_missing=0
@@ -161,6 +214,27 @@ else
     echo "  # Docker: https://docs.docker.com/engine/install/"
     echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
   fi
+fi
+
+# --- Shell configuration ---
+
+echo ""
+echo "Checking shell configuration..."
+echo ""
+
+if [[ "$OS" == "Darwin" ]]; then
+  TEMPLATE_OS="macos"
+elif [[ "$OS" == "Linux" ]]; then
+  TEMPLATE_OS="linux"
+else
+  TEMPLATE_OS=""
+fi
+
+if [[ -n "$TEMPLATE_OS" ]]; then
+  check_shell_rc bash bash
+  check_shell_rc zsh zsh
+else
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}no templates for %s${NC}\n" "shell rc" "$OS"
 fi
 
 # --- Optional direct-installer tools ---

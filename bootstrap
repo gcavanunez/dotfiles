@@ -148,10 +148,10 @@ if infocmp -x xterm-ghostty &>/dev/null 2>&1; then
   echo "     infocmp -x xterm-ghostty | ssh YOUR-SERVER -- tic -x -"
 fi
 
-# Verify
+# Doctor
 echo ""
-echo "==> Verifying tools..."
-bash "$DOTFILES/verify"
+echo "==> Running doctor..."
+bash "$DOTFILES/doctor"
 
 echo ""
 CURRENT_SHELL=$(basename "$SHELL")
