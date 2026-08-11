@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OMARCHY_DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CLI_SOURCE="$OMARCHY_DOTFILES/bin/omarchy-lid"
+HYPR_SOURCE="$OMARCHY_DOTFILES/hypr/lid.conf"
+LOGIND_SOURCE="$OMARCHY_DOTFILES/logind/50-lid-switch.conf"
+LOGIND_DESTINATION="/etc/systemd/logind.conf.d/50-lid-switch.conf"
+HYPR_DESTINATION="$HOME/.config/hypr/lid.conf"
+HYPR_BINDINGS="$HOME/.config/hypr/bindings.conf"
+HYPR_SOURCE_LINE="source = ~/.config/hypr/lid.conf"
+logind_changed=false
+
+if ! command -v omarchy &>/dev/null || [[ ! -d $HOME/.local/share/omarchy ]]; then
+  echo "This installer only supports Omarchy machines." >&2
+  exit 1
+fi
+
+if [[ ! -f $HYPR_BINDINGS ]]; then
+  echo "Missing Omarchy Hyprland bindings file: $HYPR_BINDINGS" >&2
+  exit 1
+fi
+
+mkdir -p "$HOME/.local/bin" "$HOME/.config/hypr"
+ln -sfn "$CLI_SOURCE" "$HOME/.local/bin/omarchy-lid"
+ln -sfn "$HYPR_SOURCE" "$HYPR_DESTINATION"
+
+if ! grep -Fqx "$HYPR_SOURCE_LINE" "$HYPR_BINDINGS"; then
+  printf '\n# Closed-lid policy managed by ~/dotfiles/omarchy.\n%s\n' \
+    "$HYPR_SOURCE_LINE" >>"$HYPR_BINDINGS"
+fi
+
+if [[ ! -r $LOGIND_DESTINATION ]] || ! cmp -s "$LOGIND_SOURCE" "$LOGIND_DESTINATION"; then
+  sudo install -o root -g root -Dm0644 "$LOGIND_SOURCE" "$LOGIND_DESTINATION"
+  logind_changed=true
+fi
+
+if command -v hyprctl &>/dev/null && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  hyprctl reload
+  config_errors=$(hyprctl configerrors)
+  if [[ -n $config_errors ]]; then
+    printf '%s\n' "$config_errors" >&2
+    exit 1
+  fi
+fi
+
+cat <<'EOF'
+Omarchy lid controls installed.
+
+Use:
+  omarchy-lid on
+  omarchy-lid off
+  omarchy-lid toggle
+  omarchy-lid status
+EOF
+
+if $logind_changed; then
+  echo "Reboot to apply the updated systemd-logind policy."
+fi

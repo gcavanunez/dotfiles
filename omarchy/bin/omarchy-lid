@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly TOGGLE_NAME="lid-awake-on-ac"
+
+usage() {
+  cat <<'EOF'
+Usage: omarchy-lid <on|off|toggle|status>
+
+Control whether closing the lid keeps this Omarchy machine awake on external
+power. Battery-powered lid closes always suspend.
+EOF
+}
+
+require_omarchy() {
+  if ! command -v omarchy &>/dev/null || [[ ! -d $HOME/.local/share/omarchy ]]; then
+    echo "omarchy-lid is only supported on Omarchy machines." >&2
+    exit 1
+  fi
+}
+
+is_enabled() {
+  omarchy toggle enabled "$TOGGLE_NAME"
+}
+
+on_external_power() {
+  local online
+
+  for online in /sys/class/power_supply/*/online; do
+    [[ -r $online ]] || continue
+    [[ "$(<"$online")" == "1" ]] && return 0
+  done
+
+  return 1
+}
+
+toggle() {
+  omarchy toggle \
+    --enabled-notification "Closed-lid use enabled on external power" \
+    --disabled-notification "Lid close will suspend on external power" \
+    "$TOGGLE_NAME"
+}
+
+turn_on() {
+  is_enabled || toggle
+}
+
+turn_off() {
+  if is_enabled; then
+    toggle
+  fi
+}
+
+status() {
+  local state="off"
+  local power="battery"
+
+  is_enabled && state="on"
+  on_external_power && power="external"
+  printf 'Closed-lid use: %s (power: %s)\n' "$state" "$power"
+}
+
+handle_close() {
+  if ! on_external_power || ! is_enabled; then
+    systemctl suspend
+  fi
+}
+
+main() {
+  require_omarchy
+
+  case "${1:-status}" in
+    on | enable)
+      turn_on
+      status
+      ;;
+    off | disable)
+      turn_off
+      status
+      ;;
+    toggle)
+      toggle
+      status
+      ;;
+    status)
+      status
+      ;;
+    handle-close)
+      handle_close
+      ;;
+    -h | --help | help)
+      usage
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+}
+
+main "$@"
