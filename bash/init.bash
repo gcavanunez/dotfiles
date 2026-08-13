@@ -1,9 +1,9 @@
 # Initialize tools not already provided by the host's Bash configuration.
-if command -v mise &>/dev/null && [[ ${MISE_SHELL:-} != bash ]]; then
+if command -v mise &>/dev/null; then
   eval "$(mise activate bash)"
 fi
 
-if [[ ${TERM:-} != dumb ]] && command -v starship &>/dev/null && [[ ${STARSHIP_SHELL:-} != bash ]]; then
+if [[ ${TERM:-} != dumb ]] && command -v starship &>/dev/null; then
   eval "$(starship init bash)"
 fi
 
@@ -13,7 +13,7 @@ fi
 
 if [[ -z ${BLE_VERSION:-} ]] && command -v fzf &>/dev/null && ! declare -F _fzf_search_completion &>/dev/null; then
   eval "$(fzf --bash)"
-elif [[ -n ${BLE_VERSION:-} ]] && declare -F ble-import &>/dev/null; then
+elif [[ -n ${BLE_VERSION:-} ]] && command -v fzf &>/dev/null && declare -F ble-import &>/dev/null; then
   ble-import -d integration/fzf-completion
   ble-import -d integration/fzf-key-bindings
 fi
