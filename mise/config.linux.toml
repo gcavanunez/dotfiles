@@ -13,7 +13,6 @@ php = "https://github.com/ramsey/asdf-php.git"
 [tools]
 "aqua:YS-L/csvlens" = "latest"
 "aqua:cloudflare/cloudflared" = "latest"
-"aqua:pnpm/pnpm" = "latest"
 atuin = "latest"
 bat = "latest"
 btop = "latest"
@@ -42,6 +41,7 @@ node = "lts"
 "npm:portless" = "latest"
 # uses ramsey/asdf-php (static binaries, no phpize/php-config)
 php = "8.4"
+pnpm = "latest"
 python = ["3.12", "3.11"]
 ripgrep = "latest"
 ruby = "latest"
