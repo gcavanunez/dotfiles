@@ -4,9 +4,6 @@ legacy_version_file = true
 [settings.ruby]
 compile = false
 
-[settings.erlang]
-compile = false
-
 [env]
 ASDF_PHP_FPM = "1"
 
