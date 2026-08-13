@@ -115,15 +115,16 @@ rgfzf() {
 
 # Diff this host's mise config against the bootstrap template for this OS.
 misediff() {
+    local dotfiles="${DOTFILES:-$HOME/dotfiles}"
     local config="$HOME/.config/mise/config.toml"
     local template
 
     case "$(uname -s)" in
         Darwin)
-            template="$HOME/dotfiles/mise/config.macos.template.toml"
+            template="$dotfiles/mise/config.macos.template.toml"
             ;;
         Linux)
-            template="${DOTFILES:-$HOME/dotfiles}/mise/config.linux.toml"
+            template="$dotfiles/mise/config.linux.toml"
             ;;
         *)
             echo "Unsupported OS: $(uname -s)" >&2

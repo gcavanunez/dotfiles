@@ -8,6 +8,7 @@ compile = false
 bun = "latest"
 go = "latest"
 node = "lts"
+"npm:@earendil-works/pi-coding-agent" = "latest"
 ruby = "latest"
 rust = "latest"
 starship = "latest"

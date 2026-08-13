@@ -61,12 +61,12 @@ alias decompress="tar -xzf"
 
 # Shell
 if [ -n "$ZSH_VERSION" ]; then
-  alias reloadshell="source \$HOME/.zshrc"
+  alias reloadshell="exec zsh"
 elif [ -n "$BASH_VERSION" ]; then
-  alias reloadshell="source \$HOME/.bashrc"
+  alias reloadshell="exec bash"
 fi
-alias editrc="nvim ~/dotfiles"
-alias reloadtmux="tmux source \$HOME/.tmux.conf"
+alias editrc='${EDITOR:-nvim} "${DOTFILES:-$HOME/dotfiles}"'
+alias reloadtmux="tmux source \$HOME/.config/tmux/tmux.conf"
 # Refresh tmux server's PATH from a fresh shell (no kill needed). Useful after `mise upgrade`.
 alias tmux-sync-env="tmux set-environment -g PATH \"\$(zsh -ic 'echo -n \$PATH')\""
 alias tsc="\${EDITOR:-nvim} ~/.config/tmux-sessionizer/tmux-sessionizer.conf"

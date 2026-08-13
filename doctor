@@ -114,27 +114,27 @@ TOOLS=(
   delta
   eza
   fd
-  ffmpeg
   fzf
   gh
-  gnu-sed:gsed
   go
   jq
   lazydocker
   lazygit
   node
+  pi
   ripgrep:rg
   ruby
   rust:rustc
   starship
   tmux
   tree-sitter
-  tree
   zoxide
 )
 
 if [[ "$OS" != "Darwin" ]]; then
-  TOOLS+=(php)
+  TOOLS+=(mermaid-cli:mmdc php tectonic)
+else
+  TOOLS+=(ffmpeg gnu-sed:gsed tree)
 fi
 
 missing=0
@@ -178,6 +178,10 @@ SYSTEM_TOOLS=(
   nvim
   docker
 )
+
+if [[ "$OS" != "Darwin" ]]; then
+  SYSTEM_TOOLS+=(ffmpeg sed tree)
+fi
 
 sys_missing=0
 
@@ -246,8 +250,9 @@ else
     echo "  # Docker: install Docker Desktop, OrbStack, or Colima"
   else
     echo "  # ffmpeg: install via your distro package manager"
+    echo "  # sed: install via your distro package manager"
+    echo "  # tree: install via your distro package manager"
     echo "  # Docker: https://docs.docker.com/engine/install/"
-    echo "  # gh CLI: https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
   fi
 fi
 
