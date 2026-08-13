@@ -11,3 +11,6 @@ cursor-style-blink = false
 shell-integration-features = no-cursor
 custom-shader = ./cursor_blade.glsl
 clipboard-read = allow
+
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+async-backend = epoll

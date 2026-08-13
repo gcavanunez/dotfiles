@@ -48,10 +48,7 @@ if ! command -v nvim &>/dev/null; then
   if [[ "$OS" == "Darwin" ]]; then
     brew install neovim
   else
-    curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
-    sudo rm -rf /opt/nvim-linux-x86_64
-    sudo tar -xzf nvim-linux-x86_64.tar.gz -C /opt/
-    rm nvim-linux-x86_64.tar.gz
+    bash "$DOTFILES/scripts/upgrade-nvim"
   fi
 fi
 

@@ -1,25 +1,109 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-INSTALL_DIR="/opt/nvim-linux-x86_64"
+INSTALL_DIR="/opt/neovim"
+BIN_LINK="/usr/local/bin/nvim"
+BACKUP_DIR="$INSTALL_DIR.backup"
 REPO="neovim/neovim"
-ASSET="nvim-linux-x86_64.tar.gz"
 OS=$(uname -s)
+ARCH=$(uname -m)
+TMPDIR_PATH=""
+STAGE_DIR=""
+LEGACY_INSTALL_DIR=""
+
+case "$ARCH" in
+  x86_64)
+    ASSET="nvim-linux-x86_64.tar.gz"
+    ARCHIVE_DIR="nvim-linux-x86_64"
+    ;;
+  aarch64 | arm64)
+    ASSET="nvim-linux-arm64.tar.gz"
+    ARCHIVE_DIR="nvim-linux-arm64"
+    ;;
+  *)
+    echo "Error: no configured Neovim asset for architecture $ARCH" >&2
+    exit 1
+    ;;
+esac
+
+cleanup() {
+  [[ -z "$TMPDIR_PATH" ]] || rm -rf "$TMPDIR_PATH"
+}
+
+trap cleanup EXIT
 
 current_version() {
-  if command -v nvim &>/dev/null; then
-    nvim --version | head -1 | awk '{print $2}'
+  if [[ -x "$INSTALL_DIR/bin/nvim" ]]; then
+    "$INSTALL_DIR/bin/nvim" --version | awk 'NR == 1 { print $2; exit }'
   else
     echo "none"
   fi
 }
 
 latest_version() {
-  gh release view --repo "$REPO" --json tagName --jq '.tagName'
+  local release_url
+  release_url=$(curl --fail --silent --show-error --location \
+    --retry 3 --retry-all-errors \
+    --output /dev/null --write-out '%{url_effective}' \
+    "https://github.com/$REPO/releases/latest")
+  basename "$release_url"
+}
+
+is_dotfiles_managed() {
+  local resolved user_install_root
+
+  resolved=$(command -v nvim 2>/dev/null || true)
+  if [[ -z "$resolved" ]]; then
+    return 0
+  fi
+
+  resolved=$(realpath "$resolved")
+  user_install_root="${XDG_DATA_HOME:-$HOME/.local/share}"
+  if [[ "$resolved" == "$INSTALL_DIR/bin/nvim" ]]; then
+    return 0
+  elif [[ "$resolved" == /opt/nvim-linux-*/bin/nvim ||
+    "$resolved" == "$user_install_root"/nvim-linux-*/bin/nvim ]]; then
+    LEGACY_INSTALL_DIR=${resolved%/bin/nvim}
+    return 0
+  fi
+
+  return 1
+}
+
+ensure_bin_link() {
+  if [[ -e "$BIN_LINK" && ! -L "$BIN_LINK" ]]; then
+    echo "Error: $BIN_LINK exists and is not a symlink; refusing to replace it" >&2
+    return 1
+  fi
+
+  sudo mkdir -p "$(dirname "$BIN_LINK")"
+  sudo ln -sfn "$INSTALL_DIR/bin/nvim" "$BIN_LINK"
+}
+
+migrate_legacy_path() {
+  local legacy_backup
+
+  [[ -n "$LEGACY_INSTALL_DIR" && ! -L "$LEGACY_INSTALL_DIR" ]] || return 0
+  legacy_backup="$LEGACY_INSTALL_DIR.backup"
+
+  if [[ -e "$legacy_backup" ]]; then
+    echo "Warning: leaving legacy install at $LEGACY_INSTALL_DIR because $legacy_backup already exists" >&2
+    return 0
+  fi
+
+  if [[ "$LEGACY_INSTALL_DIR" == /opt/* ]]; then
+    sudo mv "$LEGACY_INSTALL_DIR" "$legacy_backup"
+    sudo ln -s "$INSTALL_DIR" "$LEGACY_INSTALL_DIR"
+  else
+    mv "$LEGACY_INSTALL_DIR" "$legacy_backup"
+    ln -s "$INSTALL_DIR" "$LEGACY_INSTALL_DIR"
+  fi
+
+  echo "Legacy path now points to $INSTALL_DIR; rollback retained at $legacy_backup"
 }
 
 main() {
-  local current latest
+  local current latest staged_version
 
   if [[ "$OS" == "Darwin" ]]; then
     echo "Neovim is managed by Homebrew on macOS. Use: brew upgrade neovim"
@@ -29,6 +113,12 @@ main() {
     exit 1
   fi
 
+  if ! is_dotfiles_managed; then
+    echo "Neovim is managed outside dotfiles: $(realpath "$(command -v nvim)")"
+    echo "Leaving it unchanged."
+    exit 0
+  fi
+
   current=$(current_version)
   latest=$(latest_version)
 
@@ -36,22 +126,58 @@ main() {
   echo "Latest:  $latest"
 
   if [[ "$current" == "$latest" ]]; then
+    ensure_bin_link
+    migrate_legacy_path
     echo "Already up to date."
     exit 0
   fi
 
-  local tmpdir
-  tmpdir=$(mktemp -d)
-  trap 'rm -rf "$tmpdir"' EXIT
+  TMPDIR_PATH=$(mktemp -d)
 
   echo "Downloading $ASSET ($latest)..."
-  gh release download "$latest" --repo "$REPO" --pattern "$ASSET" --dir "$tmpdir"
+  curl --fail --location --retry 3 --retry-all-errors \
+    --output "$TMPDIR_PATH/$ASSET" \
+    "https://github.com/$REPO/releases/download/$latest/$ASSET"
+
+  tar -xzf "$TMPDIR_PATH/$ASSET" -C "$TMPDIR_PATH"
+  staged_version=$("$TMPDIR_PATH/$ARCHIVE_DIR/bin/nvim" --version | awk 'NR == 1 { print $2; exit }')
+  if [[ "$staged_version" != "$latest" ]]; then
+    echo "Error: downloaded $staged_version, expected $latest" >&2
+    exit 1
+  fi
 
   echo "Installing to $INSTALL_DIR..."
-  sudo rm -rf "$INSTALL_DIR"
-  sudo tar -xzf "$tmpdir/$ASSET" -C "$(dirname "$INSTALL_DIR")"
+  STAGE_DIR="/opt/.neovim-stage.$$"
+  sudo rm -rf "$STAGE_DIR" "$BACKUP_DIR"
+  sudo mv "$TMPDIR_PATH/$ARCHIVE_DIR" "$STAGE_DIR"
+  sudo chown -R root:root "$STAGE_DIR"
 
-  echo "Done: $(nvim --version | head -1)"
+  if [[ -e "$BIN_LINK" && ! -L "$BIN_LINK" ]]; then
+    sudo rm -rf "$STAGE_DIR"
+    echo "Error: $BIN_LINK exists and is not a symlink; refusing to replace it" >&2
+    exit 1
+  fi
+
+  if [[ -d "$INSTALL_DIR" ]]; then
+    sudo mv "$INSTALL_DIR" "$BACKUP_DIR"
+  fi
+
+  if ! sudo mv "$STAGE_DIR" "$INSTALL_DIR"; then
+    [[ ! -d "$BACKUP_DIR" ]] || sudo mv "$BACKUP_DIR" "$INSTALL_DIR"
+    echo "Error: installation failed; restored the previous version" >&2
+    exit 1
+  fi
+
+  if ! ensure_bin_link; then
+    sudo rm -rf "$INSTALL_DIR"
+    [[ ! -d "$BACKUP_DIR" ]] || sudo mv "$BACKUP_DIR" "$INSTALL_DIR"
+    echo "Error: could not create $BIN_LINK; restored the previous version" >&2
+    exit 1
+  fi
+
+  sudo rm -rf "$BACKUP_DIR"
+  migrate_legacy_path
+  echo "Done: $("$BIN_LINK" --version | awk 'NR == 1 { print; exit }')"
 }
 
 main "$@"
