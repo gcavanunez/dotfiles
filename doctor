@@ -211,6 +211,16 @@ if command -v nvim &>/dev/null; then
   fi
 fi
 
+if [[ "$OS" == "Linux" ]]; then
+  mise_config="$HOME/.config/mise/config.toml"
+  mise_target="$DOTFILES/mise/config.linux.toml"
+  if [[ -L "$mise_config" && $(realpath "$mise_config") == "$mise_target" ]]; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "mise config" "linked to mise/config.linux.toml"
+  else
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise config" "not linked to $mise_target"
+  fi
+fi
+
 # Extra: check if docker daemon is reachable
 if command -v docker &>/dev/null; then
   if docker info &>/dev/null 2>&1; then

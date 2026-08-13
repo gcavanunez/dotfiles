@@ -115,6 +115,7 @@ rgfzf() {
 
 # Diff this host's mise config against the bootstrap template for this OS.
 misediff() {
+    local config="$HOME/.config/mise/config.toml"
     local template
 
     case "$(uname -s)" in
@@ -122,7 +123,7 @@ misediff() {
             template="$HOME/dotfiles/mise/config.macos.template.toml"
             ;;
         Linux)
-            template="$HOME/dotfiles/mise/config.linux.template.toml"
+            template="${DOTFILES:-$HOME/dotfiles}/mise/config.linux.toml"
             ;;
         *)
             echo "Unsupported OS: $(uname -s)" >&2
@@ -130,5 +131,10 @@ misediff() {
             ;;
     esac
 
-    diff -u "$template" "$HOME/.config/mise/config.toml"
+    if [[ -L "$config" && "$(realpath "$config")" == "$(realpath "$template")" ]]; then
+        echo "$config -> $template"
+        return
+    fi
+
+    diff -u "$template" "$config"
 }
