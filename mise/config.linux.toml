@@ -33,8 +33,8 @@ lazydocker = "latest"
 lazygit = "latest"
 node = "lts"
 "npm:@earendil-works/pi-coding-agent" = "latest"
-"npm:@kitlangton/stack" = "latest"
-"npm:@mermaid-js/mermaid-cli" = "latest"
+"npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = ["@effect/platform-node@4.0.0-beta.64", "effect@4.0.0-beta.64"] }
+"npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = ["cytoscape@3.34.1"] }
 "npm:agent-browser" = "latest"
 "npm:cloc" = "latest"
 "npm:pm2" = "latest"
