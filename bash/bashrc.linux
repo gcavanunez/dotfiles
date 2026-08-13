@@ -1,24 +1,11 @@
+[[ $- != *i* ]] && return
+
+[ -f ~/.config/bash/pre.bash ] && source ~/.config/bash/pre.bash
+
 # opencode
 export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
 # GPG signing is opt-in. Uncomment when using GPG-signed commits.
 # export GPG_TTY=$(tty)
 
-# mise (version manager)
-eval "$(mise activate bash)"
-
-# starship prompt
-eval "$(starship init bash)"
-
-# zoxide (smarter cd)
-eval "$(zoxide init bash)"
-
-# fzf
-eval "$(fzf --bash)"
-
-# atuin (shell history)
-eval "$(atuin init bash)"
-
-# dotfiles
-[ -f ~/.config/bash/functions.bash ] && source ~/.config/bash/functions.bash
-[ -f ~/.config/bash/aliases.bash ] && source ~/.config/bash/aliases.bash
+[ -f ~/.config/bash/init.bash ] && source ~/.config/bash/init.bash

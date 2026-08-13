@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="0.4.0-devel3"
+ARCHIVE="ble-0.4.0-devel3-2.tar.xz"
+SHA256="bdcdcfff216495403adf82a701fe41675f64b64644dc77caabd3e015871ebd61"
+INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/blesh"
+BACKUP_DIR="$INSTALL_DIR.backup"
+TMPDIR_PATH=""
+
+cleanup() {
+  [[ -z "$TMPDIR_PATH" ]] || rm -rf "$TMPDIR_PATH"
+}
+
+trap cleanup EXIT
+
+if [[ -f "$INSTALL_DIR/ble.sh" ]] && bash "$INSTALL_DIR/ble.sh" --version 2>/dev/null | grep -Fq "$VERSION"; then
+  echo "ble.sh $VERSION is already installed."
+  exit 0
+fi
+
+TMPDIR_PATH=$(mktemp -d)
+curl --fail --location --retry 3 --retry-all-errors \
+  --output "$TMPDIR_PATH/$ARCHIVE" \
+  "https://github.com/akinomyoga/ble.sh/releases/download/v$VERSION/$ARCHIVE"
+
+if command -v sha256sum &>/dev/null; then
+  printf '%s  %s\n' "$SHA256" "$TMPDIR_PATH/$ARCHIVE" | sha256sum --check --status
+else
+  [[ $(shasum -a 256 "$TMPDIR_PATH/$ARCHIVE" | cut -d' ' -f1) == "$SHA256" ]]
+fi
+
+tar -xJf "$TMPDIR_PATH/$ARCHIVE" -C "$TMPDIR_PATH"
+mkdir -p "$(dirname "$INSTALL_DIR")"
+rm -rf "$BACKUP_DIR"
+if [[ -e "$INSTALL_DIR" ]]; then
+  mv "$INSTALL_DIR" "$BACKUP_DIR"
+fi
+
+if ! mv "$TMPDIR_PATH/ble-$VERSION" "$INSTALL_DIR"; then
+  [[ ! -e "$BACKUP_DIR" ]] || mv "$BACKUP_DIR" "$INSTALL_DIR"
+  echo "Error: ble.sh installation failed; restored the previous version" >&2
+  exit 1
+fi
+
+rm -rf "$BACKUP_DIR"
+echo "Installed $(bash "$INSTALL_DIR/ble.sh" --version) to $INSTALL_DIR"

@@ -42,6 +42,12 @@ if ! command -v mise &>/dev/null; then
 fi
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
+DEFAULT_SHELL=$(basename "${SHELL:-}")
+if [[ "$DEFAULT_SHELL" == "bash" ]]; then
+  echo "==> Installing ble.sh..."
+  bash "$DOTFILES/scripts/install-blesh"
+fi
+
 # Install neovim if not present
 if ! command -v nvim &>/dev/null; then
   echo "==> Installing neovim..."
@@ -86,6 +92,47 @@ fi
 # Run dotfiles install (symlinks configs that are safe to symlink)
 echo "==> Linking dotfiles..."
 bash "$DOTFILES/install"
+
+if [[ "$DEFAULT_SHELL" == "bash" && -f $HOME/.bashrc ]]; then
+  if ! grep -Fq '.config/bash/pre.bash' "$HOME/.bashrc"; then
+    tmp_bashrc=$(mktemp)
+    awk '
+      !inserted && /\[\[ \$- .*i.*\]\].*return/ {
+        print
+        print ""
+        print "[ -f ~/.config/bash/pre.bash ] && source ~/.config/bash/pre.bash"
+        inserted=1
+        next
+      }
+      !inserted && /^case \$- in/ {
+        in_interactive_guard=1
+      }
+      in_interactive_guard && /^esac$/ {
+        print
+        print ""
+        print "[ -f ~/.config/bash/pre.bash ] && source ~/.config/bash/pre.bash"
+        inserted=1
+        in_interactive_guard=0
+        next
+      }
+      { print }
+      END {
+        if (!inserted) {
+          print ""
+          print "[ -f ~/.config/bash/pre.bash ] && source ~/.config/bash/pre.bash"
+        }
+      }
+    ' "$HOME/.bashrc" > "$tmp_bashrc"
+    cat "$tmp_bashrc" > "$HOME/.bashrc"
+    rm "$tmp_bashrc"
+    echo "  Added early ble.sh initialization to ~/.bashrc"
+  fi
+
+  if ! grep -Fq '.config/bash/init.bash' "$HOME/.bashrc"; then
+    printf '\n[ -f ~/.config/bash/init.bash ] && source ~/.config/bash/init.bash\n' >> "$HOME/.bashrc"
+    echo "  Added shared Bash initialization to ~/.bashrc"
+  fi
+fi
 
 # Copy mise global config and install tools
 if [[ "$OS" == "Darwin" ]]; then

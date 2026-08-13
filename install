@@ -63,5 +63,7 @@ ln -sf "$DOTFILES/zsh/aliases.zsh" "$HOME/.config/zsh/aliases.zsh"
 
 # Bash functions and aliases (shared files — .bashrc itself is machine-specific)
 mkdir -p "$HOME/.config/bash"
+ln -sf "$DOTFILES/bash/pre.bash" "$HOME/.config/bash/pre.bash"
+ln -sf "$DOTFILES/bash/init.bash" "$HOME/.config/bash/init.bash"
 ln -sf "$DOTFILES/zsh/functions.zsh" "$HOME/.config/bash/functions.bash"
 ln -sf "$DOTFILES/zsh/aliases.zsh" "$HOME/.config/bash/aliases.bash"
