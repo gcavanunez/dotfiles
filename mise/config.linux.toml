@@ -4,6 +4,9 @@ legacy_version_file = true
 [settings.ruby]
 compile = false
 
+[settings.erlang]
+compile = false
+
 [env]
 ASDF_PHP_FPM = "1"
 
@@ -17,7 +20,6 @@ atuin = "latest"
 bat = "latest"
 btop = "latest"
 bun = "latest"
-"cargo:tuicr" = "latest"
 delta = "latest"
 elixir = "latest"
 erlang = "latest"
@@ -25,6 +27,7 @@ eza = "latest"
 fd = "latest"
 fzf = "latest"
 gh = "latest"
+"github:agavra/tuicr" = "latest"
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
 hunk = "latest"
