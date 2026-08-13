@@ -49,8 +49,10 @@ rm -rf "$HOME/.config/ghostty"
 ln -s "$DOTFILES/ghostty" "$HOME/.config/ghostty"
 
 # Karabiner
-mkdir -p "$HOME/.config/karabiner"
-ln -sf "$DOTFILES/karabiner/karabiner.json" "$HOME/.config/karabiner/karabiner.json"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    mkdir -p "$HOME/.config/karabiner"
+    ln -sf "$DOTFILES/karabiner/karabiner.json" "$HOME/.config/karabiner/karabiner.json"
+fi
 
 # Starship
 ln -sf "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
