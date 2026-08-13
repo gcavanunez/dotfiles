@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="2026.8.5"
+SHA256_LINUX_X64="ee362b6d96c648e27325a8bc7ee866bde4fffc20c88c777c5eb5c3b5c6f3e226"
+INSTALL_PATH="$HOME/.local/bin/mise"
+TMPDIR_PATH=""
+
+cleanup() {
+  [[ -z "$TMPDIR_PATH" ]] || rm -rf "$TMPDIR_PATH"
+}
+
+trap cleanup EXIT
+
+if [[ -x "$INSTALL_PATH" ]] && "$INSTALL_PATH" --version | grep -Fq "$VERSION"; then
+  echo "mise $VERSION is already installed."
+  exit 0
+fi
+
+case "$(uname -s)-$(uname -m)" in
+  Linux-x86_64)
+    asset="mise-v$VERSION-linux-x64"
+    sha256="$SHA256_LINUX_X64"
+    ;;
+  *)
+    echo "Error: no configured mise asset for $(uname -s)-$(uname -m)" >&2
+    exit 1
+    ;;
+esac
+
+TMPDIR_PATH=$(mktemp -d)
+curl --fail --location --retry 3 --retry-all-errors \
+  --output "$TMPDIR_PATH/mise" \
+  "https://github.com/jdx/mise/releases/download/v$VERSION/$asset"
+printf '%s  %s\n' "$sha256" "$TMPDIR_PATH/mise" | sha256sum --check --status
+
+mkdir -p "$(dirname "$INSTALL_PATH")"
+install -m 0755 "$TMPDIR_PATH/mise" "$INSTALL_PATH"
+echo "Installed $("$INSTALL_PATH" --version) to $INSTALL_PATH"

@@ -1,4 +1,6 @@
 # Initialize tools not already provided by the host's Bash configuration.
+export PATH="$HOME/.local/bin:$PATH"
+
 if command -v mise &>/dev/null; then
   eval "$(mise activate bash)"
 fi
@@ -13,9 +15,6 @@ fi
 
 if [[ -z ${BLE_VERSION:-} ]] && command -v fzf &>/dev/null && ! declare -F _fzf_search_completion &>/dev/null; then
   eval "$(fzf --bash)"
-elif [[ -n ${BLE_VERSION:-} ]] && command -v fzf &>/dev/null && declare -F ble-import &>/dev/null; then
-  ble-import -d integration/fzf-completion
-  ble-import -d integration/fzf-key-bindings
 fi
 
 if command -v atuin &>/dev/null && [[ ${__atuin_initialized:-} != true ]]; then

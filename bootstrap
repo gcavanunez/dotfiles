@@ -31,14 +31,15 @@ if [[ "$OS" == "Darwin" ]]; then
   echo "==> macOS manual setup notes: $DOTFILES/setup/macos.md"
 fi
 
-# Install mise if not present
-if ! command -v mise &>/dev/null; then
-  echo "==> Installing mise..."
-  if [[ "$OS" == "Darwin" ]]; then
+# Install mise using the platform's selected ownership model.
+if [[ "$OS" == "Darwin" ]]; then
+  if ! command -v mise &>/dev/null; then
+    echo "==> Installing mise..."
     brew install mise
-  else
-    curl https://mise.jdx.dev/install.sh | sh
   fi
+else
+  echo "==> Installing mise..."
+  bash "$DOTFILES/scripts/install-mise"
 fi
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
