@@ -7,6 +7,10 @@ fi
 # opencode
 export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
+# zsh completions
+autoload -Uz compinit
+compinit
+
 # mise (version manager)
 eval "$(mise activate zsh)"
 

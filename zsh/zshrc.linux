@@ -4,6 +4,10 @@ export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 # GPG signing is opt-in. Uncomment when using GPG-signed commits.
 # export GPG_TTY=$(tty)
 
+# zsh completions
+autoload -Uz compinit
+compinit
+
 # mise (version manager)
 eval "$(mise activate zsh)"
 
