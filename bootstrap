@@ -44,10 +44,6 @@ fi
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 DEFAULT_SHELL=$(basename "${SHELL:-}")
-if [[ "$DEFAULT_SHELL" == "bash" ]]; then
-  echo "==> Installing ble.sh..."
-  bash "$DOTFILES/scripts/install-blesh"
-fi
 
 # Install neovim if not present
 if ! command -v nvim &>/dev/null; then
@@ -126,7 +122,7 @@ if [[ "$DEFAULT_SHELL" == "bash" && -f $HOME/.bashrc ]]; then
     ' "$HOME/.bashrc" > "$tmp_bashrc"
     cat "$tmp_bashrc" > "$HOME/.bashrc"
     rm "$tmp_bashrc"
-    echo "  Added early ble.sh initialization to ~/.bashrc"
+    echo "  Added early Bash initialization to ~/.bashrc"
   fi
 
   if ! grep -Fq '.config/bash/init.bash' "$HOME/.bashrc"; then

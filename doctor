@@ -60,7 +60,7 @@ check_shell_rc() {
     if grep -Fq '.config/bash/pre.bash' "$rc_file"; then
       printf "  ${GREEN}✓${NC} %-14s %s\n" "$rc_name" "uses shared Bash initialization"
     else
-      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "$rc_name" "missing early ble.sh initialization"
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "$rc_name" "missing early Bash initialization"
     fi
     return
   fi
@@ -275,16 +275,6 @@ if [[ -n "$TEMPLATE_OS" ]]; then
   check_shell_rc zsh zsh
 else
   printf "  ${YELLOW}!${NC} %-14s ${YELLOW}no templates for %s${NC}\n" "shell rc" "$OS"
-fi
-
-if [[ $(basename "${SHELL:-}") == "bash" ]]; then
-  blesh_path="${XDG_DATA_HOME:-$HOME/.local/share}/blesh/ble.sh"
-  if [[ -f "$blesh_path" ]]; then
-    blesh_version=$(bash "$blesh_path" --version 2>&1)
-    printf "  ${GREEN}✓${NC} %-14s %s\n" "ble.sh" "$blesh_version"
-  else
-    printf "  ${RED}✗${NC} %-14s ${RED}%s${NC}\n" "ble.sh" "not found; run scripts/install-blesh"
-  fi
 fi
 
 # --- Optional direct-installer tools ---
