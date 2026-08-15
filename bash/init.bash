@@ -1,11 +1,11 @@
 # Initialize tools not already provided by the host's Bash configuration.
 export PATH="$HOME/.local/bin:$PATH"
 
-if command -v mise &>/dev/null; then
+if command -v mise &>/dev/null && ! declare -F _mise_hook &>/dev/null; then
   eval "$(mise activate bash)"
 fi
 
-if [[ ${TERM:-} != dumb ]] && command -v starship &>/dev/null; then
+if [[ ${TERM:-} != dumb ]] && command -v starship &>/dev/null && ! declare -F starship_precmd &>/dev/null; then
   eval "$(starship init bash)"
 fi
 
