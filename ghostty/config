@@ -1,7 +1,6 @@
 font-family = "JetBrainsMono Nerd Font Mono"
 font-size = "18"
 theme = TokyoNight Storm
-font-size = "12"
 shell-integration = zsh
 macos-option-as-alt = left
 macos-titlebar-style = hidden
@@ -11,6 +10,3 @@ cursor-style-blink = false
 shell-integration-features = no-cursor
 custom-shader = ./cursor_blade.glsl
 clipboard-read = allow
-
-# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
-async-backend = epoll
