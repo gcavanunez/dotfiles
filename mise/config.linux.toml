@@ -25,6 +25,7 @@ fd = "latest"
 fzf = "latest"
 gh = "latest"
 "github:agavra/tuicr" = "latest"
+"github:backnotprop/plannotator" = { version = "latest", minimum_release_age = "0s" }
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
 hunk = "latest"

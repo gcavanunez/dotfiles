@@ -7,6 +7,9 @@ Type=simple
 WorkingDirectory=%h
 Environment="PATH=%h/.opencode/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
 Environment="DOCKER_HOST=unix:///var/run/docker.sock"
+Environment="PLANNOTATOR_REMOTE=1"
+Environment="PLANNOTATOR_URL_HOST=main-uwu.tailbcce82.ts.net"
+Environment="PLANNOTATOR_PORT=19432-19463"
 EnvironmentFile=%h/.config/opencode/server.env
 ExecStart=%h/.opencode/bin/opencode serve --port 4096 --hostname 0.0.0.0
 Restart=on-failure
