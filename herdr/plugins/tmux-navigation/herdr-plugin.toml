@@ -1,0 +1,37 @@
+id = "dotfiles.tmux-navigation"
+name = "Tmux Navigation"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Toggle the last focused tab or workspace."
+platforms = ["linux", "macos"]
+
+[[startup]]
+command = ["./tmux-navigation", "initialize"]
+
+[[actions]]
+id = "last-tab"
+title = "Toggle last tab"
+contexts = ["tab"]
+command = ["./tmux-navigation", "last-tab"]
+
+[[actions]]
+id = "last-workspace"
+title = "Toggle last workspace"
+contexts = ["workspace"]
+command = ["./tmux-navigation", "last-workspace"]
+
+[[events]]
+on = "tab.focused"
+command = ["./tmux-navigation", "track-event"]
+
+[[events]]
+on = "tab.closed"
+command = ["./tmux-navigation", "track-event"]
+
+[[events]]
+on = "workspace.focused"
+command = ["./tmux-navigation", "track-event"]
+
+[[events]]
+on = "workspace.closed"
+command = ["./tmux-navigation", "track-event"]

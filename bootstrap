@@ -131,31 +131,26 @@ if [[ "$DEFAULT_SHELL" == "bash" && -f $HOME/.bashrc ]]; then
   fi
 fi
 
-# Copy mise global config and install tools
+# Link the platform's mise global config and install tools
 if [[ "$OS" == "Darwin" ]]; then
-  MISE_TEMPLATE="$DOTFILES/mise/config.macos.template.toml"
+  MISE_CONFIG_SOURCE="$DOTFILES/mise/config.macos.toml"
 elif [[ "$OS" == "Linux" ]]; then
-  MISE_TEMPLATE="$DOTFILES/mise/config.linux.toml"
+  MISE_CONFIG_SOURCE="$DOTFILES/mise/config.linux.toml"
 else
   echo "Error: no mise template for $OS" >&2
   exit 1
 fi
 
 mkdir -p "$HOME/.config/mise"
-if [[ "$OS" == "Linux" ]]; then
-  MISE_CONFIG="$HOME/.config/mise/config.toml"
-  if [[ ! -L "$MISE_CONFIG" || $(realpath "$MISE_CONFIG") != "$MISE_TEMPLATE" ]]; then
-    if [[ -e "$MISE_CONFIG" || -L "$MISE_CONFIG" ]]; then
-      backup="$MISE_CONFIG.backup.$(date +%Y%m%d%H%M%S)"
-      mv "$MISE_CONFIG" "$backup"
-      echo "  Backed up existing mise config to $backup"
-    fi
-    ln -s "$MISE_TEMPLATE" "$MISE_CONFIG"
-    echo "  Linked ~/.config/mise/config.toml to $(basename "$MISE_TEMPLATE")"
+MISE_CONFIG="$HOME/.config/mise/config.toml"
+if [[ ! -L "$MISE_CONFIG" || $(realpath "$MISE_CONFIG") != "$MISE_CONFIG_SOURCE" ]]; then
+  if [[ -e "$MISE_CONFIG" || -L "$MISE_CONFIG" ]]; then
+    backup="$MISE_CONFIG.backup.$(date +%Y%m%d%H%M%S)"
+    mv "$MISE_CONFIG" "$backup"
+    echo "  Backed up existing mise config to $backup"
   fi
-elif [[ ! -f $HOME/.config/mise/config.toml ]]; then
-  cp "$MISE_TEMPLATE" "$HOME/.config/mise/config.toml"
-  echo "  Created ~/.config/mise/config.toml from $(basename "$MISE_TEMPLATE") — edit as needed"
+  ln -s "$MISE_CONFIG_SOURCE" "$MISE_CONFIG"
+  echo "  Linked ~/.config/mise/config.toml to $(basename "$MISE_CONFIG_SOURCE")"
 fi
 echo "==> Installing mise tools..."
 mise install

@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-sessionizer"
+CONFIG_FILE="$CONFIG_DIR/tmux-sessionizer.conf"
+
+if [[ -f "$CONFIG_FILE" ]]; then
+    # Reuse the same project roots as tmux-sessionizer.
+    source "$CONFIG_FILE"
+fi
+
+for command in herdr fzf jq; do
+    if ! command -v "$command" &>/dev/null; then
+        printf 'herdr-sessionizer: %s is required\n' "$command" >&2
+        exit 1
+    fi
+done
+
+search_paths=()
+if declare -p TS_SEARCH_PATHS &>/dev/null; then
+    search_paths+=("${TS_SEARCH_PATHS[@]}")
+else
+    search_paths+=("$HOME" "$HOME/personal" "$HOME/personal/dev/env/.config")
+fi
+
+if declare -p TS_EXTRA_SEARCH_PATHS &>/dev/null; then
+    search_paths+=("${TS_EXTRA_SEARCH_PATHS[@]}")
+fi
+
+snapshot=$(herdr api snapshot)
+
+list_workspaces() {
+    jq -r '
+        .result.snapshot.workspaces[]
+        | select(.focused != true)
+        | ["workspace", .workspace_id, ("[HERDR] " + .label)]
+        | @tsv
+    ' <<< "$snapshot"
+}
+
+list_projects() {
+    {
+        for entry in "${search_paths[@]}"; do
+            path="$entry"
+            depth="${TS_MAX_DEPTH:-1}"
+
+            if [[ "$entry" =~ ^(.+):([0-9]+)$ ]]; then
+                path="${BASH_REMATCH[1]}"
+                depth="${BASH_REMATCH[2]}"
+            fi
+
+            if [[ -d "$path" ]]; then
+                find "$path" -mindepth 1 -maxdepth "$depth" -path '*/.git' -prune -o -type d -print
+            fi
+        done
+    } | LC_ALL=C sort -u | while IFS= read -r project; do
+        printf 'project\t%s\t%s\n' "$project" "$project"
+    done
+}
+
+list_candidates() {
+    list_workspaces
+    list_projects
+}
+
+case "${1:-}" in
+    --list)
+        list_candidates | cut -f3-
+        exit 0
+        ;;
+    -h|--help)
+        printf 'Usage: herdr-sessionizer [--list]\n'
+        exit 0
+        ;;
+    '')
+        ;;
+    *)
+        printf 'herdr-sessionizer: unknown option: %s\n' "$1" >&2
+        exit 2
+        ;;
+esac
+
+selection=$(list_candidates | fzf \
+    --reverse \
+    --delimiter=$'\t' \
+    --with-nth=3 \
+    --prompt='Select a workspace> ') || exit 0
+
+[[ -n "$selection" ]] || exit 0
+
+IFS=$'\t' read -r kind value _ <<< "$selection"
+
+if [[ "$kind" == "workspace" ]]; then
+    herdr workspace focus "$value" >/dev/null
+    exit 0
+fi
+
+existing_workspace=$(jq -r --arg cwd "$value" '
+    [
+        .result.snapshot.panes[]
+        | select(.cwd == $cwd or .foreground_cwd == $cwd)
+        | .workspace_id
+    ]
+    | unique
+    | .[0] // empty
+' <<< "$snapshot")
+
+if [[ -n "$existing_workspace" ]]; then
+    herdr workspace focus "$existing_workspace" >/dev/null
+    exit 0
+fi
+
+label=$(basename "$value" | tr . _)
+herdr workspace create --cwd "$value" --label "$label" --focus >/dev/null

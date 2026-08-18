@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+herdr_bin=${HERDR_BIN_PATH:-herdr}
+state_dir=${HERDR_PLUGIN_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/herdr/plugins/dotfiles.tmux-navigation}
+workspace_state=$state_dir/workspaces
+tab_state_dir=$state_dir/tabs
+lock_path=$state_dir/history.lock
+
+release_lock() {
+    if [[ -d $lock_path && -f $lock_path/owner && $(< "$lock_path/owner") == $$ ]]; then
+        rm -f "$lock_path/owner"
+        rmdir "$lock_path"
+    fi
+}
+
+acquire_lock() {
+    local attempts holder
+
+    mkdir -p "$tab_state_dir"
+    attempts=0
+    until mkdir "$lock_path" 2>/dev/null; do
+        attempts=$((attempts + 1))
+        if (( attempts >= 500 )); then
+            holder=""
+            [[ -f $lock_path/owner ]] && holder=$(< "$lock_path/owner")
+            printf 'Timed out waiting for navigation history lock held by %s\n' "${holder:-unknown process}" >&2
+            exit 1
+        fi
+        sleep 0.01
+    done
+    printf '%s\n' "$$" > "$lock_path/owner"
+    trap release_lock EXIT
+    trap 'exit 1' HUP INT TERM
+}
+
+read_pair() {
+    current=""
+    previous=""
+    if [[ -f $1 ]]; then
+        IFS=$'\t' read -r current previous < "$1" || true
+    fi
+}
+
+write_pair() {
+    local file=$1 tmp
+
+    tmp=$file.$$
+    printf '%s\t%s\n' "$current" "$previous" > "$tmp"
+    mv -f "$tmp" "$file"
+}
+
+focused_ids() {
+    "$herdr_bin" api snapshot | jq -r '
+        [.result.snapshot.focused_workspace_id // "", .result.snapshot.focused_tab_id // ""]
+        | @tsv
+    '
+}
+
+workspace_exists() {
+    local workspace_id=$1 workspaces
+
+    workspaces=$("$herdr_bin" workspace list) || return 2
+    jq -e --arg id "$workspace_id" \
+        'any(.result.workspaces[]; .workspace_id == $id)' <<< "$workspaces" >/dev/null
+}
+
+tab_exists_in_workspace() {
+    local tab_id=$1 workspace_id=$2 tabs
+
+    tabs=$("$herdr_bin" tab list) || return 2
+    jq -e --arg tab "$tab_id" --arg workspace "$workspace_id" \
+        'any(.result.tabs[]; .tab_id == $tab and .workspace_id == $workspace)' <<< "$tabs" >/dev/null
+}
+
+track_workspace() {
+    local workspace_id=$1
+
+    [[ -n $workspace_id ]] || return 0
+    read_pair "$workspace_state"
+    if [[ $current != "$workspace_id" ]]; then
+        previous=$current
+        current=$workspace_id
+        write_pair "$workspace_state"
+    fi
+}
+
+track_tab() {
+    local workspace_id=$1 tab_id=$2 file
+
+    [[ -n $workspace_id && -n $tab_id ]] || return 0
+    file=$tab_state_dir/$workspace_id
+    read_pair "$file"
+    if [[ $current != "$tab_id" ]]; then
+        previous=$current
+        current=$tab_id
+        write_pair "$file"
+    fi
+}
+
+initialize() {
+    local workspace_id tab_id
+
+    acquire_lock
+    IFS=$'\t' read -r workspace_id tab_id < <(focused_ids)
+    track_workspace "$workspace_id"
+    track_tab "$workspace_id" "$tab_id"
+}
+
+track_event() {
+    local event_json=${HERDR_PLUGIN_EVENT_JSON:-} event=${HERDR_PLUGIN_EVENT:-}
+    local workspace_id tab_id file
+
+    [[ -n $event_json ]] || return 0
+    acquire_lock
+
+    case $event in
+        workspace.focused)
+            workspace_id=$(jq -r '.data.workspace_id // ""' <<< "$event_json")
+            track_workspace "$workspace_id"
+            ;;
+        tab.focused)
+            workspace_id=$(jq -r '.data.workspace_id // ""' <<< "$event_json")
+            tab_id=$(jq -r '.data.tab_id // ""' <<< "$event_json")
+            track_tab "$workspace_id" "$tab_id"
+            ;;
+        workspace.closed)
+            workspace_id=$(jq -r '.data.workspace_id // ""' <<< "$event_json")
+            read_pair "$workspace_state"
+            [[ $current == "$workspace_id" ]] && current=""
+            [[ $previous == "$workspace_id" ]] && previous=""
+            write_pair "$workspace_state"
+            rm -f "$tab_state_dir/$workspace_id"
+            ;;
+        tab.closed)
+            workspace_id=$(jq -r '.data.workspace_id // ""' <<< "$event_json")
+            tab_id=$(jq -r '.data.tab_id // ""' <<< "$event_json")
+            file=$tab_state_dir/$workspace_id
+            read_pair "$file"
+            [[ $current == "$tab_id" ]] && current=""
+            [[ $previous == "$tab_id" ]] && previous=""
+            write_pair "$file"
+            ;;
+    esac
+}
+
+last_workspace() {
+    local focused_workspace focused_tab target exists_status
+
+    acquire_lock
+    IFS=$'\t' read -r focused_workspace focused_tab < <(focused_ids)
+    track_workspace "$focused_workspace"
+    read_pair "$workspace_state"
+    target=$previous
+
+    if [[ -z $target || $target == "$current" ]]; then
+        exit 0
+    fi
+    if workspace_exists "$target"; then
+        :
+    else
+        exists_status=$?
+        [[ $exists_status == 1 ]] && exit 0
+        exit "$exists_status"
+    fi
+
+    previous=$current
+    current=$target
+    write_pair "$workspace_state"
+    "$herdr_bin" workspace focus "$target" >/dev/null
+}
+
+last_tab() {
+    local workspace_id focused_tab target file exists_status
+
+    acquire_lock
+    IFS=$'\t' read -r workspace_id focused_tab < <(focused_ids)
+    track_tab "$workspace_id" "$focused_tab"
+    file=$tab_state_dir/$workspace_id
+    read_pair "$file"
+    target=$previous
+
+    if [[ -z $target || $target == "$current" ]]; then
+        exit 0
+    fi
+    if tab_exists_in_workspace "$target" "$workspace_id"; then
+        :
+    else
+        exists_status=$?
+        [[ $exists_status == 1 ]] && exit 0
+        exit "$exists_status"
+    fi
+
+    previous=$current
+    current=$target
+    write_pair "$file"
+    "$herdr_bin" tab focus "$target" >/dev/null
+}
+
+command -v jq >/dev/null 2>&1 || {
+    printf 'Tmux Navigation requires jq\n' >&2
+    exit 127
+}
+
+case ${1:-} in
+    initialize) initialize ;;
+    track-event) track_event ;;
+    last-tab) last_tab ;;
+    last-workspace) last_workspace ;;
+    *)
+        printf 'Usage: %s {initialize|track-event|last-tab|last-workspace}\n' "$0" >&2
+        exit 2
+        ;;
+esac

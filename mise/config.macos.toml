@@ -1,0 +1,27 @@
+[settings]
+legacy_version_file = true
+idiomatic_version_file_enable_tools = []
+
+[settings.ruby]
+compile = false
+
+[tools]
+bun = "latest"
+"cargo:terminal-control" = { version = "latest", install_env = { PATH = "/opt/homebrew/opt/zig@0.15/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" } }
+go = "1.24"
+"github:backnotprop/plannotator" = { version = "latest", minimum_release_age = "0s" }
+herdr = "latest"
+hunk = "latest"
+node = "lts"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@kitlangton/ghui" = "latest"
+"npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = ["@effect/platform-node@4.0.0-beta.64", "effect@4.0.0-beta.64"] }
+"npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = ["cytoscape@3.34.1"] }
+"npm:agent-browser" = "latest"
+pitchfork = "latest"
+python = "3.11"
+ruby = "3.3"
+rust = "latest"
+sentry-cli = "latest"
+starship = "latest"
+tree-sitter = "latest"

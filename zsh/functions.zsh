@@ -121,7 +121,7 @@ misediff() {
 
     case "$(uname -s)" in
         Darwin)
-            template="$dotfiles/mise/config.macos.template.toml"
+            template="$dotfiles/mise/config.macos.toml"
             ;;
         Linux)
             template="$dotfiles/mise/config.linux.toml"

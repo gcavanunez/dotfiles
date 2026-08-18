@@ -25,6 +25,7 @@ ln -sf "$DOTFILES/tmux/tmux-host-color" "$HOME/.local/bin/tmux-host-color"
 
 # tmux-sessionizer
 ln -sf "$DOTFILES/tmux/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
+ln -sf "$DOTFILES/herdr/herdr-sessionizer" "$HOME/.local/bin/herdr-sessionizer"
 mkdir -p "$HOME/.config/tmux-sessionizer"
 if [[ ! -f $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf ]]; then
     cp "$DOTFILES/tmux/tmux-sessionizer.conf" "$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf"
@@ -35,6 +36,17 @@ fi
 # zellij
 rm -rf "$HOME/.config/zellij"
 ln -sf "$DOTFILES/zellij" "$HOME/.config/zellij"
+
+# Herdr
+rm -rf "$HOME/.config/herdr"
+ln -s "$DOTFILES/herdr" "$HOME/.config/herdr"
+if command -v herdr >/dev/null 2>&1; then
+    command -v jq >/dev/null 2>&1 || {
+        echo "Herdr tmux navigation requires jq" >&2
+        exit 1
+    }
+    herdr plugin link "$DOTFILES/herdr/plugins/tmux-navigation" --enabled >/dev/null
+fi
 
 # wezterm
 rm -rf "$HOME/.config/wezterm"

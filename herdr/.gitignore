@@ -1,0 +1,9 @@
+# Herdr keeps runtime state beside config.toml.
+*
+!.gitignore
+!config.toml
+!herdr-sessionizer
+!plugins/
+!plugins/tmux-navigation/
+!plugins/tmux-navigation/herdr-plugin.toml
+!plugins/tmux-navigation/tmux-navigation

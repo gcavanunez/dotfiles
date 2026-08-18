@@ -1,0 +1,48 @@
+# Keep Herdr's defaults, overriding only the tmux muscle-memory bindings.
+onboarding = false
+
+[terminal]
+new_cwd = "follow"
+
+[keys]
+prefix = "ctrl+space"
+detach = "prefix+d"
+
+# Match tmux's Alt+Shift+H/L window navigation while retaining prefix+p/n.
+previous_tab = ["prefix+p", "alt+shift+h"]
+next_tab = ["prefix+n", "alt+shift+l"]
+
+# Keep tmux's split keys alongside Herdr's defaults.
+split_vertical = ["prefix+v", "prefix+%"]
+split_horizontal = ["prefix+minus", "prefix+\""]
+
+[ui]
+tab_bar_position = "bottom"
+pane_gaps = false
+pane_scrollbars = false
+confirm_close = false
+prompt_new_tab_name = false
+
+[[keys.command]]
+key = "prefix+f"
+type = "popup"
+command = "~/.local/bin/herdr-sessionizer"
+description = "open project workspace"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+l"
+type = "plugin_action"
+command = "dotfiles.tmux-navigation.last-tab"
+description = "toggle last tab"
+
+[[keys.command]]
+key = "prefix+shift+l"
+type = "plugin_action"
+command = "dotfiles.tmux-navigation.last-workspace"
+description = "toggle last workspace"
+
+[theme]
+name = "terminal"
+auto_switch = false

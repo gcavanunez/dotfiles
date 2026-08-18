@@ -215,11 +215,16 @@ if command -v nvim &>/dev/null; then
   fi
 fi
 
-if [[ "$OS" == "Linux" ]]; then
-  mise_config="$HOME/.config/mise/config.toml"
+if [[ "$OS" == "Darwin" ]]; then
+  mise_target="$DOTFILES/mise/config.macos.toml"
+elif [[ "$OS" == "Linux" ]]; then
   mise_target="$DOTFILES/mise/config.linux.toml"
+fi
+
+if [[ -n "${mise_target:-}" ]]; then
+  mise_config="$HOME/.config/mise/config.toml"
   if [[ -L "$mise_config" && $(realpath "$mise_config") == "$mise_target" ]]; then
-    printf "  ${GREEN}✓${NC} %-14s %s\n" "mise config" "linked to mise/config.linux.toml"
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "mise config" "linked to mise/$(basename "$mise_target")"
   else
     printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise config" "not linked to $mise_target"
   fi
