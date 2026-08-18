@@ -36,6 +36,7 @@ node = "lts"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 "npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = ["@effect/platform-node@4.0.0-beta.64", "effect@4.0.0-beta.64"] }
 "npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = ["cytoscape@3.34.1"] }
+"npm:@opencode-ai/cli" = { version = "beta", allow_builds = ["@opencode-ai/cli"] }
 "npm:agent-browser" = "latest"
 "npm:cloc" = "latest"
 "npm:pm2" = "latest"
@@ -52,6 +53,6 @@ starship = "latest"
 tmux = "latest"
 tree-sitter = "latest"
 uv = "latest"
-wacli = "latest"
+wacli = "0.17.0"
 zig = "0.13"
 zoxide = "latest"
