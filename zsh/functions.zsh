@@ -124,7 +124,13 @@ misediff() {
             template="$dotfiles/mise/config.macos.toml"
             ;;
         Linux)
-            template="$dotfiles/mise/config.linux.toml"
+            local ID=""
+            [[ ! -r /etc/os-release ]] || source /etc/os-release
+            if [[ "$ID" == "omarchy" ]]; then
+                template="$dotfiles/mise/config.omarchy.toml"
+            else
+                template="$dotfiles/mise/config.linux.toml"
+            fi
             ;;
         *)
             echo "Unsupported OS: $(uname -s)" >&2

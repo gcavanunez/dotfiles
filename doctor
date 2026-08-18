@@ -126,6 +126,7 @@ TOOLS=(
   ruby
   rust:rustc
   starship
+  terminal-control:termctrl
   tmux
   tree-sitter
   zoxide
@@ -218,7 +219,17 @@ fi
 if [[ "$OS" == "Darwin" ]]; then
   mise_target="$DOTFILES/mise/config.macos.toml"
 elif [[ "$OS" == "Linux" ]]; then
-  mise_target="$DOTFILES/mise/config.linux.toml"
+  distro_id=""
+  if [[ -r /etc/os-release ]]; then
+    source /etc/os-release
+    distro_id="${ID:-}"
+  fi
+
+  if [[ "$distro_id" == "omarchy" ]]; then
+    mise_target="$DOTFILES/mise/config.omarchy.toml"
+  else
+    mise_target="$DOTFILES/mise/config.linux.toml"
+  fi
 fi
 
 if [[ -n "${mise_target:-}" ]]; then

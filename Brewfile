@@ -4,7 +4,6 @@
 brew "atuin"
 brew "bat"
 brew "btop"
-brew "cloc"
 brew "cloudflared"
 brew "csvlens"
 brew "eza"

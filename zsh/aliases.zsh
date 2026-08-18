@@ -52,7 +52,7 @@ alias c="claude"
 alias awsp="aws configure --profile"
 
 # Mise
-alias mup="mise upgrade -C ~"
+alias mup="MISE_MINIMUM_RELEASE_AGE=0 mise up"
 alias mls="mise list"
 alias mic="${EDITOR:-nvim} ~/.config/mise/config.toml"
 

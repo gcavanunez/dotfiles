@@ -1,6 +1,0 @@
-[settings]
-disable_tools = ["github:agavra/tuicr"]
-
-[tools]
-# Upstream Linux binaries require glibc 2.39; hl-mango has glibc 2.35.
-"cargo:tuicr" = "latest"

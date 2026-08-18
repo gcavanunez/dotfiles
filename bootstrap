@@ -135,7 +135,17 @@ fi
 if [[ "$OS" == "Darwin" ]]; then
   MISE_CONFIG_SOURCE="$DOTFILES/mise/config.macos.toml"
 elif [[ "$OS" == "Linux" ]]; then
-  MISE_CONFIG_SOURCE="$DOTFILES/mise/config.linux.toml"
+  distro_id=""
+  if [[ -r /etc/os-release ]]; then
+    source /etc/os-release
+    distro_id="${ID:-}"
+  fi
+
+  if [[ "$distro_id" == "omarchy" ]]; then
+    MISE_CONFIG_SOURCE="$DOTFILES/mise/config.omarchy.toml"
+  else
+    MISE_CONFIG_SOURCE="$DOTFILES/mise/config.linux.toml"
+  fi
 else
   echo "Error: no mise template for $OS" >&2
   exit 1
