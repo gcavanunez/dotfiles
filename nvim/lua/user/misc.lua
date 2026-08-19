@@ -1,3 +1,5 @@
+require('user.remote_clipboard').setup()
+
 vim.cmd([[
   augroup FileTypeOverrides
     autocmd!
