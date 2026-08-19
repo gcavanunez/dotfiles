@@ -7,6 +7,7 @@ HYPR_SOURCE="$OMARCHY_DOTFILES/hypr/lid.conf"
 LOGIND_SOURCE="$OMARCHY_DOTFILES/logind/50-lid-switch.conf"
 LOGIND_DESTINATION="/etc/systemd/logind.conf.d/50-lid-switch.conf"
 HYPR_DESTINATION="$HOME/.config/hypr/lid.conf"
+HYPR_TEMP="$HYPR_DESTINATION.tmp.$$"
 HYPR_BINDINGS="$HOME/.config/hypr/bindings.conf"
 HYPR_SOURCE_LINE="source = ~/.config/hypr/lid.conf"
 logind_changed=false
@@ -25,7 +26,8 @@ omarchy refresh applications
 
 mkdir -p "$HOME/.local/bin" "$HOME/.config/hypr"
 ln -sfn "$CLI_SOURCE" "$HOME/.local/bin/omarchy-lid"
-ln -sfn "$HYPR_SOURCE" "$HYPR_DESTINATION"
+install -m0644 "$HYPR_SOURCE" "$HYPR_TEMP"
+mv -f "$HYPR_TEMP" "$HYPR_DESTINATION"
 
 if ! grep -Fqx "$HYPR_SOURCE_LINE" "$HYPR_BINDINGS"; then
   printf '\n# Closed-lid policy managed by ~/dotfiles/omarchy.\n%s\n' \

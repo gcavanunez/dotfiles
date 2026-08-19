@@ -12,9 +12,9 @@ an Omarchy machine:
 ~/dotfiles/omarchy/install
 ```
 
-The installer symlinks the user-side files, copies the tracked logind policy to
-`/etc/systemd/logind.conf.d/50-lid-switch.conf`, and does not modify Omarchy's
-managed files under `~/.local/share/omarchy`.
+The installer symlinks the CLI, copies the Hyprland configuration and tracked
+logind policy into place, and does not modify Omarchy's managed files under
+`~/.local/share/omarchy`.
 
 Reboot after installation, then control AC-powered closed-lid behavior with:
 
