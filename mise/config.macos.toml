@@ -6,6 +6,7 @@ idiomatic_version_file_enable_tools = []
 compile = false
 
 [tools]
+"aqua:aws/aws-cli" = "latest"
 bun = "latest"
 codex = "latest"
 "cargo:terminal-control" = { version = "latest", install_env = { PATH = "/opt/homebrew/opt/zig@0.15/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" } }

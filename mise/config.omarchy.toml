@@ -11,6 +11,7 @@ ASDF_PHP_FPM = "1"
 php = "https://github.com/ramsey/asdf-php.git"
 
 [tools]
+"aqua:aws/aws-cli" = "latest"
 bun = "latest"
 codex = "latest"
 "cargo:terminal-control" = { version = "latest", depends = "zig" }
