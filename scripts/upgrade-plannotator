@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly INSTALLER_URL="https://plannotator.ai/install.sh"
+INSTALLER_PATH=$(mktemp)
+
+cleanup() {
+  rm -f "$INSTALLER_PATH"
+}
+
+trap cleanup EXIT
+
+curl --fail --silent --show-error --location \
+  --retry 3 --retry-all-errors \
+  --output "$INSTALLER_PATH" \
+  "$INSTALLER_URL"
+
+bash "$INSTALLER_PATH" --verify-attestation --non-interactive

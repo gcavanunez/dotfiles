@@ -29,7 +29,6 @@ fastfetch = "latest"
 fd = "latest"
 fzf = "latest"
 gh = "latest"
-"github:backnotprop/plannotator" = { version = "latest", minimum_release_age = "0s" }
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
 herdr = "latest"
