@@ -6,6 +6,7 @@ compile = false
 
 [env]
 ASDF_PHP_FPM = "1"
+FIZZY_NO_KEYRING = "1"
 
 [plugins]
 php = "https://github.com/ramsey/asdf-php.git"
@@ -29,6 +30,7 @@ fastfetch = "latest"
 fd = "latest"
 fzf = "latest"
 gh = "latest"
+"github:basecamp/fizzy-cli" = "latest"
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
 herdr = "latest"
