@@ -29,6 +29,9 @@ vim.opt.splitright = true
 -- vim.opt.scrolloff = 999
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
+if vim.env.SSH_CONNECTION then
+  vim.g.clipboard = 'osc52'
+end
 vim.opt.clipboard = 'unnamedplus'      -- Use Linux system clipboard
 vim.opt.confirm = true                 -- ask for confirmation instead of erroring
 vim.opt.undodir = os.getenv("HOME") .. "/.nvim/undodir"
