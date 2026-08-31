@@ -20,8 +20,7 @@ bat = "latest"
 btop = "latest"
 bun = "latest"
 codex = "latest"
-"cargo:terminal-control" = { version = "latest", depends = "zig" }
-"cargo:tuicr" = "latest"
+"github:agavra/tuicr" = "latest"
 delta = "latest"
 elixir = "latest"
 erlang = "latest"
@@ -44,9 +43,11 @@ node = "lts"
   "@effect/platform-node@4.0.0-beta.64",
   "effect@4.0.0-beta.64",
 ] }
+"npm:@kitlangton/terminal-control-linux-x64-gnu" = "latest"
 "npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = [
   "cytoscape@3.34.1",
 ] }
+"npm:@opencode-ai/cli" = { version = "beta", allow_builds = ["@opencode-ai/cli"] }
 "npm:agent-browser" = "latest"
 "npm:cloc" = "latest"
 "npm:pm2" = "latest"

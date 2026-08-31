@@ -26,6 +26,7 @@ ln -sf "$DOTFILES/tmux/tmux-host-color" "$HOME/.local/bin/tmux-host-color"
 # tmux-sessionizer
 ln -sf "$DOTFILES/tmux/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
 ln -sf "$DOTFILES/herdr/herdr-sessionizer" "$HOME/.local/bin/herdr-sessionizer"
+ln -sf "$DOTFILES/scripts/upgrade-cliproxyapi" "$HOME/.local/bin/upgrade-cliproxyapi"
 mkdir -p "$HOME/.config/tmux-sessionizer"
 if [[ ! -f $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf ]]; then
     cp "$DOTFILES/tmux/tmux-sessionizer.conf" "$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf"

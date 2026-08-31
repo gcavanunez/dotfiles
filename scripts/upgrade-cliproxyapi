@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly INSTALLER_URL="https://raw.githubusercontent.com/router-for-me/cliproxyapi-installer/refs/heads/master/cliproxyapi-installer"
+readonly SERVICE="cliproxyapi.service"
+readonly HEALTH_URL="http://127.0.0.1:8317/"
+readonly CONFIG_PATH="$HOME/cliproxyapi/config.yaml"
+INSTALLER_PATH=$(mktemp)
+was_installed=false
+
+cleanup() {
+  rm -f "$INSTALLER_PATH"
+}
+
+trap cleanup EXIT
+
+if [[ $(uname -s) != "Linux" ]]; then
+  echo "Error: this CLIProxyAPI updater is Linux-specific." >&2
+  exit 1
+fi
+
+command -v curl >/dev/null 2>&1 || {
+  echo "Error: curl is required." >&2
+  exit 1
+}
+
+command -v systemctl >/dev/null 2>&1 || {
+  echo "Error: systemctl is required." >&2
+  exit 1
+}
+
+[[ ! -f "$CONFIG_PATH" ]] || was_installed=true
+
+curl --fail --silent --show-error --location \
+  --retry 3 --retry-all-errors \
+  --output "$INSTALLER_PATH" \
+  "$INSTALLER_URL"
+
+bash "$INSTALLER_PATH" upgrade
+
+if [[ ! -f "$CONFIG_PATH" ]]; then
+  echo "Error: installer did not create $CONFIG_PATH." >&2
+  exit 1
+fi
+
+if [[ "$was_installed" == false ]]; then
+  sed -i 's/^host: ""$/host: "127.0.0.1"/' "$CONFIG_PATH"
+fi
+sed -i '/^[[:space:]]*- "your-api-key-[0-9][0-9]*"[[:space:]]*$/d' "$CONFIG_PATH"
+chmod 600 "$CONFIG_PATH"
+
+systemctl --user enable --now "$SERVICE"
+
+if ! systemctl --user is-active --quiet "$SERVICE"; then
+  systemctl --user --no-pager --full status "$SERVICE" || true
+  echo "Error: $SERVICE did not start." >&2
+  exit 1
+fi
+
+curl --fail --silent --show-error \
+  --retry 5 --retry-connrefused --max-time 5 \
+  --output /dev/null \
+  "$HEALTH_URL"
+
+version=$("$HOME/cliproxyapi/cli-proxy-api" --help 2>&1 | awk '/CLIProxyAPI Version:/ && !version { gsub(",", "", $3); version=$3 } END { print version }')
+echo "CLIProxyAPI $version is active at $HEALTH_URL"
