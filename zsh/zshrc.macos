@@ -4,8 +4,8 @@ elif [[ -x /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-# opencode
-export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
+# user-local binaries
+export PATH="$HOME/.local/bin:$PATH"
 
 # zsh completions
 autoload -Uz compinit

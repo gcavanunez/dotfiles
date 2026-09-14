@@ -2,8 +2,8 @@
 
 [ -f ~/.config/bash/pre.bash ] && source ~/.config/bash/pre.bash
 
-# opencode
-export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
+# user-local binaries
+export PATH="$HOME/.local/bin:$PATH"
 
 # GPG signing is opt-in. Uncomment when using GPG-signed commits.
 # export GPG_TTY=$(tty)
