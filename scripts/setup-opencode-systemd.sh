@@ -3,17 +3,25 @@ set -euo pipefail
 
 DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 UNIT_SOURCE="$DOTFILES/systemd/user/opencode.service"
+SERVER_SOURCE="$DOTFILES/scripts/opencode-systemd-serve"
 UNIT_DIR="$HOME/.config/systemd/user"
 ENV_DIR="$HOME/.config/opencode"
 ENV_FILE="$ENV_DIR/server.env"
+OPENCODE="$HOME/.opencode/bin/opencode"
 
 if [[ ! -f "$UNIT_SOURCE" ]]; then
   echo "Missing service unit: $UNIT_SOURCE" >&2
   exit 1
 fi
 
-if [[ ! -x "$HOME/.opencode/bin/opencode" ]] && ! command -v opencode &>/dev/null; then
-  echo "opencode not found. Install it first with: curl -fsSL https://opencode.ai/install | bash" >&2
+if [[ ! -x "$SERVER_SOURCE" ]]; then
+  echo "Missing service launcher: $SERVER_SOURCE" >&2
+  exit 1
+fi
+
+if [[ ! -x "$OPENCODE" ]] || ! "$OPENCODE" --version &>/dev/null; then
+  echo "The official OpenCode V2 binary is not runnable at $OPENCODE." >&2
+  echo "Install it with: curl -fsSL https://opencode.ai/v2/install | bash" >&2
   exit 1
 fi
 
@@ -28,21 +36,33 @@ if [[ -z "$docker_bin" ]]; then
   exit 1
 fi
 
-mkdir -p "$UNIT_DIR" "$ENV_DIR"
+mkdir -p "$UNIT_DIR" "$ENV_DIR" "$HOME/.local/bin"
 ln -sf "$UNIT_SOURCE" "$UNIT_DIR/opencode.service"
+ln -sf "$SERVER_SOURCE" "$HOME/.local/bin/opencode-systemd-serve"
+
+write_server_password() {
+  local password=$1
+  local tmp
+
+  tmp=$(mktemp "$ENV_DIR/server.env.XXXXXX")
+  if [[ -f "$ENV_FILE" ]]; then
+    awk '!/^OPENCODE_SERVER_PASSWORD=/' "$ENV_FILE" > "$tmp"
+  fi
+  printf 'OPENCODE_SERVER_PASSWORD=%q\n' "$password" >> "$tmp"
+  chmod 600 "$tmp"
+  mv "$tmp" "$ENV_FILE"
+}
 
 if [[ -n "${OPENCODE_SERVER_PASSWORD:-}" ]]; then
-  umask 077
-  printf 'OPENCODE_SERVER_PASSWORD=%q\n' "$OPENCODE_SERVER_PASSWORD" > "$ENV_FILE"
-elif [[ ! -f "$ENV_FILE" ]]; then
+  write_server_password "$OPENCODE_SERVER_PASSWORD"
+elif [[ ! -f "$ENV_FILE" ]] || ! grep -q '^OPENCODE_SERVER_PASSWORD=' "$ENV_FILE"; then
   read -rsp "OpenCode server password: " password
   printf '\n'
   if [[ -z "$password" ]]; then
     echo "Password cannot be empty." >&2
     exit 1
   fi
-  umask 077
-  printf 'OPENCODE_SERVER_PASSWORD=%q\n' "$password" > "$ENV_FILE"
+  write_server_password "$password"
 fi
 
 chmod 600 "$ENV_FILE"
@@ -57,4 +77,10 @@ fi
 echo "Docker access from user systemd: ok"
 systemctl --user enable --now opencode.service
 systemctl --user restart opencode.service
-systemctl --user --no-pager --full status opencode.service
+sleep 1
+if ! systemctl --user is-active --quiet opencode.service; then
+  systemctl --user --no-pager --full status opencode.service || true
+  exit 1
+fi
+
+systemctl --user show opencode.service -p ActiveState -p MainPID --no-pager

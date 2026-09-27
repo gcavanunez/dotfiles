@@ -1,5 +1,5 @@
 # Initialize tools not already provided by the host's Bash configuration.
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
 if command -v mise &>/dev/null && ! declare -F _mise_hook &>/dev/null; then
   eval "$(mise activate bash)"

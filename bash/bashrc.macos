@@ -9,6 +9,6 @@ elif [[ -x /usr/local/bin/brew ]]; then
 fi
 
 # user-local binaries
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.opencode/bin:$HOME/.local/bin:$PATH"
 
 [ -f ~/.config/bash/init.bash ] && source ~/.config/bash/init.bash

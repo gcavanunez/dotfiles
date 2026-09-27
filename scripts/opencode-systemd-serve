@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OPENCODE="$HOME/.opencode/bin/opencode"
+STATE_DIR="$HOME/.local/state/opencode"
+STATE_FILE="$STATE_DIR/service.json"
+
+if [[ ${1:-} == --wait-ready ]]; then
+  for _ in {1..100}; do
+    if [[ -f "$STATE_FILE" ]]; then
+      pid=$(python3 - "$STATE_FILE" <<'PY'
+import json
+import sys
+
+try:
+    with open(sys.argv[1]) as state:
+        print(json.load(state)["pid"])
+except (KeyError, OSError, ValueError):
+    pass
+PY
+      )
+      if [[ $pid =~ ^[1-9][0-9]*$ ]] && kill -0 "$pid" 2>/dev/null; then
+        exit 0
+      fi
+    fi
+    sleep 0.1
+  done
+
+  echo "opencode-systemd-serve: discovery registration was not ready" >&2
+  exit 1
+fi
+
+port=""
+args=("$@")
+for ((i = 0; i < ${#args[@]}; i++)); do
+  if [[ ${args[$i]} == --port && $((i + 1)) -lt ${#args[@]} ]]; then
+    port=${args[$((i + 1))]}
+    break
+  fi
+done
+
+if [[ -z "$port" ]]; then
+  echo "opencode-systemd-serve: --port is required" >&2
+  exit 2
+fi
+
+if [[ -z "${OPENCODE_SERVER_PASSWORD:-}" ]]; then
+  echo "opencode-systemd-serve: OPENCODE_SERVER_PASSWORD is required" >&2
+  exit 1
+fi
+
+version=$($OPENCODE --version | sed -n 's/^opencode v//p')
+if [[ -z "$version" ]]; then
+  echo "opencode-systemd-serve: could not determine the OpenCode version" >&2
+  exit 1
+fi
+
+mkdir -p "$STATE_DIR"
+state_tmp=$(mktemp "$STATE_DIR/service.json.XXXXXX")
+trap 'rm -f "$state_tmp"' EXIT
+
+STATE_PID=$$ \
+STATE_VERSION="$version" \
+STATE_URL="http://127.0.0.1:$port" \
+python3 - "$state_tmp" <<'PY'
+import json
+import os
+import sys
+import uuid
+
+with open(sys.argv[1], "w") as output:
+    json.dump(
+        {
+            "id": str(uuid.uuid4()),
+            "version": os.environ["STATE_VERSION"],
+            "url": os.environ["STATE_URL"],
+            "pid": int(os.environ["STATE_PID"]),
+            "password": os.environ["OPENCODE_SERVER_PASSWORD"],
+        },
+        output,
+        indent=2,
+    )
+    output.write("\n")
+PY
+
+chmod 600 "$state_tmp"
+mv "$state_tmp" "$STATE_FILE"
+trap - EXIT
+
+exec "$OPENCODE" serve "$@"
