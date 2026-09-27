@@ -1,5 +1,9 @@
 # GPG Signed Commits
 
+For headless or always-on machines, prefer SSH signing with a per-machine key:
+`bash setup/ssh-signing.sh`. It keeps signing after a reboot without a passphrase
+prompt, and `./doctor` checks it.
+
 Set up GPG key generation and configure Git to sign all commits automatically.
 
 ## Prerequisites
