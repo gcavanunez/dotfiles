@@ -98,7 +98,13 @@ done
 # Herdr agent integrations (Herdr owns the generated files; restart the agent after upgrades)
 if command -v herdr >/dev/null 2>&1; then
     herdr integration install pi >/dev/null
-    herdr integration install opencode >/dev/null
+    # Herdr's OpenCode integration supports OpenCode V2 from 0.9.1.
+    herdr_version=$(herdr --version | awk '{ print $2 }')
+    if [[ $(printf '%s\n' 0.9.1 "$herdr_version" | sort -V | head -1) == 0.9.1 ]]; then
+        herdr integration install opencode >/dev/null
+    else
+        echo "Herdr $herdr_version predates OpenCode V2 support; upgrade Herdr to 0.9.1+ and rerun install" >&2
+    fi
 fi
 
 # wezterm
