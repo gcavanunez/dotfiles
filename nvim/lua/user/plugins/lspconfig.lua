@@ -9,6 +9,15 @@ return {
     -- 'jayp0521/mason-null-ls.nvim',
   },
   config = function()
+    local php_stack = require('user.php_stack')
+    local stack = php_stack.get()
+
+    -- The PHP stack enables its own servers below.
+    local automatic_enable_exclude = { 'oxfmt', 'laravel_lsp', 'phpantom_lsp' }
+    if stack.backend == 'phpantom' then
+      vim.list_extend(automatic_enable_exclude, { 'intelephense', 'phpactor' })
+    end
+
     -- Setup Mason to automatically install LSP servers
     require('mason').setup({
       ui = {
@@ -19,8 +28,12 @@ return {
         'github:mason-org/mason-registry',
       },
     })
+    php_stack.ensure_installed()
     require('mason-lspconfig').setup({
       automatic_installation = true,
+      automatic_enable = {
+        exclude = automatic_enable_exclude,
+      },
       ensure_installed = {
         'lua_ls',
         'eslint',
@@ -181,8 +194,24 @@ return {
     vim.lsp.enable({ 'vtsls', 'vue_ls' })
 
     vim.lsp.enable('ruby_lsp')
+
+    local oxlint_root_dir = vim.lsp.config.oxlint.root_dir
+    vim.lsp.config('oxlint', {
+      workspace_required = true,
+      root_dir = function(bufnr, on_dir)
+        oxlint_root_dir(bufnr, function(root_dir)
+          if not root_dir then
+            return
+          end
+
+          local local_cmd = vim.fs.joinpath(root_dir, 'node_modules', '.bin', 'oxlint')
+          if vim.fn.executable(local_cmd) == 1 or vim.fn.executable('oxlint') == 1 then
+            on_dir(root_dir)
+          end
+        end)
+      end,
+    })
     vim.lsp.enable('oxlint')
-    vim.lsp.enable('oxfmt')
     -- vim.lsp.enable('prettier')
 
     -- require('lspconfig').lua_ls.setup({
@@ -339,35 +368,15 @@ return {
       end,
     })
 
-    vim.lsp.config('blade_lsp', {
-      -- cmd = { 'node', '/home/hl-mango/_code/gcavanunez/blade-lsp/dist/server.js', '--stdio' },
-      cmd = { 'blade-lsp', '--stdio' },
-      filetypes = { 'blade' },
-      -- root_markers = { 'composer.json', 'artisan', '.git' },
-      root_markers = { 'composer.json', 'artisan', 'config.php', '.git' },
-      -- Add initialization options here:
-      init_options = {
-        -- phpCommand = { 'docker', 'compose', 'exec', '-T', 'app', 'php' },
-        --
-        -- phpEnvironment = 'local',
-        enableLaravelIntegration = true, -- set to false to disable
-      },
-    })
+    -- PHP: see lua/user/php_stack.lua for the stack and per-project overrides.
+    local mason_bin = vim.fn.stdpath('data') .. '/mason/bin/'
+    local php_filetypes = stack.blade.enabled and { 'php' } or { 'php', 'blade' }
+    local php_command_options = stack.php_command and { phpCommand = stack.php_command } or {}
 
-    -- phpPath = '/usr/bin/php',  -- or your custom path like '/opt/homebrew/bin/php'
-    -- phpPath = 'docker compose exec -it app php',  -- or your custom path like '/opt/homebrew/bin/php'
-
-    -- phpCommand = { 'sail', 'php' },
-    -- phpCommand = { 'php' },
-    vim.lsp.enable('blade_lsp')
-    -- vim.lsp.set_log_level('debug')
-    -- PHP
-    -- require('lspconfig').intelephense.setup({
-    vim.lsp.config('intelephense', {
-      filetypes = { 'php', 'blade' },
-      init_options = {
-        globalStoragePath = os.getenv('HOME') .. '/.local/share/intelephense',
-        storagePath = os.getenv('HOME') .. '/.local/share/intelephense',
+    local intelephense_options = {
+      initializationOptions = {
+        globalStoragePath = vim.fn.expand('~/.local/share/intelephense'),
+        storagePath = vim.fn.expand('~/.local/share/intelephense'),
       },
       settings = {
         intelephense = {
@@ -379,6 +388,124 @@ return {
           },
         },
       },
+    }
+
+    local embedded_php_backend = {
+      embeddedPhpBackend = 'intelephense',
+      embeddedPhpLspCommand = { mason_bin .. 'intelephense', '--stdio' },
+      intelephense = intelephense_options,
+    }
+    if stack.backend == 'phpantom' then
+      embedded_php_backend = {
+        embeddedPhpBackend = 'phpantom',
+        embeddedPhpLspCommand = php_stack.cmd(stack, 'phpantom'),
+      }
+    end
+
+    vim.lsp.config('blade_lsp', {
+      cmd = php_stack.cmd(stack, 'blade'),
+      filetypes = { 'blade' },
+      root_markers = { 'composer.json', 'artisan', 'config.php', '.git' },
+      init_options = vim.tbl_extend('force', {
+        enableLaravelIntegration = true,
+        enableEmbeddedPhpBridge = true,
+        phpEnvironment = 'local',
+      }, embedded_php_backend, php_command_options),
+    })
+    vim.lsp.enable('blade_lsp', stack.blade.enabled)
+
+    vim.lsp.config('laravel_lsp', {
+      cmd = php_stack.cmd(stack, 'laravel'),
+      filetypes = { 'blade' },
+      root_markers = { 'artisan' },
+      capabilities = capabilities,
+      -- Complete component names right after the `x-foo:` style prefix.
+      on_attach = function(client)
+        if client._laravel_component_completion_wrapped then
+          return
+        end
+        client._laravel_component_completion_wrapped = true
+
+        local request = client.request
+        client.request = function(self, method, params, handler, bufnr)
+          if method ~= 'textDocument/completion' or not params or not params.position then
+            return request(self, method, params, handler, bufnr)
+          end
+
+          local line = vim.api.nvim_buf_get_lines(bufnr or 0, params.position.line, params.position.line + 1, false)[1]
+          local before_cursor = line and line:sub(1, params.position.character) or ''
+          local component_prefix = before_cursor:match('</?([%w_.-]+):$')
+          if not component_prefix or component_prefix == 'livewire' then
+            return request(self, method, params, handler, bufnr)
+          end
+
+          local cursor_character = params.position.character
+          params = vim.deepcopy(params)
+          params.position.character = cursor_character - 1
+
+          return request(self, method, params, function(err, result, context, config)
+            local items = result and (result.items or result) or {}
+            for _, item in ipairs(items) do
+              local edit = item.textEdit
+              if edit and edit.range then
+                edit.range['end'].character = cursor_character
+              end
+            end
+            if handler then
+              handler(err, result, context, config)
+            end
+          end, bufnr)
+        end
+      end,
+      init_options = vim.tbl_extend('force', {
+        definitionProvider = true,
+        pestGenerateDocBlocks = false,
+
+        bladeComponentCompletion = true,
+        bladeComponentHover = true,
+        bladeComponentLink = true,
+
+        livewireComponentCompletion = true,
+        livewireComponentHover = true,
+        livewireComponentLink = true,
+
+        routeCompletion = false,
+        routeDiagnostics = false,
+        routeHover = false,
+        routeLink = false,
+
+        viewCompletion = false,
+        viewDiagnostics = false,
+        viewHover = false,
+        viewLink = false,
+
+        configCompletion = false,
+        configDiagnostics = false,
+        configHover = false,
+        configLink = false,
+
+        translationCompletion = false,
+        translationDiagnostics = false,
+        translationHover = false,
+        translationLink = false,
+      }, php_command_options),
+    })
+    vim.lsp.enable('laravel_lsp', stack.laravel.enabled)
+
+    if stack.backend == 'phpantom' then
+      vim.lsp.config('phpantom_lsp', {
+        cmd = php_stack.cmd(stack, 'phpantom'),
+        filetypes = php_filetypes,
+        root_markers = { 'composer.json', '.git' },
+        capabilities = capabilities,
+      })
+      vim.lsp.enable('phpantom_lsp')
+    end
+
+    vim.lsp.config('intelephense', {
+      filetypes = php_filetypes,
+      init_options = intelephense_options.initializationOptions,
+      settings = intelephense_options.settings,
       on_attach = function(client, bufnr)
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
@@ -405,7 +532,7 @@ return {
       capabilities = capabilities,
     })
 
-    -- require('lspconfig').phpactor.setup({
+    -- phpactor only provides rename and code actions next to intelephense.
     vim.lsp.config('phpactor', {
       capabilities = capabilities,
       on_attach = function(client, bufnr)
@@ -413,7 +540,6 @@ return {
         client.server_capabilities.hoverProvider = false
         client.server_capabilities.implementationProvider = false
         client.server_capabilities.referencesProvider = false
-        -- client.server_capabilities.renameProvider = false
         client.server_capabilities.selectionRangeProvider = false
         client.server_capabilities.signatureHelpProvider = false
         client.server_capabilities.typeDefinitionProvider = false
@@ -424,8 +550,6 @@ return {
         client.server_capabilities.documentFormattingProvider = false
         client.server_capabilities.documentRangeFormattingProvider = false
       end,
-      -- filetypes = { 'php', 'blade' },
-
       init_options = {
         ['language_server_phpstan.enabled'] = false,
         ['language_server_psalm.enabled'] = false,
@@ -589,40 +713,40 @@ return {
     })
 
     -- Define an autocmd group for the blade workaround
-    local augroup = vim.api.nvim_create_augroup('lsp_blade_workaround', { clear = true })
-
-    -- Autocommand to temporarily change 'blade' filetype to 'php' when opening for LSP server activation
-    vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-      group = augroup,
-      pattern = '*.blade.php',
-      callback = function()
-        vim.bo.filetype = 'php'
-      end,
-    })
-
-    -- Additional autocommand to switch back to 'blade' after LSP has attached
-    vim.api.nvim_create_autocmd('LspAttach', {
-      pattern = '*.blade.php',
-      callback = function(args)
-        vim.schedule(function()
-          -- Check if the attached client is 'intelephense'
-          for _, client in ipairs(vim.lsp.get_clients()) do
-            if client.name == 'intelephense' and client.attached_buffers[args.buf] then
-              -- vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
-              -- vim.api.nvim_set_option_value('filetype', 'blade', { buf = args.buf })
-              -- -- update treesitter parser to blade
-              -- vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
-              -- vim.api.nvim_set_option_value('syntax', 'blade', { buf = args.buf })
-
-              vim.api.nvim_set_option_value('filetype', 'blade', { scope = 'local' })
-              -- update treesitter parser to blade
-              vim.api.nvim_set_option_value('syntax', 'blade', { scope = 'local' })
-              break
-            end
-          end
-        end)
-      end,
-    })
+    -- local augroup = vim.api.nvim_create_augroup('lsp_blade_workaround', { clear = true })
+    --
+    -- -- Autocommand to temporarily change 'blade' filetype to 'php' when opening for LSP server activation
+    -- vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+    --   group = augroup,
+    --   pattern = '*.blade.php',
+    --   callback = function()
+    --     vim.bo.filetype = 'php'
+    --   end,
+    -- })
+    --
+    -- -- Additional autocommand to switch back to 'blade' after LSP has attached
+    -- vim.api.nvim_create_autocmd('LspAttach', {
+    --   pattern = '*.blade.php',
+    --   callback = function(args)
+    --     vim.schedule(function()
+    --       -- Check if the attached client is 'intelephense'
+    --       for _, client in ipairs(vim.lsp.get_clients()) do
+    --         if client.name == 'intelephense' and client.attached_buffers[args.buf] then
+    --           -- vim.api.nvim_buf_set_option(args.buf, 'filetype', 'blade')
+    --           -- vim.api.nvim_set_option_value('filetype', 'blade', { buf = args.buf })
+    --           -- -- update treesitter parser to blade
+    --           -- vim.api.nvim_buf_set_option(args.buf, 'syntax', 'blade')
+    --           -- vim.api.nvim_set_option_value('syntax', 'blade', { buf = args.buf })
+    --
+    --           vim.api.nvim_set_option_value('filetype', 'blade', { scope = 'local' })
+    --           -- update treesitter parser to blade
+    --           vim.api.nvim_set_option_value('syntax', 'blade', { scope = 'local' })
+    --           break
+    --         end
+    --       end
+    --     end)
+    --   end,
+    -- })
     -- vim.api.nvim_create_autocmd('LspAttach', {
     --   callback = function(args)
     --     local bufnr = args.buf
