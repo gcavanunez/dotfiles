@@ -33,7 +33,7 @@ claude = { version = "latest", minimum_release_age = "0s" }
 codex = { version = "latest", minimum_release_age = "0s" }
 copilot = "latest"
 crush = "latest"
-cursor-agent = "latest"
+cursor-agent = { version = "latest", bin_path = "bin", strip_components = "0", url = 'https://downloads.cursor.com/lab/{{ version }}/{{ os(macos="darwin") }}/{{ arch(arm64="arm64", x64="x64") }}/agent-cli-package.tar.gz', version_list_url = "https://cursor.com/install", version_regex = 'downloads\.cursor\.com/lab/([0-9]{4}\.[0-9]{2}\.[0-9]{2}-[0-9a-f]+)/', postinstall = 'mkdir -p "$MISE_TOOL_INSTALL_PATH/bin" && ln -sfn ../dist-package/cursor-agent "$MISE_TOOL_INSTALL_PATH/bin/cursor-agent"' }
 elixir = "latest"
 erlang = "latest"
 gh = "latest"
@@ -47,7 +47,7 @@ gh = "latest"
 go = "latest"
 k6 = "latest"
 node = "lts"
-"npm:@kitlangton/ghui" = { version = "latest", allow_low_downloads = true }
+"npm:@kitlangton/ghui" = { version = "latest", allow_low_downloads = "true" }
 "npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = [
   "@effect/platform-node@4.0.0-beta.64",
   "effect@4.0.0-beta.64",
@@ -78,3 +78,4 @@ tree-sitter = "latest"
 uv = "latest"
 wacli = "latest"
 zig = ["0.15.2", "0.13"]
+"http:muse" = { version = "latest", url = "https://api.meta.ai/muse-launcher.sh", bin = "muse", version_list_url = "https://api.meta.ai/muse-code/channels/muse-stable", version_json_path = ".version" }
