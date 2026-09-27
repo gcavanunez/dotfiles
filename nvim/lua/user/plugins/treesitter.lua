@@ -180,7 +180,6 @@ local parsers = {
   'php_only',
   'phpdoc',
   'python',
-  'typescriptreact',
   'query',
   'regex',
   'ruby',
@@ -200,14 +199,16 @@ local parsers = {
   'elixir',
 }
 
--- local ft_map = {
---   ['typescript.tsx'] = 'tsx',
---   ecma = 'javascript',
---   javascriptreact = 'javascript',
---   jsx = 'javascript',
---   ts = 'typescript',
---   typescriptreact = 'tsx',
--- }
+local parser_by_filetype = {
+  javascriptreact = 'javascript',
+  typescriptreact = 'tsx',
+}
+
+local treesitter_filetypes = vim.list_extend(
+  vim.deepcopy(parsers),
+  vim.tbl_keys(parser_by_filetype)
+)
+
 ---@type LazySpec
 return {
   {
@@ -220,8 +221,12 @@ return {
     config = function(_, opts)
       local nts = require('nvim-treesitter')
 
+      for filetype, parser in pairs(parser_by_filetype) do
+        vim.treesitter.language.register(parser, filetype)
+      end
+
       vim.api.nvim_create_autocmd('FileType', {
-        pattern = parsers,
+        pattern = treesitter_filetypes,
         callback = function()
           vim.treesitter.start()
           vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
@@ -265,16 +270,8 @@ return {
       })
 
       nts.setup(opts)
+      nts.install(parsers)
 
-      local exclude = { 'typescriptreact' }
-      local parsers_to_install = vim.tbl_filter(function(p)
-        return not vim.tbl_contains(exclude, p)
-      end, parsers)
-      nts.install(parsers_to_install)
-
-      -- for filetype, lang in pairs(ft_map) do
-      --   vim.treesitter.language.register(lang, filetype)
-      -- end
       map('n', '<leader>it', vim.treesitter.inspect_tree)
       map('n', '<leader>i', vim.show_pos)
 

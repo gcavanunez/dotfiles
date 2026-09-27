@@ -50,8 +50,8 @@ require('lazy').setup({
   -- Allow plugins to enable repeating of commands.
   { 'tpope/vim-repeat' },
 
-  -- Navigate seamlessly between Vim windows and Tmux panes.
-  { 'christoomey/vim-tmux-navigator' },
+  -- Navigate seamlessly between Vim windows and multiplexer panes.
+  { import = 'user.plugins.multiplexer-navigator' },
 
   -- Jump to the last location when opening a file.
   { 'farmergreg/vim-lastplace' },
