@@ -2,6 +2,11 @@
 
 DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OS=$(uname -s)
+distro_id=""
+if [[ "$OS" == "Linux" && -r /etc/os-release ]]; then
+  source /etc/os-release
+  distro_id="${ID:-}"
+fi
 
 # Ensure mise-installed tools are on PATH
 if [ -d "$HOME/.local/share/mise/shims" ]; then
@@ -117,6 +122,7 @@ TOOLS=(
   fzf
   gh
   go
+  herdr
   jq
   lazydocker
   lazygit
@@ -200,6 +206,36 @@ for bin in "${SYSTEM_TOOLS[@]}"; do
   fi
 done
 
+if command -v mise &>/dev/null; then
+  mise_path=$(realpath "$(command -v mise)")
+  if [[ "$distro_id" == "omarchy" ]]; then
+    if [[ "$mise_path" == /usr/bin/mise ]] && pacman -Qq mise-bin &>/dev/null; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "mise install" "Omarchy-managed mise-bin at /usr/bin/mise"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise install" "expected Omarchy's mise-bin; found $mise_path"
+    fi
+
+    if [[ $(mise settings get auto_update 2>/dev/null) == false ]]; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "mise updates" "binary managed by omarchy update"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise updates" "disable binary self-update for Omarchy's mise-bin"
+    fi
+  else
+    expected_mise_path="$HOME/.local/bin/mise"
+    if [[ "$mise_path" == "$expected_mise_path" ]]; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "mise install" "official standalone at $expected_mise_path"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise install" "expected $expected_mise_path; found $mise_path"
+    fi
+
+    if [[ $(mise settings get auto_update 2>/dev/null) == true ]]; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "mise updates" "automatic self-update enabled"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise updates" "automatic self-update not enabled"
+    fi
+  fi
+fi
+
 if command -v nvim &>/dev/null; then
   nvim_path=$(realpath "$(command -v nvim)")
   if [[ "$nvim_path" == /opt/neovim/bin/nvim ]]; then
@@ -219,12 +255,6 @@ fi
 if [[ "$OS" == "Darwin" ]]; then
   mise_target="$DOTFILES/mise/config.macos.toml"
 elif [[ "$OS" == "Linux" ]]; then
-  distro_id=""
-  if [[ -r /etc/os-release ]]; then
-    source /etc/os-release
-    distro_id="${ID:-}"
-  fi
-
   if [[ "$distro_id" == "omarchy" ]]; then
     mise_target="$DOTFILES/mise/config.omarchy.toml"
   else
@@ -303,7 +333,88 @@ if command -v opencode &>/dev/null; then
   version=$(tool_version opencode)
   printf "  ${GREEN}✓${NC} %-14s %s\n" "opencode" "$version"
 else
-  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found (install with: curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path)${NC}\n" "opencode"
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found (install with: curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path)${NC}\n" "opencode"
+fi
+
+claude_launcher="$HOME/.local/bin/claude"
+claude_versions="$HOME/.local/share/claude/versions"
+if [[ "${distro_id:-}" == "omarchy" ]]; then
+  if command -v claude &>/dev/null; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "claude" "managed by Omarchy at $(command -v claude)"
+  else
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found (install with: omarchy-mise-install claude)${NC}\n" "claude"
+  fi
+elif [[ -L "$claude_launcher" && $(readlink "$claude_launcher") == "$claude_versions"/* ]]; then
+  printf "  ${GREEN}✓${NC} %-14s %s\n" "claude" "native $(basename "$(readlink "$claude_launcher")")"
+  if [[ -n "${DISABLE_AUTOUPDATER:-}${DISABLE_UPDATES:-}" ]]; then
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "claude updates" "disabled by DISABLE_AUTOUPDATER/DISABLE_UPDATES"
+  fi
+elif command -v claude &>/dev/null; then
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "claude" "found at $(command -v claude); expected native launcher at $claude_launcher"
+else
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}not found (install with: curl -fsSL https://claude.ai/install.sh | bash)${NC}\n" "claude"
+fi
+
+# --- Agent integrations ---
+
+echo ""
+echo "Checking agent integrations..."
+echo ""
+
+if command -v herdr &>/dev/null; then
+  herdr_integrations=$(herdr integration status 2>/dev/null)
+  for agent in pi opencode; do
+    status_line=$(grep "^$agent:" <<< "$herdr_integrations")
+    if [[ "$status_line" == "$agent: current "* ]]; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "herdr/$agent" "${status_line#"$agent: "}"
+    elif [[ -n "$status_line" ]]; then
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s (run: herdr integration install %s)${NC}\n" "herdr/$agent" "${status_line#"$agent: "}" "$agent"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}status unavailable${NC}\n" "herdr/$agent"
+    fi
+  done
+else
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}Herdr not installed${NC}\n" "herdr"
+fi
+
+# --- Drift guardrails ---
+
+echo ""
+echo "Checking for drift..."
+echo ""
+
+dirty=$(git -C "$DOTFILES" status --porcelain 2>/dev/null)
+if [[ -z "$dirty" ]]; then
+  printf "  ${GREEN}✓${NC} %-14s %s\n" "dotfiles repo" "clean on $(git -C "$DOTFILES" rev-parse --abbrev-ref HEAD 2>/dev/null)"
+else
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "dotfiles repo" "$(wc -l <<< "$dirty" | tr -d ' ') uncommitted change(s); commit shared work or drop it"
+fi
+
+mise_bins=$(type -ap mise 2>/dev/null | while read -r bin; do realpath "$bin"; done | sort -u)
+if [[ $(grep -c . <<< "$mise_bins") -gt 1 ]]; then
+  printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "mise binaries" "more than one on PATH: $(tr '\n' ' ' <<< "$mise_bins")"
+fi
+
+if [[ "$OS" == "Linux" ]] && systemctl --user is-enabled opencode.service &>/dev/null; then
+  if [[ $(loginctl show-user "$USER" -p Linger --value 2>/dev/null) == yes ]]; then
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "linger" "user services start at boot"
+  else
+    printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "linger" "off; run: sudo loginctl enable-linger $USER"
+  fi
+fi
+
+if [[ $(git config --global commit.gpgsign) == true ]]; then
+  if [[ $(git config --global gpg.format) == ssh ]]; then
+    signing_key=$(git config --global user.signingkey)
+    signing_key="${signing_key/#\~/$HOME}"
+    if [[ -f "${signing_key%.pub}" ]] && ssh-keygen -y -P "" -f "${signing_key%.pub}" &>/dev/null; then
+      printf "  ${GREEN}✓${NC} %-14s %s\n" "signing" "SSH key signs without a prompt"
+    else
+      printf "  ${YELLOW}!${NC} %-14s ${YELLOW}%s${NC}\n" "signing" "SSH signing key missing or passphrase-protected (see setup/ssh-signing.sh)"
+    fi
+  else
+    printf "  ${GREEN}✓${NC} %-14s %s\n" "signing" "GPG signing enabled"
+  fi
 fi
 
 # --- Ghostty terminfo ---
