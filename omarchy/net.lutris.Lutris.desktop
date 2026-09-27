@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Lutris
+Comment=Video Game Preservation Platform
+Categories=Game;PackageManager;
+Keywords=gaming;wine;emulator;
+Exec=/usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/bin /usr/bin/python3 /usr/bin/lutris %U
+TryExec=/usr/bin/lutris
+Icon=net.lutris.Lutris
+Terminal=false
+Type=Application
+StartupWMClass=net.lutris.Lutris
+StartupNotify=true
+MimeType=x-scheme-handler/lutris;application/x-lutris;
+X-GNOME-UsesNotifications=true

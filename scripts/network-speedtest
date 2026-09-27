@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# Measure live interface throughput using Fast.com traffic. Stop with Ctrl-C.
+set -euo pipefail
+
+usage() {
+  echo "Usage: ${0##*/} [down|up]"
+}
+
+direction="${1:-}"
+if [[ $# == 1 && $direction == --help ]]; then
+  usage
+  exit 0
+fi
+if [[ $# != 1 || ! $direction =~ ^(down|up)$ ]]; then
+  usage >&2
+  exit 2
+fi
+
+for cmd in ip curl jq awk; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "$cmd is required" >&2
+    exit 1
+  fi
+done
+
+iface=$(ip -4 route get 1.1.1.1 | awk '{
+  for (i = 1; i < NF; i++) if ($i == "dev") { print $(i + 1); exit }
+}')
+counter=rx_bytes
+[[ $direction == down ]] || counter=tx_bytes
+counter_path="/sys/class/net/$iface/statistics/$counter"
+if [[ -z $iface || ! -r $counter_path || ! -r /proc/uptime ]]; then
+  echo "No active Linux network interface" >&2
+  exit 1
+fi
+
+echo "Testing $direction on $iface. Values are Mbps, including other interface traffic. Ctrl-C to stop." >&2
+if speed=$(cat "/sys/class/net/$iface/speed" 2>/dev/null) && [[ $speed =~ ^[0-9]+$ && $speed -gt 0 ]]; then
+  echo "Reported link speed: $speed Mbps" >&2
+fi
+
+# Public Fast.com client token, also used by the Omarchy speed test.
+fast_token="YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm"
+fast_api_url="https://api.fast.com/netflix/speedtest/v2?https=true&token=$fast_token&urlCount=3"
+if ! fast_urls=$(curl -4 -fsS --connect-timeout 5 --max-time 15 "$fast_api_url" |
+  jq -er '[.targets[]?.url | select(type == "string") | select(startswith("https://"))] | .[]'); then
+  echo "Failed to fetch speed test endpoints" >&2
+  exit 1
+fi
+mapfile -t urls <<< "$fast_urls"
+
+traffic_pids=()
+payload=""
+cleanup() {
+  local pid
+  for pid in "${traffic_pids[@]}"; do
+    kill -TERM "$pid" 2>/dev/null || true
+  done
+  for pid in "${traffic_pids[@]}"; do
+    wait "$pid" 2>/dev/null || true
+  done
+  [[ -z $payload ]] || rm -f "$payload"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+if [[ $direction == up ]]; then
+  payload=$(mktemp)
+  dd if=/dev/zero of="$payload" bs=1M count=16 status=none
+fi
+
+traffic_worker() {
+  local idx=$1 child=""
+  # Each worker owns one curl process and reaps it when interrupted.
+  trap 'if [[ -n $child ]]; then kill "$child" 2>/dev/null || true; wait "$child" 2>/dev/null || true; fi' EXIT
+  trap 'exit 0' INT TERM
+  local args=(-4 -fsS -o /dev/null --connect-timeout 5 --max-time 120)
+  if [[ $direction == up ]]; then
+    args+=(-X POST --data-binary "@$payload")
+  fi
+  while true; do
+    curl "${args[@]}" "${urls[$((idx % ${#urls[@]}))]}" 2>/dev/null &
+    child=$!
+    if ! wait "$child"; then
+      child=""
+      return 1
+    fi
+    child=""
+    idx=$((idx + 1))
+  done
+}
+
+any_alive() {
+  local pid
+  for pid in "${traffic_pids[@]}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+read -r before < "$counter_path"
+read -r time_before _ < /proc/uptime
+for ((i = 0; i < 8; i++)); do
+  traffic_worker "$i" &
+  traffic_pids+=("$!")
+done
+
+while any_alive; do
+  sleep 1
+  read -r after < "$counter_path"
+  read -r time_after _ < /proc/uptime
+  awk -v before="$before" -v after="$after" -v start="$time_before" -v end="$time_after" 'BEGIN {
+    rate = (after >= before && end > start) ? (after - before) * 8 / 1000000 / (end - start) : 0
+    if (rate < 10) printf "%.1f\n", rate
+    else printf "%.0f\n", rate
+  }'
+  before=$after
+  time_before=$time_after
+done
+
+echo "All speed test connections stopped. Check connectivity or try again." >&2
+exit 1

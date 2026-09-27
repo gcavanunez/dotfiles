@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:$PATH"
+exec /usr/bin/python3 /usr/bin/lutris "$@"

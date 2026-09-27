@@ -19,6 +19,10 @@ ln -s "$DOTFILES/kitty" "$HOME/.config/kitty"
 # Tmux
 mkdir -p "$HOME/.config/tmux"
 ln -sf "$DOTFILES/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+# Retire this repo's legacy config link so tmux consistently uses the XDG path.
+if [[ -L $HOME/.tmux.conf && $(readlink -f "$HOME/.tmux.conf") == "$DOTFILES/tmux/tmux.conf" ]]; then
+    rm "$HOME/.tmux.conf"
+fi
 mkdir -p "$HOME/.local/bin"
 ln -sf "$DOTFILES/tmux/tmux-host-style" "$HOME/.local/bin/tmux-host-style"
 ln -sf "$DOTFILES/tmux/tmux-host-color" "$HOME/.local/bin/tmux-host-color"
@@ -30,6 +34,19 @@ mkdir -p "$HOME/.config/tmux-sessionizer"
 if [[ ! -f $HOME/.config/tmux-sessionizer/tmux-sessionizer.conf ]]; then
     cp "$DOTFILES/tmux/tmux-sessionizer.conf" "$HOME/.config/tmux-sessionizer/tmux-sessionizer.conf"
     echo "Created default tmux-sessionizer config — edit ~/.config/tmux-sessionizer/tmux-sessionizer.conf to customize"
+fi
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+    # Network diagnostics
+    ln -sf "$DOTFILES/scripts/network-speedtest" "$HOME/.local/bin/network-speedtest"
+
+    # Lutris must use the system Python that owns its packaged modules.
+    if [[ -x /usr/bin/lutris ]]; then
+        mkdir -p "$HOME/.local/share/applications"
+        ln -sf "$DOTFILES/scripts/lutris" "$HOME/.local/bin/lutris"
+        ln -sf "$DOTFILES/omarchy/net.lutris.Lutris.desktop" \
+            "$HOME/.local/share/applications/net.lutris.Lutris.desktop"
+    fi
 fi
 
 # https://gist.github.com/dhh/159b129f511f76db3ae8adb463f70d05
@@ -46,6 +63,42 @@ if command -v herdr >/dev/null 2>&1; then
         exit 1
     }
     herdr plugin link "$DOTFILES/herdr/plugins/tmux-navigation" --enabled >/dev/null
+fi
+
+# Pi (settings, credentials, sessions, trust, and package state remain machine-local)
+pi_agent_dir="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
+case "$pi_agent_dir" in
+    "~") pi_agent_dir="$HOME" ;;
+    "~/"*) pi_agent_dir="$HOME/${pi_agent_dir#\~/}" ;;
+esac
+mkdir -p "$pi_agent_dir"
+
+pi_prompts="$pi_agent_dir/prompts"
+if [[ -e "$pi_prompts" && ! -L "$pi_prompts" ]]; then
+    echo "Pi prompts already exist — merge $pi_prompts before linking" >&2
+    exit 1
+else
+    ln -sfn "$DOTFILES/pi/prompts" "$pi_prompts"
+fi
+
+pi_extensions="$pi_agent_dir/extensions"
+mkdir -p "$pi_extensions"
+for source in "$DOTFILES/pi/extensions/goal.ts" "$DOTFILES/pi/extensions/answer.ts"; do
+    target="$pi_extensions/$(basename "$source")"
+    if [[ -e "$target" || -L "$target" ]]; then
+        if [[ ! -L "$target" || "$(readlink "$target")" != "$source" ]]; then
+            echo "Pi extension already exists — merge $target before linking" >&2
+            exit 1
+        fi
+    else
+        ln -s "$source" "$target"
+    fi
+done
+
+# Herdr agent integrations (Herdr owns the generated files; restart the agent after upgrades)
+if command -v herdr >/dev/null 2>&1; then
+    herdr integration install pi >/dev/null
+    herdr integration install opencode >/dev/null
 fi
 
 # wezterm
