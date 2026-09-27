@@ -75,6 +75,12 @@ if ! systemd-run --user --wait --collect --quiet --property=Type=oneshot "$docke
 fi
 
 echo "Docker access from user systemd: ok"
+# Linger starts the user's systemd instance at boot, so OpenCode runs without a login.
+if [[ $(loginctl show-user "$USER" -p Linger --value 2>/dev/null) != yes ]]; then
+  echo "Enabling linger so OpenCode starts at boot..."
+  sudo loginctl enable-linger "$USER"
+fi
+
 systemctl --user enable --now opencode.service
 systemctl --user restart opencode.service
 sleep 1
