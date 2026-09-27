@@ -31,17 +31,10 @@ if [[ "$OS" == "Darwin" ]]; then
   echo "==> macOS manual setup notes: $DOTFILES/setup/macos.md"
 fi
 
-# Install mise using the platform's selected ownership model.
-if [[ "$OS" == "Darwin" ]]; then
-  if ! command -v mise &>/dev/null; then
-    echo "==> Installing mise..."
-    brew install mise
-  fi
-else
-  echo "==> Installing mise..."
-  bash "$DOTFILES/scripts/install-mise"
-fi
-export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+# Omarchy owns mise-bin; other hosts use the official standalone installer.
+echo "==> Setting up mise..."
+bash "$DOTFILES/scripts/install-mise"
+export PATH="$HOME/.opencode/bin:$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 DEFAULT_SHELL=$(basename "${SHELL:-}")
 
@@ -165,6 +158,13 @@ fi
 echo "==> Installing mise tools..."
 mise install
 
+# Claude Code uses Anthropic's native installer, which updates itself in the
+# background. Omarchy ships its own mise-backed launcher, so leave it there.
+if [[ "${distro_id:-}" != "omarchy" && ! -e "$HOME/.local/bin/claude" ]]; then
+  echo "==> Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+
 # GitHub CLI auth reminder
 if command -v gh &>/dev/null; then
   if ! gh auth status &>/dev/null 2>&1; then
@@ -190,8 +190,8 @@ if ! command -v docker &>/dev/null; then
 fi
 
 # OpenCode reminder
-if ! command -v opencode &>/dev/null; then
-  echo "==> opencode not found — install it with: curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path"
+if [[ ! -x "$HOME/.opencode/bin/opencode" ]]; then
+  echo "==> OpenCode V2 not found — install it with: curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path"
 fi
 
 # SSH key reminder

@@ -1,4 +1,5 @@
 [settings]
+auto_update = true
 legacy_version_file = true
 idiomatic_version_file_enable_tools = []
 
@@ -7,28 +8,33 @@ compile = false
 
 [tools]
 "aqua:aws/aws-cli" = "latest"
+"aqua:cloudflare/cloudflared" = "latest"
 bun = "latest"
-codex = "latest"
-"npm:@kitlangton/terminal-control-linux-x64-gnu" = "latest"
+codex = { version = "latest", minimum_release_age = "0s" }
+"npm:@kitlangton/terminal-control-darwin-arm64" = { version = "latest", allow_low_downloads = true }
 go = "1.24"
 "github:agavra/tuicr" = "latest"
+"github:showwin/speedtest-go" = "latest"
 "github:tectonic-typesetting/tectonic" = "latest"
 herdr = "latest"
 "aqua:modem-dev/hunk" = "latest"
+k6 = "latest"
 node = "lts"
 "npm:@kitlangton/ghui" = { version = "latest", allow_low_downloads = true }
 "npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = [
   "@effect/platform-node@4.0.0-beta.64",
   "effect@4.0.0-beta.64",
 ] }
+"npm:@shopify/cli" = "latest"
 "npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = [
   "cytoscape@3.34.1",
 ] }
-"npm:@opencode/cli" = { version = "latest", allow_builds = ["@opencode/cli"], allow_low_downloads = true }
 "npm:agent-browser" = "latest"
 "npm:cloc" = "latest"
+"npm:playwright" = "latest"
 "npm:pm2" = "latest"
-pi = "latest"
+"npm:wrangler" = "latest"
+pi = { version = "latest", minimum_release_age = "0s" }
 pitchfork = "latest"
 python = "3.11"
 ruby = "3.3"
@@ -36,3 +42,4 @@ rust = "latest"
 sentry-cli = "latest"
 starship = "latest"
 tree-sitter = "latest"
+wacli = "latest"

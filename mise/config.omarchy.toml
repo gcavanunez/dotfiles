@@ -1,26 +1,51 @@
 [settings]
+# Omarchy owns the mise binary (pacman mise-bin); `omarchy update` upgrades it.
+auto_update = false
 legacy_version_file = true
 
 [settings.ruby]
 compile = false
 
+# Omarchy sets this so `mise up` never removes a version a running session uses.
+[settings.upgrade]
+auto_prune = false
+
 [env]
 ASDF_PHP_FPM = "1"
+# mise updates Claude Code through Omarchy's launcher; keep Claude's own
+# updater from installing a second native copy.
+DISABLE_AUTOUPDATER = "1"
 
 [plugins]
 php = "https://github.com/ramsey/asdf-php.git"
 
+# Omarchy's ~/.local/bin launchers run `mise use -g <tool>`, which writes into
+# this file through the ~/.config/mise/config.toml symlink. Keep every launcher
+# tool listed here so those writes are no-ops; commit any tool a new launcher
+# appends.
 [tools]
 "aqua:aws/aws-cli" = "latest"
+"aqua:cloudflare/cloudflared" = "latest"
+"aqua:modem-dev/hunk" = "latest"
+antigravity-cli = "latest"
 bun = "latest"
-codex = "latest"
+claude = { version = "latest", minimum_release_age = "0s" }
+codex = { version = "latest", minimum_release_age = "0s" }
+copilot = "latest"
+crush = "latest"
+cursor-agent = "latest"
 elixir = "latest"
 erlang = "latest"
 gh = "latest"
 "github:agavra/tuicr" = "latest"
+"github:basecamp/basecamp-cli" = "latest"
+"github:basecamp/hey-cli" = "latest"
+"github:can1357/oh-my-pi" = "latest"
+"github:OpenRouterLabs/ori-releases" = "latest"
+"github:showwin/speedtest-go" = "latest"
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
-"aqua:modem-dev/hunk" = "latest"
+k6 = "latest"
 node = "lts"
 "npm:@kitlangton/ghui" = { version = "latest", allow_low_downloads = true }
 "npm:@kitlangton/stack" = { version = "latest", allow_low_downloads = true, trust_policy_excludes = [
@@ -31,14 +56,18 @@ node = "lts"
 "npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = [
   "cytoscape@3.34.1",
 ] }
-"npm:@opencode/cli" = { version = "latest", allow_builds = ["@opencode/cli"], allow_low_downloads = true }
+"npm:@shopify/cli" = "latest"
+"npm:@xai-official/grok" = "latest"
 "npm:agent-browser" = "latest"
+"npm:cf" = "latest"
 "npm:cloc" = "latest"
+"npm:playwright" = "latest"
 "npm:pm2" = "latest"
 "npm:portless" = "latest"
+"npm:wrangler" = "latest"
 # uses ramsey/asdf-php (static binaries, no phpize/php-config)
 php = "8.4"
-pi = "latest"
+pi = { version = "latest", minimum_release_age = "0s" }
 pitchfork = "latest"
 pnpm = "latest"
 python = ["3.12", "3.11"]

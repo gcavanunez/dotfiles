@@ -1,10 +1,12 @@
 # macOS packages managed by Homebrew.
-# Language runtimes, starship, and opencode are managed outside Homebrew.
+# Language runtimes, mise, starship, cloudflared, and opencode are managed outside Homebrew.
+# cliproxyapi is installed everywhere; each Mac turns it on with `brew services start cliproxyapi`.
 
 brew "atuin"
 brew "bat"
 brew "btop"
-brew "cloudflared"
+brew "cliproxyapi"
+brew "coreutils"
 brew "csvlens"
 brew "eza"
 brew "fd"
@@ -18,7 +20,6 @@ brew "gnu-sed"
 brew "jq"
 brew "lazydocker"
 brew "lazygit"
-brew "mise"
 brew "neovim"
 brew "pinentry-mac"
 brew "ripgrep"

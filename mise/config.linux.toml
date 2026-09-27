@@ -1,4 +1,5 @@
 [settings]
+auto_update = true
 legacy_version_file = true
 
 [settings.ruby]
@@ -19,7 +20,7 @@ atuin = "latest"
 bat = "latest"
 btop = "latest"
 bun = "latest"
-codex = "latest"
+codex = { version = "latest", minimum_release_age = "0s" }
 "github:agavra/tuicr" = "latest"
 delta = "latest"
 elixir = "latest"
@@ -30,11 +31,13 @@ fd = "latest"
 fzf = "latest"
 gh = "latest"
 "github:basecamp/fizzy-cli" = "latest"
+"github:showwin/speedtest-go" = "latest"
 "github:tectonic-typesetting/tectonic" = "latest"
 go = "latest"
 herdr = "latest"
 "aqua:modem-dev/hunk" = "latest"
 jq = "latest"
+k6 = "latest"
 lazydocker = "latest"
 lazygit = "latest"
 node = "lts"
@@ -44,17 +47,19 @@ node = "lts"
   "effect@4.0.0-beta.64",
 ] }
 "npm:@kitlangton/terminal-control-linux-x64-gnu" = "latest"
+"npm:@shopify/cli" = "latest"
 "npm:@mermaid-js/mermaid-cli" = { version = "latest", trust_policy_excludes = [
   "cytoscape@3.34.1",
 ] }
-"npm:@opencode/cli" = { version = "latest", allow_builds = ["@opencode/cli"], allow_low_downloads = true }
 "npm:agent-browser" = "latest"
 "npm:cloc" = "latest"
+"npm:playwright" = "latest"
 "npm:pm2" = "latest"
 "npm:portless" = "latest"
+"npm:wrangler" = "latest"
 # uses ramsey/asdf-php (static binaries, no phpize/php-config)
 php = "8.4"
-pi = "latest"
+pi = { version = "latest", minimum_release_age = "0s" }
 pitchfork = "latest"
 pnpm = "latest"
 python = ["3.12", "3.11"]
