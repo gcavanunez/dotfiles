@@ -1,0 +1,19 @@
+[Unit]
+Description=mailplug mail service
+Documentation=https://github.com/gcavanunez/mailplug
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h
+Environment="PATH=%h/.bun/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=%h/.bun/bin/mailplug serve --service
+# Effect exits 130 when a signal interrupts it; that is a clean stop, not a failure.
+SuccessExitStatus=130
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
