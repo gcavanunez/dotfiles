@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf 'Usage: rex-sessionizer [--list] [--client CLIENT]\n'
+}
+
+list_only=false
+client="${REX_CLIENT:-}"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --list) list_only=true ;;
+        --client)
+            [[ $# -ge 2 && -n "$2" ]] || { usage >&2; exit 2; }
+            client="$2"
+            shift
+            ;;
+        -h|--help) usage; exit 0 ;;
+        *) printf 'rex-sessionizer: unknown option: %s\n' "$1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+config="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-sessionizer/tmux-sessionizer.conf"
+if [[ -f "$config" ]]; then
+    # Share project roots with the tmux and Herdr sessionizers.
+    source "$config"
+fi
+
+for command in rex jq; do
+    command -v "$command" >/dev/null 2>&1 || {
+        printf 'rex-sessionizer: %s is required\n' "$command" >&2
+        exit 1
+    }
+done
+
+search_paths=()
+if declare -p TS_SEARCH_PATHS &>/dev/null; then
+    # Empty-array defaults keep this compatible with macOS Bash 3.2 + nounset.
+    search_paths+=("${TS_SEARCH_PATHS[@]-}")
+else
+    search_paths+=("$HOME" "$HOME/personal" "$HOME/personal/dev/env/.config")
+fi
+if declare -p TS_EXTRA_SEARCH_PATHS &>/dev/null; then
+    search_paths+=("${TS_EXTRA_SEARCH_PATHS[@]-}")
+fi
+
+sessions=$(rex ls --json)
+
+list_candidates() {
+    jq -r '.sessions[] | ["session", .session_id, ("[REX] " + (.label // .session_id))] | @tsv' <<< "$sessions"
+    {
+        for entry in "${search_paths[@]-}"; do
+            path="$entry"
+            depth="${TS_MAX_DEPTH:-1}"
+            if [[ "$entry" =~ ^(.+):([0-9]+)$ ]]; then
+                path="${BASH_REMATCH[1]}"
+                depth="${BASH_REMATCH[2]}"
+            fi
+            if [[ -d "$path" ]]; then
+                find "$path" -mindepth 1 -maxdepth "$depth" -name .git -prune -o -type d -print
+            fi
+        done
+    } | LC_ALL=C sort -u | while IFS= read -r project; do
+        printf 'project\t%s\t%s\n' "$project" "$project"
+    done
+}
+
+candidates=$(list_candidates)
+if [[ "$list_only" == true ]]; then
+    cut -f3- <<< "$candidates"
+    exit 0
+fi
+
+command -v fzf >/dev/null 2>&1 || { printf 'rex-sessionizer: fzf is required\n' >&2; exit 1; }
+if selection=$(fzf --reverse --delimiter=$'\t' --with-nth=3 --no-multi \
+    --prompt='Select a Rex session or project> ' <<< "$candidates"); then
+    [[ -n "$selection" ]] || exit 0
+else
+    status=$?
+    # Esc/Ctrl+C and an empty list are normal cancellation, not failures.
+    case "$status" in 1|130) exit 0 ;; *) exit "$status" ;; esac
+fi
+IFS=$'\t' read -r kind value _ <<< "$selection"
+
+# Resolve the app before creating anything. Never guess between multiple apps.
+if [[ -z "$client" ]]; then
+    clients=$(rex client ls --json)
+    app_ids=$(jq -r '.clients[] | select(.info.kind == "app" and .connection_state == "connected") | .client_id' <<< "$clients")
+    app_count=$(jq '[.clients[] | select(.info.kind == "app" and .connection_state == "connected")] | length' <<< "$clients")
+    if [[ "$app_count" != 1 ]]; then
+        printf 'rex-sessionizer: expected one connected Rex app; found %s. Use --client CLIENT.\n' "$app_count" >&2
+        exit 1
+    fi
+    client="$app_ids"
+fi
+
+find_project_session() {
+    local project="$1" session_id blocks block_id process cwd
+    while IFS= read -r session_id; do
+        # Sessions or panes can disappear while the picker is open.
+        blocks=$(rex block ls -s "$session_id" --json 2>/dev/null) || continue
+        while IFS= read -r block_id; do
+            process=$(rex block call -s "$session_id" -b "$block_id" process 2>/dev/null) || continue
+            cwd=$(jq -r '.foreground.cwd // .child.cwd // empty' <<< "$process")
+            if [[ "$cwd" == "$project" ]]; then
+                printf '%s\n' "$session_id"
+                return
+            fi
+        done < <(jq -r '.blocks[] | select(.creator_name == "com.superlogical.terminal") | .block_id' <<< "$blocks")
+    done < <(jq -r '.sessions[].session_id' <<< "$sessions")
+}
+
+case "$kind" in
+    session) target="$value" ;;
+    project)
+        project=$(cd -- "$value" && pwd -P)
+        # Refresh after fzf, so a session started while selecting can be reused.
+        sessions=$(rex ls --json)
+        target=$(find_project_session "$project")
+        if [[ -z "$target" ]]; then
+            label=$(basename "$project")
+            created=$(rex new "$label" -c "$project" --window Terminal --json)
+            target=$(jq -er '.session_id' <<< "$created")
+        fi
+        ;;
+    *) printf 'rex-sessionizer: invalid picker selection\n' >&2; exit 1 ;;
+esac
+
+if ! rex -C "$client" do session.select "session_id=$target"; then
+    printf 'rex-sessionizer: could not display %s. Enable Remote Control in Rex Settings → Rex Server. The session has been kept.\n' "$target" >&2
+    exit 1
+fi

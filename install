@@ -65,6 +65,38 @@ if command -v herdr >/dev/null 2>&1; then
     herdr plugin link "$DOTFILES/herdr/plugins/tmux-navigation" --enabled >/dev/null
 fi
 
+# Rex (only configuration is linked; server and Tailscale state stay machine-local)
+rex_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/rex"
+mkdir -p "$rex_config_dir"
+rex_config="$rex_config_dir/init.lua"
+if [[ -e "$rex_config" || -L "$rex_config" ]]; then
+    if [[ ! -L "$rex_config" || "$(readlink "$rex_config")" != "$DOTFILES/rex/init.lua" ]]; then
+        echo "Rex config already exists — merge $rex_config before linking" >&2
+        exit 1
+    fi
+else
+    ln -s "$DOTFILES/rex/init.lua" "$rex_config"
+fi
+# Rex resolves require() beside the configured file, including when it is a symlink.
+rex_vendor="$rex_config_dir/vendor"
+if [[ -e "$rex_vendor" || -L "$rex_vendor" ]]; then
+    if [[ ! -L "$rex_vendor" || "$(readlink "$rex_vendor")" != "$DOTFILES/rex/vendor" ]]; then
+        echo "Rex vendor directory already exists — merge $rex_vendor before linking" >&2
+        exit 1
+    fi
+else
+    ln -s "$DOTFILES/rex/vendor" "$rex_vendor"
+fi
+rex_sessionizer="$HOME/.local/bin/rex-sessionizer"
+if [[ -e "$rex_sessionizer" || -L "$rex_sessionizer" ]]; then
+    if [[ ! -L "$rex_sessionizer" || "$(readlink "$rex_sessionizer")" != "$DOTFILES/rex/rex-sessionizer" ]]; then
+        echo "Rex sessionizer already exists — merge $rex_sessionizer before linking" >&2
+        exit 1
+    fi
+else
+    ln -s "$DOTFILES/rex/rex-sessionizer" "$rex_sessionizer"
+fi
+
 # Pi (settings, credentials, sessions, trust, and package state remain machine-local)
 pi_agent_dir="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
 case "$pi_agent_dir" in

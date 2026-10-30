@@ -1,5 +1,16 @@
+local source = vim.fn.resolve(debug.getinfo(1, 'S').source:sub(2))
+local dotfiles = vim.fn.fnamemodify(source, ':h:h:h:h:h')
+
 return {
   'christoomey/vim-tmux-navigator',
+  dependencies = {
+    {
+      name = 'vim-rex-navigator',
+      dir = dotfiles .. '/rex/vendor/vim-rex-navigator',
+      cond = vim.env.REX_SESSION ~= nil and vim.env.REX_SESSION ~= '',
+      opts = { focus = false, move = false, resize = false, close = false },
+    },
+  },
   init = function()
     vim.g.tmux_navigator_no_mappings = 1
   end,
@@ -14,8 +25,18 @@ return {
     local function navigate(direction)
       local target = directions[direction]
 
-      if vim.env.HERDR_ENV ~= '1' then
+      -- The inner multiplexer owns navigation when nested inside Rex.
+      if vim.env.TMUX and vim.env.TMUX ~= '' then
         vim.cmd(target.tmux)
+        return
+      end
+
+      if vim.env.HERDR_ENV ~= '1' then
+        if vim.env.REX_SESSION and vim.env.REX_SESSION ~= '' then
+          require('vim-rex-navigator').focus(target.herdr)
+        else
+          vim.cmd(target.tmux)
+        end
         return
       end
 
