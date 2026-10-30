@@ -11,6 +11,7 @@ local headers = {
   'ragrats',
   'tighten',
   'tighten-melt',
+  'jesseleite-reaper',
 }
 
 local function get_random_header()
