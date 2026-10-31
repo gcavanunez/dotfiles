@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Rex command tabs do not read interactive .zshrc, where Homebrew is often
+# added to PATH. Preserve Rex's injected CLI path and append missing brew dirs.
+if [[ "$(uname -s)" == Darwin ]]; then
+    for bin in /opt/homebrew/bin /usr/local/bin; do
+        if [[ -d "$bin" && ":$PATH:" != *":$bin:"* ]]; then
+            export PATH="$PATH:$bin"
+        fi
+    done
+fi
+
 usage() {
     printf 'Usage: rex-sessionizer [--list] [--client CLIENT]\n'
 }
@@ -96,38 +106,55 @@ if [[ -z "$client" ]]; then
 fi
 
 find_project_session() {
-    local project="$1" session_id blocks block_id process cwd
+    local project="$1" session_id blocks block_id window_id process cwd
     while IFS= read -r session_id; do
         # Sessions or panes can disappear while the picker is open.
         blocks=$(rex block ls -s "$session_id" --json 2>/dev/null) || continue
-        while IFS= read -r block_id; do
+        while IFS=$'\t' read -r block_id window_id; do
             process=$(rex block call -s "$session_id" -b "$block_id" process 2>/dev/null) || continue
             cwd=$(jq -r '.foreground.cwd // .child.cwd // empty' <<< "$process")
             if [[ "$cwd" == "$project" ]]; then
-                printf '%s\n' "$session_id"
+                printf '%s\t%s\t%s\n' "$session_id" "$window_id" "$block_id"
                 return
             fi
-        done < <(jq -r '.blocks[] | select(.creator_name == "com.superlogical.terminal") | .block_id' <<< "$blocks")
+        done < <(jq -r '.blocks[] | select(.creator_name == "com.superlogical.terminal" and .placement == "placed" and .window_id != null) | [.block_id, .window_id] | @tsv' <<< "$blocks")
     done < <(jq -r '.sessions[].session_id' <<< "$sessions")
 }
 
+target_window=""
+target_block=""
 case "$kind" in
     session) target="$value" ;;
     project)
         project=$(cd -- "$value" && pwd -P)
         # Refresh after fzf, so a session started while selecting can be reused.
         sessions=$(rex ls --json)
-        target=$(find_project_session "$project")
-        if [[ -z "$target" ]]; then
+        match=$(find_project_session "$project")
+        if [[ -n "$match" ]]; then
+            IFS=$'\t' read -r target target_window target_block <<< "$match"
+        else
             label=$(basename "$project")
             created=$(rex new "$label" -c "$project" --window Terminal --json)
             target=$(jq -er '.session_id' <<< "$created")
+            target_window=$(jq -r '.initial_windows[0].window_id // empty' <<< "$created")
+            target_block=$(jq -r '.initial_windows[0].block_ids[0] // empty' <<< "$created")
         fi
         ;;
     *) printf 'rex-sessionizer: invalid picker selection\n' >&2; exit 1 ;;
 esac
 
-if ! rex -C "$client" do session.select "session_id=$target"; then
+# Reusing a session must also navigate to the pane whose cwd matched. The
+# session can already be selected while its matching project is in another tab.
+if [[ -n "$target_block" ]]; then
+    rex focus -s "$target" "$target_block"
+fi
+
+selection_args=("session_id=$target")
+if [[ -n "$target_window" ]]; then
+    selection_args+=("window_id=$target_window")
+fi
+# The action belongs to the destination, not to this picker's source block.
+if ! REX_BLOCK= rex -C "$client" do -s "$target" session.select "${selection_args[@]}"; then
     printf 'rex-sessionizer: could not display %s. Enable Remote Control in Rex Settings → Rex Server. The session has been kept.\n' "$target" >&2
     exit 1
 fi

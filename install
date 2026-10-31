@@ -97,6 +97,17 @@ else
     ln -s "$DOTFILES/rex/rex-sessionizer" "$rex_sessionizer"
 fi
 
+# Rex themes are available for per-app import, not applied automatically.
+rex_themes="$rex_config_dir/themes"
+if [[ -e "$rex_themes" || -L "$rex_themes" ]]; then
+    if [[ ! -L "$rex_themes" || "$(readlink "$rex_themes")" != "$DOTFILES/rex/themes" ]]; then
+        echo "Rex themes already exist — merge $rex_themes before linking" >&2
+        exit 1
+    fi
+else
+    ln -s "$DOTFILES/rex/themes" "$rex_themes"
+fi
+
 # Pi (settings, credentials, sessions, trust, and package state remain machine-local)
 pi_agent_dir="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
 case "$pi_agent_dir" in
