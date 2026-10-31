@@ -134,7 +134,7 @@ case "$kind" in
             IFS=$'\t' read -r target target_window target_block <<< "$match"
         else
             label=$(basename "$project")
-            created=$(rex new "$label" -c "$project" --window Terminal --json)
+            created=$(rex new "$label" -c "$project" --json)
             target=$(jq -er '.session_id' <<< "$created")
             target_window=$(jq -r '.initial_windows[0].window_id // empty' <<< "$created")
             target_block=$(jq -r '.initial_windows[0].block_ids[0] // empty' <<< "$created")

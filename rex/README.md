@@ -84,6 +84,8 @@ The picker no longer creates a tab, but the pause is kept conservatively while
 the app receives the floating pane's layout. This is not an upstream fix.
 
 - Pick `[REX] ...` to switch to an existing session.
+- New sessions use the selected directory's basename as their session name;
+  tab/window names are left to Rex's defaults. Existing names are not changed.
 - Pick a project directory to reuse a session with a terminal working in that
   exact directory, or create a new session there. Reusing a session also selects
   the matching tab and focuses its pane, even if that session is already open
