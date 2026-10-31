@@ -106,6 +106,9 @@ the app receives the floating pane's layout. This is not an upstream fix.
   look for the remote session on the home server. Device labels must uniquely
   identify the connected app; missing or ambiguous matches fail before opening
   a picker rather than selecting another device.
+- That lookup runs in the local Rex server, not an interactive terminal. The
+  launcher resolves `REX_BIN_DIR` or the managed macOS Rex CLI explicitly so it
+  also works when the server's `PATH` does not contain `rex`.
 
 Switching the app requires **Settings → Rex Server → Remote Control**. The
 shortcut passes the originating client ID so it targets the right app. From a

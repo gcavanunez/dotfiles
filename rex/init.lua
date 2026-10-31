@@ -9,13 +9,36 @@ require('vendor.vim-rex-navigator.rex.vim-rex-navigator').setup({
   close = false,
 })
 
+local function local_rex_cli()
+  local candidates = {}
+  local bin_dir = os.getenv('REX_BIN_DIR')
+  if bin_dir and bin_dir ~= '' then
+    candidates[#candidates + 1] = bin_dir .. '/rex'
+  end
+  local home = os.getenv('HOME')
+  if home then
+    -- Rex injects its CLI into terminal PATH, not necessarily the server's
+    -- environment used by rex.exec. Use the managed Mac CLI without a shell.
+    candidates[#candidates + 1] = home .. '/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex'
+  end
+  for _, path in ipairs(candidates) do
+    local file = io.open(path, 'rb')
+    if file then
+      file:close()
+      return path
+    end
+  end
+  -- Packaged Linux installations and custom setups can use their normal PATH.
+  return 'rex'
+end
+
 local function sessionizer_client(ctx)
   if not ctx.server then return ctx.client_id end
 
   -- A remote-context action still runs in this server's config, and its
   -- client ID belongs here. Look up the same app's connection on the target.
   -- rex.exec runs locally, unlike rex.call, which follows ctx.server.
-  local inspected, err = rex.exec({ 'rex', 'client', 'inspect', ctx.client_id, '--json' }, { timeout = 5 })
+  local inspected, err = rex.exec({ local_rex_cli(), 'client', 'inspect', ctx.client_id, '--json' }, { timeout = 5 })
   if not inspected then error(err, 0) end
   if not inspected.ok then error('Could not identify the originating Rex app: ' .. inspected.stderr, 0) end
   local source, decode_err = rex.json.decode(inspected.stdout)
