@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# As with the project picker, command panes do not read interactive .zshrc.
+if [[ "$(uname -s)" == Darwin ]]; then
+    for bin in /opt/homebrew/bin /usr/local/bin; do
+        if [[ -d "$bin" && ":$PATH:" != *":$bin:"* ]]; then
+            export PATH="$PATH:$bin"
+        fi
+    done
+fi
+
+if [[ $# != 2 || -z "$1" || -z "$2" ]]; then
+    printf 'Usage: rex-copy-mode SESSION SOURCE_BLOCK\n' >&2
+    exit 2
+fi
+session="$1"
+source_block="$2"
+config="${XDG_CONFIG_HOME:-$HOME/.config}/rex/copy-mode.lua"
+for command in rex nvim; do
+    command -v "$command" >/dev/null 2>&1 || {
+        printf 'rex-copy-mode: %s is required\n' "$command" >&2
+        exit 1
+    }
+done
+[[ -f "$config" ]] || { printf 'rex-copy-mode: missing %s\n' "$config" >&2; exit 1; }
+
+umask 077
+directory=$(mktemp -d "${TMPDIR:-/tmp}/rex-copy-mode.XXXXXXXX")
+snapshot="$directory/snapshot.txt"
+cleanup() {
+    rm -f -- "$snapshot"
+    rmdir -- "$directory"
+    # Explicit IDs avoid targeting the viewer itself or another host's pane.
+    rex focus -s "$session" "$source_block" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+trap 'exit 130' HUP INT TERM
+
+# CLI capture handles large scrollback in chunks, unlike a single format call.
+rex capture -s "$session" -b "$source_block" --trim --unwrap > "$snapshot"
+nvim --noplugin -u "$config" -i NONE -n -R -- "$snapshot"

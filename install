@@ -96,6 +96,22 @@ if [[ -e "$rex_sessionizer" || -L "$rex_sessionizer" ]]; then
 else
     ln -s "$DOTFILES/rex/rex-sessionizer" "$rex_sessionizer"
 fi
+for relative in rex-copy-mode copy-mode.lua; do
+    if [[ "$relative" == rex-copy-mode ]]; then
+        target="$HOME/.local/bin/$relative"
+    else
+        target="$rex_config_dir/$relative"
+    fi
+    source="$DOTFILES/rex/$relative"
+    if [[ -e "$target" || -L "$target" ]]; then
+        if [[ ! -L "$target" || "$(readlink "$target")" != "$source" ]]; then
+            echo "Rex copy mode already exists — merge $target before linking" >&2
+            exit 1
+        fi
+    else
+        ln -s "$source" "$target"
+    fi
+done
 
 # Rex themes are available for per-app import, not applied automatically.
 rex_themes="$rex_config_dir/themes"

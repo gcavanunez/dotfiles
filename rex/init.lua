@@ -32,7 +32,7 @@ local function local_rex_cli()
   return 'rex'
 end
 
-local function sessionizer_client(ctx)
+local function originating_client(ctx)
   if not ctx.server then return ctx.client_id end
 
   -- A remote-context action still runs in this server's config, and its
@@ -64,6 +64,27 @@ local function sessionizer_client(ctx)
   return target
 end
 
+local function show_floating_layer(ctx, client_id, window_id)
+  local selection = { session_id = ctx.session_id, window_id = window_id }
+  if not ctx.server then rex.client.queue('session.select', selection) end
+  -- Keep the existing layout-update grace period before selecting the tab.
+  -- https://discord.com/channels/1546797889009881158/1560295127203717161
+  local pause, pause_err = rex.exec({ 'sleep', '0.3' }, { timeout = 1 })
+  if not pause then error(pause_err, 0) end
+  if not pause.ok then error('Could not wait for the floating pane: ' .. pause.stderr, 0) end
+  if ctx.server then
+    -- Queued client actions have no server field and run against the app's
+    -- home connection. Perform this one through the session's server instead.
+    local selected, select_err = rex.call('client.perform', {
+      client_id = client_id,
+      session_id = ctx.session_id,
+      action = 'session.select',
+      args = selection,
+    })
+    if not selected then error(select_err, 0) end
+  end
+end
+
 rex.action({
   name = 'project_sessionizer',
   title = 'Choose Project or Session',
@@ -73,7 +94,7 @@ rex.action({
     if not ctx.client_id or not ctx.session_id then
       error('Open the sessionizer from the Rex app, or run rex-sessionizer in a terminal.', 0)
     end
-    local client_id = sessionizer_client(ctx)
+    local client_id = originating_client(ctx)
     local window_id
     if ctx.block_id then
       local described, err = rex.session.describe_block({ block_id = ctx.block_id })
@@ -105,30 +126,49 @@ rex.action({
     if not layer then error(err, 0) end
     -- Keep the originating app on the existing tab containing the floating
     -- picker, including when the action runs for a remote session.
-    local selection = {
-      session_id = ctx.session_id,
-      window_id = window_id,
-    }
-    if not ctx.server then rex.client.queue('session.select', selection) end
-    -- Keep the existing layout-update grace period before selecting the tab.
-    -- https://discord.com/channels/1546797889009881158/1560295127203717161
-    local pause, pause_err = rex.exec({ 'sleep', '0.3' }, { timeout = 1 })
-    if not pause then error(pause_err, 0) end
-    if not pause.ok then error('Could not wait for the floating picker: ' .. pause.stderr, 0) end
-    if ctx.server then
-      -- Queued client actions have no server field and run against the app's
-      -- home connection. Perform this one through the session's server instead.
-      local selected, select_err = rex.call('client.perform', {
-        client_id = client_id,
-        session_id = ctx.session_id,
-        action = 'session.select',
-        args = selection,
-      })
-      if not selected then error(select_err, 0) end
-    end
+    show_floating_layer(ctx, client_id, window_id)
     return layer
   end,
 })
 
 -- Match the tmux sessionizer: prefix Ctrl+Space, then f.
 rex.bind('ctrl+space>f', 'project_sessionizer')
+
+rex.action({
+  name = 'copy_mode',
+  title = 'Copy Pane Snapshot',
+  description = 'Browse and yank a read-only Neovim snapshot of the pane and its scrollback.',
+  category = 'Pane',
+  run = function(ctx)
+    if not ctx.client_id or not ctx.session_id or not ctx.block_id then
+      error('Open Copy Pane Snapshot from a terminal pane in the Rex app.', 0)
+    end
+    local client_id = originating_client(ctx)
+    local described, describe_err = rex.session.describe_block({ block_id = ctx.block_id })
+    if not described then error(describe_err, 0) end
+    local window_id = described.block.window_id
+    if not window_id then error('The source pane must be in a Rex tab.', 0) end
+    local layer, err = rex.session.new_layer({
+      window_id = window_id,
+      bounds = { 0.025, 0.025, 0.95, 0.95 },
+      focus = true,
+      layout = rex.layout.block({
+        flavor = 'com.superlogical.terminal.shell',
+        label = 'Copy snapshot',
+        options = {
+          -- Capture and temporary files belong to the terminal's host, not
+          -- necessarily the home server executing this config action.
+          command = {
+            'sh', '-c', 'exec "$HOME/.local/bin/rex-copy-mode" "$@"',
+            'rex-copy-mode', ctx.session_id, ctx.block_id,
+          },
+        },
+      }),
+    })
+    if not layer then error(err, 0) end
+    show_floating_layer(ctx, client_id, window_id)
+    return layer
+  end,
+})
+
+rex.bind('ctrl+space>[', 'copy_mode')

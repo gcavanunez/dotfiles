@@ -18,7 +18,8 @@ then Herdr, then Rex. Outside Rex, existing navigation remains unchanged.
 Run the dotfiles `install` script. It links `init.lua`, `vendor`, and `themes` under
 `${XDG_CONFIG_HOME:-$HOME/.config}/rex`, refusing to replace unrelated files.
 Rex's server state and Tailscale credentials are not part of these dotfiles.
-The installer also links `rex-sessionizer` into `~/.local/bin`.
+The installer also links `rex-sessionizer` and `rex-copy-mode` into `~/.local/bin`,
+and `copy-mode.lua` into Rex's config directory.
 
 Then validate and load the bindings:
 
@@ -123,3 +124,40 @@ List candidates without opening a picker or changing sessions:
 ```sh
 rex-sessionizer --list
 ```
+
+## Snapshot copy mode (trial)
+
+Press **Ctrl+Space, then [**, or choose **Copy Pane Snapshot** from the command
+palette. A nearly full-tab floating, read-only Neovim viewer opens at the bottom
+of the source pane's captured output. The original program keeps running.
+
+- Use Vim motions, `gg`/`G`, Ctrl+U/D, and `/`/`?` to navigate and search.
+- `v`, `V`, or Ctrl+V starts character, line, or rectangular selection.
+- `y` copies a selection and closes; normal-mode `yy` copies the current line.
+- Enter copies the selection (or current line) and closes.
+- `q`, Esc, or Ctrl+C cancels without copying. Focus returns to the source pane.
+
+This is **not native Rex copy mode**: it is a plain-text snapshot, without live
+updates or terminal colors. Normal shell scrollback is included; alternate-screen
+apps (Neovim, OpenCode, lazygit, etc.) expose only their current visible screen,
+not their hidden history. Soft-wrapped lines are joined before viewing.
+
+Neovim 0.10+ with `vim.ui.clipboard.osc52` is required on each terminal host.
+The viewer ignores your Neovim configuration/plugins and disables modelines,
+swap, undo files, and clipboard reads. Copying uses OSC52 through Rex to the
+viewing app's clipboard, not `pbcopy` or Wayland on the remote machine. Rex must
+allow terminal clipboard writes and be active (background writes were ignored
+in the tested Mac build). Other apps viewing the same pane may also
+receive clipboard writes; the floating layer and its focus are shared session
+state, not a private per-device view.
+
+Capturing and private temporary files stay on the source host; normal exit or
+cancellation removes them. A force-kill/crash can leave a `rex-copy-mode.*`
+temporary directory behind. Install both new links on remote hosts and reload
+their configs as well as the app's home config. No server restart is required.
+
+Inspired by the snapshot-viewer approach in the
+[community copy-mode thread](https://discord.com/channels/1546797889009881158/1558373508117958686)
+and [catsby's example](https://gist.github.com/catsby/0fd3d65ae905ee645a5e7de89b17b5df).
+This implementation captures on the target host and uses OSC52 instead of the
+example's host-local temporary files and clipboard provider.
