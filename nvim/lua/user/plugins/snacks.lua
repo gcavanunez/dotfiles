@@ -73,6 +73,29 @@ local function git_diff_commit_open(item)
     layout = 'ivy',
     title = commit:sub(1, 8) .. ' ' .. subject,
     previewers = { git = { native = true }, diff = { native = true } },
+    confirm = function(picker, file_item)
+      local path = file_item and Snacks.picker.util.path(file_item)
+      if path then
+        path = vim.fs.normalize(vim.fn.fnamemodify(path, ':p'))
+        local function matches(buf)
+          return vim.fs.normalize(vim.api.nvim_buf_get_name(buf)) == path
+        end
+        local main_buf = vim.api.nvim_win_get_buf(picker.main)
+        if matches(main_buf) then
+          require('user.gitsigns_commit_base').set(main_buf, commit)
+        else
+          vim.api.nvim_create_autocmd('BufEnter', {
+            callback = function(ev)
+              if matches(ev.buf) then
+                require('user.gitsigns_commit_base').set(ev.buf, commit)
+                return true
+              end
+            end,
+          })
+        end
+      end
+      picker:action('jump')
+    end,
   })
 end
 

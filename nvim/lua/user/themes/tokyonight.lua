@@ -36,6 +36,9 @@ return {
         fg = c.fg_gutter,
       }
 
+      -- Signs for changes from a reviewed commit (see user.gitsigns_commit_base)
+      hl.GitSignsCommit = { fg = c.yellow }
+
       -- Tabs
       hl.TabActive = {
         bg = c.bg,

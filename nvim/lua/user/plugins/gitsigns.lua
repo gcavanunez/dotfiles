@@ -8,6 +8,13 @@ return {
     { 'gS', '<cmd>Gitsigns undo_stage_hunk<CR>' },
     { 'gp', '<cmd>Gitsigns preview_hunk<CR>' },
     { 'gb', '<cmd>Gitsigns blame_line<CR>' },
+    {
+      '<leader>gr',
+      function()
+        require('user.gitsigns_commit_base').reset()
+      end,
+      desc = 'Reset Gitsigns Base',
+    },
   },
   opts = {
     preview_config = {
