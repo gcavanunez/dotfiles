@@ -113,6 +113,16 @@ for relative in rex-copy-mode copy-mode.lua; do
     fi
 done
 
+rex_lucuma_restart="$HOME/.local/bin/rex-lucuma-restart"
+if [[ -e "$rex_lucuma_restart" || -L "$rex_lucuma_restart" ]]; then
+    if [[ ! -L "$rex_lucuma_restart" || "$(readlink "$rex_lucuma_restart")" != "$DOTFILES/rex/rex-lucuma-restart" ]]; then
+        echo "Rex Lucuma restart helper already exists — merge $rex_lucuma_restart before linking" >&2
+        exit 1
+    fi
+else
+    ln -s "$DOTFILES/rex/rex-lucuma-restart" "$rex_lucuma_restart"
+fi
+
 # Rex themes are available for per-app import, not applied automatically.
 rex_themes="$rex_config_dir/themes"
 if [[ -e "$rex_themes" || -L "$rex_themes" ]]; then

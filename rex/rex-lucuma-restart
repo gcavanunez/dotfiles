@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""Activate Lucuma's installed Rex package through an independent SSH connection."""
+
+import argparse
+import json
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import sys
+import time
+
+
+SSH_TARGET = "lucuma@100.101.46.13"
+HOST_ID = "40bdf783-823d-4083-b1a7-517069b9459a"
+TAILSCALE_NAME = "arch-lucuma-rex"
+TAILSCALE_DNS = TAILSCALE_NAME + ".tailbcce82.ts.net"
+REX = "/usr/bin/rex"
+BOOT_ID = Path("/proc/sys/kernel/random/boot_id")
+
+
+def rex(*args):
+    # Always use Lucuma's local personal server, never inherited pane routing.
+    env = dict(os.environ)
+    for name in ("REX_SERVER", "REX_CLIENT", "REX_SESSION", "REX_BLOCK"):
+        env.pop(name, None)
+    result = subprocess.run(
+        [REX, "--autostart=false", *args],
+        env=env, capture_output=True, text=True, timeout=60,
+    )
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "Rex command failed")
+    return result.stdout
+
+
+def identity():
+    info = json.loads(rex("whoami", "--json"))
+    if info.get("account") != "lucuma" or info.get("host_id") != HOST_ID:
+        raise RuntimeError("Not Lucuma's expected personal Rex server; refusing.")
+    return info
+
+
+def inspect_remote():
+    info = identity()
+    tailscale = info.get("tailscale", {})
+    if (tailscale.get("dns_name") != TAILSCALE_DNS
+            or tailscale.get("allow_tailnet_members") is not False):
+        raise RuntimeError("Lucuma's Tailscale configuration changed; review it first.")
+    first_line = rex("version").splitlines()[0].split()
+    if len(first_line) != 2 or first_line[0] != "rex":
+        raise RuntimeError("Could not read the installed Rex version.")
+    return {
+        "installed": first_line[1],
+        "running": info["rex_version"],
+        "host_id": info["host_id"],
+        "instance_id": info["instance_id"],
+        "pid": info["pid"],
+        "sessions": info["session_count"],
+        "boot_id": BOOT_ID.read_text().strip(),
+    }
+
+
+def restart_remote(expected):
+    # Recheck after confirmation: never stop a different server or activate a
+    # package that changed while the person was deciding.
+    before = inspect_remote()
+    if before != expected:
+        raise RuntimeError("Server, package, or session count changed; rerun to review.")
+    if before["installed"] == before["running"]:
+        raise RuntimeError("Rex already matches the installed package; no restart needed.")
+    for unit in ("rex.service", "rex.socket", "rex-login-server.service",
+                 "rex-login-server.socket"):
+        result = subprocess.run(
+            ["systemctl", "is-active", unit],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.stdout.strip() not in ("inactive", "unknown"):
+            raise RuntimeError(f"Cannot confirm {unit} is inactive; refusing to restart.")
+
+    # Finish bringing the server back even if the SSH client disconnects after
+    # confirmation. No input is needed on this non-interactive SSH worker.
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    rex("server", "stop")
+    rex("server", "start", "--tailscale", "--tailscale-hostname", TAILSCALE_NAME,
+        "--json")
+
+    deadline = time.monotonic() + 90
+    while True:
+        after = identity()
+        if after["rex_version"] != before["installed"]:
+            raise RuntimeError("Server started, but its version does not match the package.")
+        if BOOT_ID.read_text().strip() != before["boot_id"]:
+            raise RuntimeError("The machine rebooted during the operation; review its state.")
+        tailscale = after.get("tailscale", {})
+        if tailscale.get("allow_tailnet_members") is not False:
+            raise RuntimeError("Server started with unexpected Tailscale access settings.")
+        if (tailscale.get("state") == "running"
+                and tailscale.get("dns_name") == TAILSCALE_DNS
+                and tailscale.get("https", {}).get("state") == "available"):
+            return {"status": rex("server", "status")}
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "New Rex server is running, but Tailscale is not ready after 90 seconds. "
+                "Check it over SSH before retrying; do not restart blindly."
+            )
+        time.sleep(2)
+
+
+def remote(action, expected=None):
+    # Stream this same helper to Python over SSH; no remote install or local Rex
+    # executable is required. Durable copies of the helper still sync via Git.
+    args = ["python3", "-", "__remote", action]
+    if expected is not None:
+        args.append(json.dumps(expected))
+    result = subprocess.run(
+        ["ssh", "-T", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes",
+         "-o", "ConnectTimeout=8", "-o", "ServerAliveInterval=10",
+         "-o", "ServerAliveCountMax=3", SSH_TARGET, shlex.join(args)],
+        input=Path(__file__).resolve().read_text(),
+        capture_output=True, text=True, timeout=180,
+    )
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "SSH helper failed")
+    return json.loads(result.stdout)
+
+
+def main():
+    # Internal entry point only for code streamed over SSH, not a confirmation
+    # bypass exposed as a local command-line flag.
+    if sys.argv[1:2] == ["__remote"]:
+        if __file__ != "<stdin>" or not os.environ.get("SSH_CONNECTION"):
+            raise RuntimeError("Internal mode is only available through SSH stdin.")
+        if sys.argv[2:] == ["check"]:
+            result = inspect_remote()
+        elif len(sys.argv) == 4 and sys.argv[2] == "restart":
+            result = restart_remote(json.loads(sys.argv[3]))
+        else:
+            raise RuntimeError("Invalid SSH helper request.")
+        print(json.dumps(result))
+        return 0
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true",
+                        help="only report installed/running versions; never restart")
+    args = parser.parse_args()
+    before = remote("check")
+    print(f"Lucuma installed Rex: {before['installed']}")
+    print(f"Lucuma running Rex:   {before['running']}")
+    print(f"Rex sessions:        {before['sessions']}")
+    if before["installed"] == before["running"]:
+        print("Already running the installed version; nothing to restart.")
+        return 0
+    if args.check:
+        print("Restart needed to activate the installed package. No changes made.")
+        return 0
+    if sys.platform != "darwin":
+        raise RuntimeError("Run the restart helper on Air or Pro, not inside Lucuma's Rex.")
+    if not sys.stdin.isatty():
+        raise RuntimeError("Restart requires interactive confirmation. Use --check to inspect.")
+    print("WARNING: this ends programs in ALL Lucuma Rex sessions.")
+    print("No packages will be installed and the machine will not reboot.")
+    try:
+        answer = input("Type 'restart' to activate the installed version, or Enter to cancel: ")
+    except EOFError:
+        answer = ""
+    if answer.strip() != "restart":
+        print("Cancelled; no changes made.")
+        return 0
+    print("Restarting over independent SSH; waiting for Tailscale (up to 90 seconds)...",
+          flush=True)
+    result = remote("restart", before)
+    print(result["status"], end="")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\nInterrupted. If restart was confirmed, check server status over SSH.",
+              file=sys.stderr)
+        sys.exit(130)
+    except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError) as exc:
+        print(f"rex-lucuma-restart: {exc}", file=sys.stderr)
+        sys.exit(1)
