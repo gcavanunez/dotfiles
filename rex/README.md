@@ -19,7 +19,7 @@ Run the dotfiles `install` script. It links `init.lua`, `vendor`, and `themes` u
 `${XDG_CONFIG_HOME:-$HOME/.config}/rex`, refusing to replace unrelated files.
 Rex's server state and Tailscale credentials are not part of these dotfiles.
 The installer also links `rex-sessionizer`, `rex-copy-mode`, and
-`rex-lucuma-restart` into `~/.local/bin`, and `copy-mode.lua` into Rex's config
+`lucuma-update` into `~/.local/bin`, and `copy-mode.lua` into Rex's config
 directory.
 
 Then validate and load the bindings:
@@ -32,41 +32,38 @@ rex config reload
 Restart Neovim to load the updated navigation configuration. For remote Rex
 servers, install the configuration and reload it on the remote machine too.
 
-## Activate Rex updates on Lucuma
+## Update Lucuma and restart Rex
 
-Run `omarchy update` on Lucuma to install updates. Its manually started personal
-Rex server keeps running the old version until restarted; an update does not
-necessarily install a new Rex package, so check before interrupting sessions.
-
-After the update, run this **on Air or Pro in a Mac-hosted terminal**:
+From **Air or Pro in a Mac-hosted terminal**, run:
 
 ```sh
-rex-lucuma-restart --check  # report versions only; never restart
-rex-lucuma-restart          # ask before restarting, only if versions differ
+lucuma-update
 ```
 
-The helper uses the existing SSH key and known-host entry for
-`lucuma@100.101.46.13`. It needs Python 3 and SSH on the Mac, Python 3 and
-`/usr/bin/rex` on Lucuma; it does not depend on the Mac's `rex` being in `PATH`.
-It verifies Lucuma's existing Rex host ID and Tailscale name, displays the
-installed/running versions and session count, and requires typing `restart` at
-an interactive prompt. Enter cancels; there is no non-interactive `--yes` flag.
+This small Bash script opens an interactive SSH connection to
+`lucuma@100.101.46.13` and runs `omarchy update`, including its normal sudo and
+update prompts. If the update exits unsuccessfully, the script stops without
+restarting Rex. On success, type `restart` at the final prompt to run:
 
-**Restarting ends programs in every Lucuma Rex session.** Do not launch it from
-a Lucuma-hosted Rex pane or via an SSH chain whose lifetime depends on that pane.
-Restart mode refuses non-macOS callers; `--check` is read-only on any caller.
-The operation runs through independent SSH, not through the Rex server it stops.
-It rechecks the server/package after confirmation, refuses active standard Rex
-systemd units, preserves `--tailscale --tailscale-hostname arch-lucuma-rex`, and
-waits up to 90 seconds for Rex to report its Tailscale HTTPS endpoint available.
-It verifies the new version and unchanged host/boot identity, then prints
-`rex server status`. If startup fails, inspect over SSH before retrying.
+```sh
+/usr/bin/rex --autostart=false server stop
+/usr/bin/rex server start --tailscale --tailscale-hostname arch-lucuma-rex
+/usr/bin/rex server status
+```
 
-This is a manual activation helper, **not** an automatic Omarchy hook. It does
-not run updates, change repositories, bypass trust checks, enable services, or
-reboot the machine. Only the helper link is needed; no Rex config reload is
-necessary. If Lucuma is replaced or its identity changes, review the constants
-in the helper rather than bypassing SSH host verification.
+Enter at that prompt leaves Rex running. A confirmed restart happens even if
+the update did not change the Rex package; there is no version-checking layer.
+The status command may initially show Tailscale still starting.
+
+**Restarting ends programs in all Lucuma Rex sessions.** Use a Mac-hosted
+terminal, not a Lucuma-hosted Rex pane or an SSH chain dependent on one. The
+independent SSH connection survives stopping Rex. Existing SSH keys and host
+trust are required; no Python or local Rex CLI is needed.
+
+The script keeps the current manually started personal server setup. It does
+not enable services, add update hooks, bypass trust checks, or reboot the machine.
+Only its `~/.local/bin/lucuma-update` link is needed; no config reload is required.
+The previous `rex-lucuma-restart` Python helper and its managed link are retired.
 
 ## Colors
 
