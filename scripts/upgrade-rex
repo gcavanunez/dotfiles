@@ -6,7 +6,7 @@ readonly CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/rex/upgrade.conf"
 
 if [[ $# == 1 && "$1" == --help ]]; then
   echo "Usage: ${0##*/}"
-  echo 'Run locally on Omarchy, outside Rex: update packages, then restart the personal Rex server.'
+  echo 'Restart the local personal Rex server using the already installed package.'
   exit 0
 fi
 if [[ $# != 0 ]]; then
@@ -14,15 +14,15 @@ if [[ $# != 0 ]]; then
   exit 2
 fi
 if [[ $(uname -s) != Linux ]]; then
-  echo 'Error: this Rex updater is for Omarchy Linux.' >&2
+  echo 'Error: this Rex restart script is for Linux.' >&2
   exit 1
 fi
 if [[ -n ${REX_SESSION:-} ]]; then
   echo 'Error: run this from SSH or a terminal outside Rex; restarting Rex ends its programs.' >&2
   exit 1
 fi
-command -v omarchy >/dev/null 2>&1 && [[ -x "$REX_BIN" ]] || {
-  echo 'Error: Omarchy and the packaged Rex CLI are required.' >&2
+[[ -x "$REX_BIN" ]] || {
+  echo 'Error: the packaged Rex CLI is required.' >&2
   exit 1
 }
 [[ -f "$CONFIG_PATH" ]] || {
@@ -35,8 +35,7 @@ REX_START_ARGS=()
 source "$CONFIG_PATH"
 unset REX_SERVER REX_CLIENT REX_SESSION REX_BLOCK
 
-echo 'Updating system packages. On success, Rex will restart and its running programs will end.'
-omarchy update
+echo 'Restarting Rex. Programs running in its sessions will end.'
 "$REX_BIN" --autostart=false server stop
 if (( ${#REX_START_ARGS[@]} )); then
   "$REX_BIN" server start "${REX_START_ARGS[@]}"

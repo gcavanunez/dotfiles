@@ -17,11 +17,12 @@ Checked through **Server & CLI preview.18 on 2026-11-12**, using Superlogical MC
 - Rex for Mac has `client.server.restart`, but it explicitly restarts the
   app's **local** server. It is not a Linux-server update/restart command.[5]
 
-For the existing manually started setup, a small **local** Bash updater can
-run the supported package upgrade, then use Rex's native stop/start commands.
+For the existing manually started setup, upgrade packages separately, then use
+Rex's native stop/start commands from a small **local** Bash script.
 Run it outside the server being restarted. Keep host-specific flags in a
 private configuration file outside the public checkout, not in the script.
-The repository's `scripts/upgrade-rex` follows that approach for Omarchy.
+The repository's `scripts/upgrade-rex` only performs that restart/status step;
+SSH and package updates are left to the caller.
 
 These findings describe documented shipped behavior, not every build's hidden
 commands. Community proposals alone are not evidence of a shipped updater.

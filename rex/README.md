@@ -31,21 +31,20 @@ rex config reload
 Restart Neovim to load the updated navigation configuration. For remote Rex
 servers, install the configuration and reload it on the remote machine too.
 
-## Update Rex on Omarchy
+## Activate an installed Rex update
 
-Like the other `scripts/upgrade-*` commands, run this on the machine being
-updated, from an SSH session or a terminal **outside Rex**:
+Handle SSH and package updates yourself, then run this on the machine being
+updated from a terminal **outside Rex**:
 
 ```sh
 ~/dotfiles/scripts/upgrade-rex
 ```
 
-It runs `omarchy update` with its normal confirmation/sudo prompts, then stops
-and starts the personal Rex server and prints its status. If the update fails,
-Rex is left running. This updates system packages too, not just Rex, and a
-successful run restarts Rex even when the Rex package did not change.
+Despite its name, this script only activates the already installed Rex version:
+it stops and starts the personal Rex server and prints its status. It does not
+SSH, run `omarchy update`, install packages, or check for newer releases.
 **The restart ends programs in all Rex sessions.** There is no additional
-restart prompt, remote connection, service migration, or automatic reboot.
+restart prompt, service migration, or automatic reboot.
 
 Before the first run, put the server's existing start options in the private,
 machine-local `${XDG_CONFIG_HOME:-$HOME/.config}/rex/upgrade.conf`, for example:
@@ -57,11 +56,11 @@ REX_START_ARGS=()  # no extra flags; otherwise use this machine's actual options
 For embedded Tailscale, add `--tailscale` and `--tailscale-hostname` with the
 existing private hostname to that array. Keep this file outside the checkout,
 do not symlink it into dotfiles, and restrict it to your account (`chmod 600`).
-It is sourced as trusted Bash configuration. The updater refuses to run if it
+It is sourced as trusted Bash configuration. The script refuses to run if it
 is missing, rather than silently dropping the server's existing options.
 
 No machine address, hostname, host ID, or SSH target belongs in this public
-updater. Start options stay local, as do server state and credentials.
+restart script. Start options stay local, as do server state and credentials.
 See [first-party upgrade/restart support](UPGRADING.md) for the checked Rex docs.
 
 ## Colors
