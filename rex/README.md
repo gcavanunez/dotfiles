@@ -18,9 +18,8 @@ then Herdr, then Rex. Outside Rex, existing navigation remains unchanged.
 Run the dotfiles `install` script. It links `init.lua`, `vendor`, and `themes` under
 `${XDG_CONFIG_HOME:-$HOME/.config}/rex`, refusing to replace unrelated files.
 Rex's server state and Tailscale credentials are not part of these dotfiles.
-The installer also links `rex-sessionizer`, `rex-copy-mode`, and
-`lucuma-update` into `~/.local/bin`, and `copy-mode.lua` into Rex's config
-directory.
+The installer also links `rex-sessionizer` and `rex-copy-mode` into `~/.local/bin`,
+and `copy-mode.lua` into Rex's config directory.
 
 Then validate and load the bindings:
 
@@ -32,38 +31,38 @@ rex config reload
 Restart Neovim to load the updated navigation configuration. For remote Rex
 servers, install the configuration and reload it on the remote machine too.
 
-## Update Lucuma and restart Rex
+## Update Rex on Omarchy
 
-From **Air or Pro in a Mac-hosted terminal**, run:
-
-```sh
-lucuma-update
-```
-
-This small Bash script opens an interactive SSH connection to
-`lucuma@100.101.46.13` and runs `omarchy update`, including its normal sudo and
-update prompts. If the update exits unsuccessfully, the script stops without
-restarting Rex. On success, type `restart` at the final prompt to run:
+Like the other `scripts/upgrade-*` commands, run this on the machine being
+updated, from an SSH session or a terminal **outside Rex**:
 
 ```sh
-/usr/bin/rex --autostart=false server stop
-/usr/bin/rex server start --tailscale --tailscale-hostname arch-lucuma-rex
-/usr/bin/rex server status
+~/dotfiles/scripts/upgrade-rex
 ```
 
-Enter at that prompt leaves Rex running. A confirmed restart happens even if
-the update did not change the Rex package; there is no version-checking layer.
-The status command may initially show Tailscale still starting.
+It runs `omarchy update` with its normal confirmation/sudo prompts, then stops
+and starts the personal Rex server and prints its status. If the update fails,
+Rex is left running. This updates system packages too, not just Rex, and a
+successful run restarts Rex even when the Rex package did not change.
+**The restart ends programs in all Rex sessions.** There is no additional
+restart prompt, remote connection, service migration, or automatic reboot.
 
-**Restarting ends programs in all Lucuma Rex sessions.** Use a Mac-hosted
-terminal, not a Lucuma-hosted Rex pane or an SSH chain dependent on one. The
-independent SSH connection survives stopping Rex. Existing SSH keys and host
-trust are required; no Python or local Rex CLI is needed.
+Before the first run, put the server's existing start options in the private,
+machine-local `${XDG_CONFIG_HOME:-$HOME/.config}/rex/upgrade.conf`, for example:
 
-The script keeps the current manually started personal server setup. It does
-not enable services, add update hooks, bypass trust checks, or reboot the machine.
-Only its `~/.local/bin/lucuma-update` link is needed; no config reload is required.
-The previous `rex-lucuma-restart` Python helper and its managed link are retired.
+```bash
+REX_START_ARGS=()  # no extra flags; otherwise use this machine's actual options
+```
+
+For embedded Tailscale, add `--tailscale` and `--tailscale-hostname` with the
+existing private hostname to that array. Keep this file outside the checkout,
+do not symlink it into dotfiles, and restrict it to your account (`chmod 600`).
+It is sourced as trusted Bash configuration. The updater refuses to run if it
+is missing, rather than silently dropping the server's existing options.
+
+No machine address, hostname, host ID, or SSH target belongs in this public
+updater. Start options stay local, as do server state and credentials.
+See [first-party upgrade/restart support](UPGRADING.md) for the checked Rex docs.
 
 ## Colors
 

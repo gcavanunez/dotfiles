@@ -113,21 +113,6 @@ for relative in rex-copy-mode copy-mode.lua; do
     fi
 done
 
-lucuma_update="$HOME/.local/bin/lucuma-update"
-if [[ -e "$lucuma_update" || -L "$lucuma_update" ]]; then
-    if [[ ! -L "$lucuma_update" || "$(readlink "$lucuma_update")" != "$DOTFILES/rex/lucuma-update" ]]; then
-        echo "Lucuma update script already exists — merge $lucuma_update before linking" >&2
-        exit 1
-    fi
-else
-    ln -s "$DOTFILES/rex/lucuma-update" "$lucuma_update"
-fi
-# Retire only this repo's old Python helper link, not an unrelated command.
-rex_lucuma_restart="$HOME/.local/bin/rex-lucuma-restart"
-if [[ -L "$rex_lucuma_restart" && "$(readlink "$rex_lucuma_restart")" == "$DOTFILES/rex/rex-lucuma-restart" ]]; then
-    rm "$rex_lucuma_restart"
-fi
-
 # Rex themes are available for per-app import, not applied automatically.
 rex_themes="$rex_config_dir/themes"
 if [[ -e "$rex_themes" || -L "$rex_themes" ]]; then
