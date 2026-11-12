@@ -41,26 +41,31 @@ updated from a terminal **outside Rex**:
 ```
 
 Despite its name, this script only activates the already installed Rex version:
-it stops and starts the personal Rex server and prints its status. It does not
-SSH, run `omarchy update`, install packages, or check for newer releases.
+it reloads the unit files, restarts the packaged **systemd user service**, and
+prints Rex's status. It does not SSH, run `omarchy update`, install packages,
+enable services, or check for newer releases.
 **The restart ends programs in all Rex sessions.** There is no additional
 restart prompt, service migration, or automatic reboot.
 
-Before the first run, put the server's existing start options in the private,
-machine-local `${XDG_CONFIG_HOME:-$HOME/.config}/rex/upgrade.conf`, for example:
+The user service must already be configured and enabled or active. The script
+uses only these native lifecycle commands:
 
-```bash
-REX_START_ARGS=()  # no extra flags; otherwise use this machine's actual options
+```sh
+systemctl --user daemon-reload
+systemctl --user restart rex.service
+/usr/bin/rex --autostart=false server status
 ```
 
-For embedded Tailscale, add `--tailscale` and `--tailscale-hostname` with the
-existing private hostname to that array. Keep this file outside the checkout,
-do not symlink it into dotfiles, and restrict it to your account (`chmod 600`).
-It is sourced as trusted Bash configuration. The script refuses to run if it
-is missing, rather than silently dropping the server's existing options.
+Keep this server's start flags (including any embedded Tailscale hostname) in
+a private user-service drop-in, normally
+`~/.config/systemd/user/rex.service.d/override.conf`, outside this checkout.
+Use `systemctl --user edit rex.service` for local changes. The helper no longer
+reads `rex/upgrade.conf` or starts an unmanaged server. For service-managed Rex,
+use `systemctl --user`, not the manual `rex server stop/start` workflow.
 
 No machine address, hostname, host ID, or SSH target belongs in this public
-restart script. Start options stay local, as do server state and credentials.
+restart script. The shared **system** service is not used; options, server
+state, and credentials remain machine-local.
 See [first-party upgrade/restart support](UPGRADING.md) for the checked Rex docs.
 
 ## Colors

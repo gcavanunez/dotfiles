@@ -17,12 +17,16 @@ Checked through **Server & CLI preview.18 on 2026-11-12**, using Superlogical MC
 - Rex for Mac has `client.server.restart`, but it explicitly restarts the
   app's **local** server. It is not a Linux-server update/restart command.[5]
 
-For the existing manually started setup, upgrade packages separately, then use
-Rex's native stop/start commands from a small **local** Bash script.
-Run it outside the server being restarted. Keep host-specific flags in a
-private configuration file outside the public checkout, not in the script.
-The repository's `scripts/upgrade-rex` only performs that restart/status step;
-SSH and package updates are left to the caller.
+For a manually started server, upgrade packages separately, then use Rex's
+native stop/start commands. For a service-managed personal server, the packaged
+user unit documents `systemctl --user daemon-reload` followed by
+`systemctl --user restart rex.service` after an upgrade. The repository's
+`scripts/upgrade-rex` performs that user-service restart and prints status.
+Run it outside the server being restarted; SSH and package updates are left
+to the caller. Host-specific flags belong in a private user-service drop-in
+outside the public checkout, not in the script. This is not the shared system
+service. For a remote embedded-Tailscale server, enabling the user service at
+boot brings up Tailscale without waiting for a local socket-activation request.
 
 These findings describe documented shipped behavior, not every build's hidden
 commands. Community proposals alone are not evidence of a shipped updater.

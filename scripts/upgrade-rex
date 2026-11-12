@@ -2,11 +2,11 @@
 set -euo pipefail
 
 readonly REX_BIN="/usr/bin/rex"
-readonly CONFIG_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/rex/upgrade.conf"
+readonly SERVICE="rex.service"
 
 if [[ $# == 1 && "$1" == --help ]]; then
   echo "Usage: ${0##*/}"
-  echo 'Restart the local personal Rex server using the already installed package.'
+  echo 'Restart the local Rex systemd user service using the already installed package.'
   exit 0
 fi
 if [[ $# != 0 ]]; then
@@ -21,25 +21,18 @@ if [[ -n ${REX_SESSION:-} ]]; then
   echo 'Error: run this from SSH or a terminal outside Rex; restarting Rex ends its programs.' >&2
   exit 1
 fi
-[[ -x "$REX_BIN" ]] || {
-  echo 'Error: the packaged Rex CLI is required.' >&2
+command -v systemctl >/dev/null 2>&1 && [[ -x "$REX_BIN" ]] || {
+  echo 'Error: systemd and the packaged Rex CLI are required.' >&2
   exit 1
 }
-[[ -f "$CONFIG_PATH" ]] || {
-  echo "Error: first put this server's REX_START_ARGS array in $CONFIG_PATH (outside dotfiles)." >&2
+if ! systemctl --user is-enabled --quiet "$SERVICE" &&
+   ! systemctl --user is-active --quiet "$SERVICE"; then
+  echo 'Error: configure the packaged Rex user service before using this restart script.' >&2
   exit 1
-}
-
-# Keep hostnames, Tailscale options, and other local flags out of public dotfiles.
-REX_START_ARGS=()
-source "$CONFIG_PATH"
-unset REX_SERVER REX_CLIENT REX_SESSION REX_BLOCK
-
-echo 'Restarting Rex. Programs running in its sessions will end.'
-"$REX_BIN" --autostart=false server stop
-if (( ${#REX_START_ARGS[@]} )); then
-  "$REX_BIN" server start "${REX_START_ARGS[@]}"
-else
-  "$REX_BIN" server start
 fi
-"$REX_BIN" server status
+
+unset REX_SERVER REX_CLIENT REX_SESSION REX_BLOCK
+echo 'Restarting Rex. Programs running in its sessions will end.'
+systemctl --user daemon-reload
+systemctl --user restart "$SERVICE"
+"$REX_BIN" --autostart=false server status
